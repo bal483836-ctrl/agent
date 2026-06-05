@@ -242,6 +242,100 @@
   .float-toggle.right { right: 0; border-radius: 4px 0 0 4px; border-right: none; display: none; }
   .left-panel.collapsed ~ .center-panel .float-toggle.left { display: flex; }
 
+  /* 技能中心弹层 */
+  .modal-mask {
+    position: fixed; inset: 0; background: rgba(15,23,42,0.45); z-index: 1000;
+    display: none; align-items: center; justify-content: center;
+  }
+  .modal-mask.show { display: flex; }
+  .modal {
+    background: #fff; width: 880px; max-width: 92vw; max-height: 86vh;
+    border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .modal-head {
+    padding: 14px 20px; border-bottom: 1px solid #e5e7eb; display: flex;
+    align-items: center; gap: 12px;
+  }
+  .modal-head .title { font-weight: 600; font-size: 15px; flex: 1; }
+  .modal-head .close { background: transparent; border: none; font-size: 18px; cursor: pointer; color: #6b7280; }
+  .modal-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
+  .modal-tabs { display: flex; gap: 16px; padding: 0 20px; border-bottom: 1px solid #e5e7eb; }
+  .modal-tab { padding: 10px 4px; font-size: 13px; color: #6b7280; cursor: pointer; border-bottom: 2px solid transparent; }
+  .modal-tab.active { color: #2563eb; border-bottom-color: #2563eb; }
+
+  .skill-toolbar { display: flex; gap: 10px; margin-bottom: 14px; align-items: center; }
+  .skill-toolbar input { flex: 1; padding: 7px 10px; border: 1px solid #e5e7eb; border-radius: 6px; outline: none; font-size: 13px; }
+  .upload-skill-btn {
+    background: #2563eb; color: #fff; border: none; padding: 7px 14px;
+    border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .upload-skill-btn:hover { background: #1d4ed8; }
+
+  .skill-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  .skill-tile {
+    border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; background: #fff;
+    cursor: pointer; transition: all 0.15s; position: relative;
+  }
+  .skill-tile:hover { border-color: #2563eb; box-shadow: 0 4px 12px rgba(37,99,235,0.08); transform: translateY(-1px); }
+  .skill-tile .row1 { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .skill-tile .ic {
+    width: 32px; height: 32px; background: #eff6ff; color: #2563eb;
+    border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .skill-tile .nm { font-weight: 600; font-size: 13px; flex: 1; }
+  .skill-tile .desc { font-size: 12px; color: #6b7280; line-height: 1.5; margin-bottom: 10px; min-height: 36px; }
+  .skill-tile .meta { display: flex; gap: 8px; font-size: 11px; color: #9ca3af; flex-wrap: wrap; }
+  .skill-tile .tag { background: #f3f4f6; padding: 2px 6px; border-radius: 3px; }
+  .skill-tile .tag.mine { background: #fef3c7; color: #92400e; }
+  .skill-tile .actions { position: absolute; top: 10px; right: 10px; display: none; gap: 4px; }
+  .skill-tile:hover .actions { display: flex; }
+  .skill-tile .actions button {
+    background: #fff; border: 1px solid #e5e7eb; padding: 2px 6px; border-radius: 4px;
+    font-size: 11px; cursor: pointer; color: #4b5563;
+  }
+  .skill-tile .actions button:hover { background: #f3f4f6; }
+  .skill-tile .actions .danger:hover { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+
+  /* 上传技能表单 */
+  .upload-form { display: flex; flex-direction: column; gap: 14px; }
+  .upload-dropzone {
+    border: 2px dashed #cbd5e1; border-radius: 8px; padding: 28px; text-align: center;
+    background: #f8fafc; cursor: pointer; transition: all 0.15s;
+  }
+  .upload-dropzone:hover { border-color: #2563eb; background: #eff6ff; }
+  .upload-dropzone .big { font-size: 32px; margin-bottom: 8px; }
+  .upload-dropzone .hint { font-size: 12px; color: #6b7280; margin-top: 4px; }
+  .form-row { display: flex; flex-direction: column; gap: 4px; }
+  .form-row label { font-size: 12px; color: #374151; font-weight: 500; }
+  .form-row label .req { color: #dc2626; }
+  .form-row input, .form-row select, .form-row textarea {
+    padding: 7px 10px; border: 1px solid #d1d5db; border-radius: 6px; outline: none;
+    font-size: 13px; font-family: inherit;
+  }
+  .form-row textarea { resize: vertical; min-height: 60px; }
+  .form-row .helper { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+  .manifest-check {
+    background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 10px 12px;
+    font-size: 12px; color: #166534;
+  }
+  .manifest-check ul { margin: 4px 0 0 16px; }
+  .modal-foot {
+    padding: 12px 20px; border-top: 1px solid #e5e7eb; display: flex;
+    justify-content: flex-end; gap: 10px; background: #fafbfc;
+  }
+
+  /* 技能详情 */
+  .skill-detail h3 { font-size: 14px; margin: 14px 0 6px; color: #1f2937; }
+  .skill-detail p, .skill-detail li { font-size: 13px; color: #4b5563; line-height: 1.7; }
+  .skill-detail ul { margin-left: 18px; }
+  .skill-detail .code {
+    background: #f6f8fa; border: 1px solid #e5e7eb; border-radius: 4px;
+    padding: 8px 10px; font-family: ui-monospace, Menlo, monospace; font-size: 12px;
+    white-space: pre-wrap; color: #1f2328;
+  }
+
   /* 滚动条 */
   ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
@@ -256,8 +350,6 @@
   <div class="logo">🧬 VaccineTrial AI</div>
   <div class="org">协和疫苗研究中心</div>
   <div class="nav-tab active">对话</div>
-  <div class="nav-tab">技能中心</div>
-  <div class="nav-tab">工作区管理</div>
   <div class="spacer"></div>
   <div class="user" title="张研究员">张</div>
 </div>
@@ -346,14 +438,20 @@
         <div class="body">
           <div class="name">VaccineTrial 助手 · 09:42</div>
           <div class="bubble">
-            已识别到您要执行 <b>CRF 数据比对</b>。我从右侧工作区找到了以下文件作为输入，请确认参数后执行：
+            已识别到您要执行 <b>CRF 数据比对</b>（匹配置信度 <b>92%</b>）。我从右侧工作区找到了以下文件作为输入，请确认参数后执行：
             <div class="skill-card">
               <div class="sk-head">
                 <div class="sk-icon">📊</div>
-                <div>
-                  <div class="sk-name">CRF 跨中心数据比对 <span class="sk-tag">Skill</span></div>
+                <div style="flex:1;">
+                  <div class="sk-name">CRF 跨中心数据比对 <span class="sk-tag">Skill</span> <span class="sk-tag" style="background:#fef3c7;color:#92400e;">本组织上传</span></div>
                   <div class="sk-desc">对两个研究中心相同字段进行行级比对，输出差异报告</div>
                 </div>
+                <button class="btn-secondary" style="font-size:11px;padding:3px 8px;">查看详情</button>
+              </div>
+              <div style="margin:8px 0 4px;font-size:11px;color:#6b7280;">
+                其他候选：
+                <a href="#" style="color:#2563eb;text-decoration:none;">数据一致性核查 (76%)</a>　·
+                <a href="#" style="color:#2563eb;text-decoration:none;">字段差异统计 (61%)</a>
               </div>
               <div class="sk-fields">
                 <div class="sk-field">
@@ -495,8 +593,8 @@
         <div class="input-bottom">
           <div class="input-toolbar">
             <button class="tool-btn" title="从工作区选择">📎 工作区文件</button>
-            <button class="tool-btn" title="临时上传">📤 临时上传</button>
-            <button class="tool-btn" title="技能">⚡ 技能</button>
+            <button class="tool-btn" title="上传文件">📤 上传文件</button>
+            <button class="tool-btn" id="skillCenterBtn" title="技能中心">⚡ 技能中心 ▾</button>
           </div>
           <div style="display:flex;gap:10px;align-items:center;">
             <span class="input-hint">已选 3 个上下文文件</span>
@@ -536,6 +634,107 @@
     </div>
   </aside>
 
+</div>
+
+<!-- 技能中心弹层 -->
+<div class="modal-mask" id="skillModal">
+  <div class="modal">
+    <div class="modal-head">
+      <span style="font-size:20px;">⚡</span>
+      <span class="title">技能中心</span>
+      <span style="font-size:12px;color:#6b7280;">本组织共 <b>12</b> 个技能 · 任意成员可用</span>
+      <button class="close" data-close>✕</button>
+    </div>
+    <div class="modal-tabs">
+      <div class="modal-tab active" data-tab="browse">浏览技能</div>
+      <div class="modal-tab" data-tab="mine">我上传的</div>
+      <div class="modal-tab" data-tab="upload">上传技能</div>
+    </div>
+
+    <!-- Tab: 浏览 -->
+    <div class="modal-body" data-pane="browse">
+      <div class="skill-toolbar">
+        <input type="text" placeholder="搜索技能名称、描述、标签…" />
+        <select style="padding:7px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:13px;">
+          <option>全部分类</option>
+          <option>数据比对</option>
+          <option>安全报告</option>
+          <option>数据提取</option>
+          <option>统计分析</option>
+        </select>
+        <button class="upload-skill-btn" data-goto-upload>＋ 上传技能</button>
+      </div>
+
+      <div class="skill-grid" id="skillGrid"></div>
+    </div>
+
+    <!-- Tab: 我上传的 -->
+    <div class="modal-body" data-pane="mine" style="display:none;">
+      <div style="font-size:12px;color:#6b7280;margin-bottom:12px;">您可以删除自己上传的技能，删除后本组织其他成员也将不可见。</div>
+      <div class="skill-grid" id="mySkillGrid"></div>
+    </div>
+
+    <!-- Tab: 上传 -->
+    <div class="modal-body" data-pane="upload" style="display:none;">
+      <div class="upload-form">
+        <div class="upload-dropzone" id="dropzone">
+          <div class="big">📦</div>
+          <div style="font-weight:500;">点击或拖拽上传技能包（.zip）</div>
+          <div class="hint">必须包含 <code>manifest.json</code> · 执行脚本 · 依赖清单 <code>requirements.txt</code></div>
+        </div>
+
+        <div class="manifest-check" style="display:none;" id="manifestCheck">
+          ✓ 技能包格式校验通过
+          <ul>
+            <li>manifest.json — 已识别（v1.0 schema）</li>
+            <li>main.py — 执行入口</li>
+            <li>requirements.txt — 6 个依赖</li>
+            <li>SHA-256: <code>3a7f...c91e</code></li>
+          </ul>
+        </div>
+
+        <div class="form-row">
+          <label>技能名称 <span class="req">*</span></label>
+          <input type="text" placeholder="例如：受试者依从性评估" />
+        </div>
+        <div class="form-row">
+          <label>简介 <span class="req">*</span></label>
+          <textarea placeholder="一句话说明技能用途，将展示在技能卡片上"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div class="form-row">
+            <label>分类</label>
+            <select>
+              <option>数据比对</option><option>安全报告</option>
+              <option>数据提取</option><option>统计分析</option><option>其他</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>输入文件类型</label>
+            <input type="text" placeholder="如：.xlsx, .csv, .pdf" />
+          </div>
+        </div>
+        <div class="form-row">
+          <label>参数说明</label>
+          <textarea placeholder="逐项说明参数名、含义、默认值"></textarea>
+        </div>
+        <div class="form-row">
+          <label>输出示例</label>
+          <input type="file" />
+          <div class="helper">可选，上传一张缩略图作为技能卡封面</div>
+        </div>
+
+        <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:10px 12px;font-size:12px;color:#92400e;">
+          ⚠ 上传后将<b>立即对本组织全部成员可见可用</b>，无需审批。请确保不包含未脱敏的受试者数据。
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn-secondary" data-close>取消</button>
+      <button class="btn-primary" id="confirmUploadBtn" style="display:none;">确认上传</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -651,11 +850,127 @@
   });
   document.querySelectorAll('.slash-item').forEach(item => {
     item.onclick = () => {
+      const name = item.querySelector('.nm').textContent;
+      insertSkillCard(name);
       input.value = '';
       slashMenu.classList.remove('show');
-      input.focus();
     };
   });
+
+  // ====== 技能中心弹层 ======
+  const skills = [
+    { ic: '📊', nm: 'CRF 跨中心数据比对', desc: '对两个研究中心相同字段进行行级比对，输出差异报告', cat: '数据比对', uses: 128, mine: true },
+    { ic: '⚠️', nm: 'SAE 报告生成', desc: '基于不良事件原始记录生成监管要求的严重不良事件报告', cat: '安全报告', uses: 87 },
+    { ic: '🔍', nm: '受试者数据提取', desc: '按入组日期、中心、访视等条件抽取受试者数据', cat: '数据提取', uses: 213 },
+    { ic: '📋', nm: '实验室异常值筛查', desc: '自动标记超出正常范围的检验值，按严重度分级', cat: '统计分析', uses: 156 },
+    { ic: '📈', nm: '入组进度统计', desc: '按中心、按周生成入组进度图表', cat: '统计分析', uses: 92 },
+    { ic: '📝', nm: '方案偏离汇总', desc: '识别并汇总方案偏离事件，输出 PDF 清单', cat: '安全报告', uses: 41, mine: true },
+    { ic: '💊', nm: '用药依从性评估', desc: '基于用药记录评估依从性比率', cat: '统计分析', uses: 63 },
+    { ic: '🧾', nm: 'CRF 字段缺失检查', desc: '快速识别 CRF 表中关键字段的缺失项', cat: '数据比对', uses: 178 },
+    { ic: '🩺', nm: 'AE 编码映射', desc: '将自由文本不良事件映射到 MedDRA 编码', cat: '安全报告', uses: 54 },
+    { ic: '📅', nm: '访视依从性分析', desc: '识别超窗、缺失访视的受试者', cat: '统计分析', uses: 76 },
+    { ic: '🔐', nm: '数据脱敏导出', desc: '按规则脱敏受试者标识后导出', cat: '数据提取', uses: 39 },
+    { ic: '📑', nm: 'DSMB 月度报告', desc: '生成数据与安全监察委员会月度报告草稿', cat: '安全报告', uses: 28, mine: true },
+  ];
+
+  function renderSkillGrid(container, list) {
+    container.innerHTML = '';
+    list.forEach(s => {
+      const tile = document.createElement('div');
+      tile.className = 'skill-tile';
+      tile.innerHTML = `
+        ${s.mine ? `<div class="actions">
+          <button title="编辑">✎</button>
+          <button class="danger" title="删除">🗑</button>
+        </div>` : ''}
+        <div class="row1">
+          <div class="ic">${s.ic}</div>
+          <div class="nm">${s.nm}</div>
+        </div>
+        <div class="desc">${s.desc}</div>
+        <div class="meta">
+          <span class="tag">${s.cat}</span>
+          ${s.mine ? '<span class="tag mine">我上传</span>' : ''}
+          <span style="margin-left:auto;">使用 ${s.uses} 次</span>
+        </div>
+      `;
+      tile.onclick = (e) => {
+        if (e.target.closest('.actions')) return;
+        closeModal();
+        insertSkillCard(s.nm);
+      };
+      container.appendChild(tile);
+    });
+  }
+  renderSkillGrid(document.getElementById('skillGrid'), skills);
+  renderSkillGrid(document.getElementById('mySkillGrid'), skills.filter(s => s.mine));
+
+  const skillModal = document.getElementById('skillModal');
+  function openModal(tab='browse') {
+    skillModal.classList.add('show');
+    switchTab(tab);
+  }
+  function closeModal() { skillModal.classList.remove('show'); }
+  function switchTab(t) {
+    document.querySelectorAll('.modal-tab').forEach(el => el.classList.toggle('active', el.dataset.tab === t));
+    document.querySelectorAll('[data-pane]').forEach(el => el.style.display = el.dataset.pane === t ? '' : 'none');
+    document.getElementById('confirmUploadBtn').style.display = (t === 'upload') ? '' : 'none';
+  }
+  document.getElementById('skillCenterBtn').onclick = () => openModal('browse');
+  document.querySelectorAll('[data-close]').forEach(b => b.onclick = closeModal);
+  document.querySelectorAll('.modal-tab').forEach(t => t.onclick = () => switchTab(t.dataset.tab));
+  document.querySelector('[data-goto-upload]').onclick = () => switchTab('upload');
+  skillModal.addEventListener('click', e => { if (e.target === skillModal) closeModal(); });
+
+  document.getElementById('dropzone').onclick = () => {
+    document.getElementById('manifestCheck').style.display = 'block';
+  };
+
+  // ====== 把一个 Skill 主动插入到对话中作为「待执行卡」 ======
+  function insertSkillCard(name) {
+    const messages = document.getElementById('messages');
+    const wrap = document.createElement('div');
+    wrap.className = 'msg ai';
+    wrap.innerHTML = `
+      <div class="avatar">AI</div>
+      <div class="body">
+        <div class="name">VaccineTrial 助手 · 主动调用</div>
+        <div class="bubble">
+          您从技能中心选择了 <b>${name}</b>，已加载参数表单（默认使用右侧上下文中已选的 3 个文件）：
+          <div class="skill-card">
+            <div class="sk-head">
+              <div class="sk-icon">⚡</div>
+              <div style="flex:1;">
+                <div class="sk-name">${name} <span class="sk-tag">Skill</span></div>
+                <div class="sk-desc">点击「执行」立即运行，或先在下方调整参数</div>
+              </div>
+            </div>
+            <div class="sk-fields">
+              <div class="sk-field">
+                <label>输入文件</label>
+                <div class="sk-files">
+                  <span class="sk-file-chip">📄 Site01_CRF_W23.xlsx</span>
+                  <span class="sk-file-chip">📄 Site02_CRF_W23.xlsx</span>
+                  <span class="sk-file-chip">📁 数据字典/</span>
+                </div>
+              </div>
+              <div class="sk-field">
+                <label>用自然语言补充参数（可选）</label>
+                <input type="text" placeholder="例如：仅保留 W22 之后的访视，按受试者排序" />
+              </div>
+            </div>
+            <div class="sk-actions">
+              <button class="btn-primary">▶ 执行</button>
+              <button class="btn-secondary">展开全部参数</button>
+              <button class="btn-secondary">取消</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    messages.appendChild(wrap);
+    messages.scrollTop = messages.scrollHeight;
+  }
 </script>
 
 </body>
