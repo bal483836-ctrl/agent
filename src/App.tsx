@@ -4,7 +4,7 @@ import ChatHistory from './components/Sidebar/ChatHistory';
 import ChatPanel from './components/Chat/ChatPanel';
 import WorkspacePanel from './components/Workspace/WorkspacePanel';
 import SkillCenterModal from './components/SkillCenter/SkillCenterModal';
-import UserProfileModal from './components/UserProfileModal';
+import LoginGate from './components/LoginGate';
 import useChatStore from './hooks/useChatStore';
 
 /**
@@ -19,6 +19,7 @@ export default function App() {
   const rightCollapsed = useChatStore((s) => s.rightCollapsed);
   const rightWidth = useChatStore((s) => s.rightWidth);
   const setRightWidth = useChatStore((s) => s.setRightWidth);
+  const loggedOut = useChatStore((s) => s.loggedOut);
 
   const resizing = useRef(false);
   useEffect(() => {
@@ -73,7 +74,7 @@ export default function App() {
       </div>
 
       <SkillCenterModal />
-      <UserProfileModal />
+      {loggedOut && <LoginGate />}
     </div>
   );
 }

@@ -88,6 +88,9 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 ::-webkit-scrollbar-track { background: transparent; }
 
+/* 异常行高亮 */
+.qc-warn-row > td { background: #fef2f2 !important; color: #b91c1c; }
+
 /* token 用量 */
 .qc-token-usage {
   display: flex; align-items: center; gap: 6px;

@@ -1,15 +1,26 @@
 import { useState } from 'react';
-import { Button, Form, Input, Select, Tag, Space, Tooltip, Divider } from 'antd';
-import { ThunderboltOutlined, FileTextOutlined, FolderOpenOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import type { SkillConfirmMessage } from '@/types';
+import {
+  Button, Form, Input, Select, Tag, Space, Tooltip, Divider, App as AntApp,
+} from 'antd';
+import {
+  ThunderboltOutlined, FileTextOutlined, FolderOpenOutlined,
+  InfoCircleOutlined, SwapOutlined,
+} from '@ant-design/icons';
+import type { SkillCandidate, SkillConfirmMessage } from '@/types';
 import useChatStore from '@/hooks/useChatStore';
+import SkillDetailModal from '@/components/SkillCenter/SkillDetailModal';
 
 /**
  * 技能确认卡（在 AI 气泡内嵌入）。
- * - 显示主候选 + 置信度 + 其他候选
- * - 列出已绑定的上下文文件 chip
- * - 渲染参数动态表单（含「语言描述」自然语言补充框）
- * - 操作：执行 / 换一个技能
+ *
+ * 交互：
+ * - 主候选：显示置信度，点「详情」打开技能详情弹层
+ * - 其他候选：点击直接切换为主候选
+ * - 输入文件：展示上下文 chip（已选文件）
+ * - 参数表单：动态渲染，含「语言描述」自然语言补充框
+ * - 操作：
+ *   · 执行（带当前表单参数 + 当前候选）
+ *   · 换一个技能（打开技能中心）
  */
 interface Props {
   msg: SkillConfirmMessage;
@@ -17,8 +28,20 @@ interface Props {
 
 export default function SkillConfirmCard({ msg }: Props) {
   const [form] = Form.useForm();
+  const { message } = AntApp.useApp();
   const runSkill = useChatStore((s) => s.runSkill);
-  const [picked] = useState(msg.candidate);
+  const openSkillCenter = useChatStore((s) => s.openSkillCenter);
+
+  // 当前选中的候选：默认主候选，点其他候选可切换
+  const [picked, setPicked] = useState<SkillCandidate>(msg.candidate);
+  const [detailSkill, setDetailSkill] = useState<SkillCandidate | null>(null);
+
+  const handleRun = async () => {
+    const params = await form.validateFields().catch(() => null);
+    if (!params) return;
+    message.success(`已用参数执行：${picked.name}`);
+    runSkill(picked);
+  };
 
   return (
     <div className="qc-skill-card">
@@ -42,16 +65,29 @@ export default function SkillConfirmCard({ msg }: Props) {
           </div>
           <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{picked.description}</div>
         </div>
-        <Button size="small" icon={<InfoCircleOutlined />}>详情</Button>
+        <Button
+          size="small" icon={<InfoCircleOutlined />}
+          onClick={() => setDetailSkill(picked)}
+        >
+          详情
+        </Button>
       </div>
 
       {msg.alternatives && msg.alternatives.length > 0 && (
         <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 10 }}>
           其他候选：
           {msg.alternatives.map((a) => (
-            <a key={a.id} style={{ marginInlineEnd: 8 }}>
-              {a.name} [{a.confidence ?? '-'}%]
-            </a>
+            <Tooltip key={a.id} title="点击切换为主候选">
+              <a
+                onClick={() => {
+                  setPicked(a);
+                  message.success(`已切换为：${a.name}`);
+                }}
+                style={{ marginInlineEnd: 8 }}
+              >
+                {a.name} [{a.confidence ?? '-'}%]
+              </a>
+            </Tooltip>
           ))}
         </div>
       )}
@@ -74,8 +110,10 @@ export default function SkillConfirmCard({ msg }: Props) {
         </Space>
       </div>
 
-      <Form form={form} layout="vertical" size="small" style={{ marginBottom: 10 }}
-        initialValues={Object.fromEntries(msg.fields.map((f) => [f.key, f.value]))}>
+      <Form
+        form={form} layout="vertical" size="small" style={{ marginBottom: 10 }}
+        initialValues={Object.fromEntries(msg.fields.map((f) => [f.key, f.value]))}
+      >
         {msg.fields.map((field) => (
           <Form.Item
             key={field.key}
@@ -84,11 +122,7 @@ export default function SkillConfirmCard({ msg }: Props) {
             tooltip={field.helper}
             style={{ marginBottom: 8 }}
           >
-            {field.type === 'select' ? (
-              <Select options={field.options} />
-            ) : (
-              <Input />
-            )}
+            {field.type === 'select' ? <Select options={field.options} /> : <Input />}
           </Form.Item>
         ))}
       </Form>
@@ -99,13 +133,25 @@ export default function SkillConfirmCard({ msg }: Props) {
       </div>
 
       <Space>
-        <Button type="primary" icon={<ThunderboltOutlined />} onClick={() => runSkill(picked)}>
+        <Button type="primary" icon={<ThunderboltOutlined />} onClick={handleRun}>
           执行
         </Button>
-        <Tooltip title="如果识别不准确，可换一个技能">
-          <Button>换一个技能</Button>
+        <Tooltip title="打开技能中心选择其他技能">
+          <Button icon={<SwapOutlined />} onClick={openSkillCenter}>
+            换一个技能
+          </Button>
         </Tooltip>
       </Space>
+
+      <SkillDetailModal
+        skill={detailSkill}
+        onClose={() => setDetailSkill(null)}
+        onApprovedUse={(sk) => {
+          setPicked(sk);
+          setDetailSkill(null);
+          message.success(`已切换为：${sk.name}`);
+        }}
+      />
     </div>
   );
 }

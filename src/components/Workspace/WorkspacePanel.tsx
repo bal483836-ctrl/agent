@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
 import {
-  Button, Dropdown, Input, Select, Space, Tooltip, Tree,
+  Button, Dropdown, Input, Select, Tooltip, Tree,
   type TreeDataNode, type TreeProps, type MenuProps,
   App as AntApp, Modal, Upload, type UploadProps,
 } from 'antd';
+import { nanoid } from 'nanoid';
 import {
   UploadOutlined, FolderAddOutlined, ReloadOutlined, SearchOutlined,
   FileTextOutlined, FolderOutlined, FolderOpenOutlined,
@@ -13,6 +14,14 @@ import {
 import useChatStore from '@/hooks/useChatStore';
 import { mockWorkspaces } from '@/mock/data';
 import type { WsNode } from '@/types';
+
+/** 把字节数格式化为可读字符串 */
+function fmtSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  return `${(bytes / 1024 / 1024 / 1024).toFixed(2)} GB`;
+}
 
 /**
  * 工作区面板（右侧）。
@@ -84,7 +93,7 @@ export default function WorkspacePanel() {
   const {
     workspaceId, setWorkspace,
     workspaceTrees, selectedContext, setSelectedContext,
-    renameWsNode, deleteWsNode, moveWsNode,
+    renameWsNode, deleteWsNode, moveWsNode, addWsNode,
   } = useChatStore();
   const { message } = AntApp.useApp();
 
@@ -176,14 +185,43 @@ export default function WorkspacePanel() {
     moveWsNode(dragKey, dropKey, info.dropToGap);
   };
 
-  /* —— 上传 —— */
+  /* —— 上传：mock 把文件真的加进树根 —— */
   const uploadProps: UploadProps = {
     multiple: true, showUploadList: false,
     beforeUpload: (file) => {
-      message.success(`已上传到「${mockWorkspaces.find((w) => w.id === workspaceId)?.name}」：${file.name}`);
+      addWsNode(null, {
+        key: `f-${nanoid(6)}`,
+        name: file.name,
+        type: 'file',
+        size: fmtSize(file.size),
+      });
+      message.success(`已上传：${file.name}`);
       return false;
     },
   };
+
+  /* —— 新建文件夹 —— */
+  const handleNewFolder = () => {
+    let name = '新建文件夹';
+    Modal.confirm({
+      title: '新建文件夹',
+      content: (
+        <Input
+          defaultValue={name}
+          onChange={(e) => { name = e.target.value; }}
+          maxLength={64}
+        />
+      ),
+      onOk: () => {
+        const finalName = (name || '新建文件夹').trim();
+        addWsNode(null, { key: `d-${nanoid(6)}`, name: finalName, type: 'folder', children: [] });
+        message.success(`已创建文件夹：${finalName}`);
+      },
+    });
+  };
+
+  /* —— 刷新（mock：当前 store 已是最新） —— */
+  const handleRefresh = () => message.success('已刷新');
 
   return (
     <>
@@ -236,13 +274,13 @@ export default function WorkspacePanel() {
         <Tooltip title="新建文件夹">
           <Button
             type="text" size="small" icon={<FolderAddOutlined />}
-            onClick={() => message.info('新建文件夹（mock）')}
+            onClick={handleNewFolder}
           />
         </Tooltip>
         <Tooltip title="刷新">
           <Button
             type="text" size="small" icon={<ReloadOutlined />}
-            onClick={() => message.success('已刷新')}
+            onClick={handleRefresh}
           />
         </Tooltip>
         <Tooltip title="搜索">

@@ -1,11 +1,15 @@
-import { Avatar, Tooltip } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import { useState } from 'react';
+import { Avatar, Button, Divider, Popover, Tag, App as AntApp } from 'antd';
+import {
+  UserOutlined, MailOutlined, IdcardOutlined, CalendarOutlined,
+  TeamOutlined, LogoutOutlined,
+} from '@ant-design/icons';
 import useChatStore from '@/hooks/useChatStore';
 
 /**
  * 顶部品牌栏。
- * - 左：量子链 Logo 与中英文品牌
- * - 右：当前用户头像（点击弹出用户信息）
+ * - 左：量子链 Logo + 中英文品牌
+ * - 右：头像；点击展开下拉面板（Popover）显示用户信息与退出登录入口
  */
 const Logo = () => (
   <svg
@@ -19,13 +23,72 @@ const Logo = () => (
   </svg>
 );
 
+/** 内联展开的个人信息面板 */
+function ProfileContent({ onClose }: { onClose: () => void }) {
+  const user = useChatStore((s) => s.currentUser);
+  const logout = useChatStore((s) => s.logout);
+  const { message } = AntApp.useApp();
+
+  return (
+    <div style={{ width: 280 }}>
+      {/* 头像 + 姓名 + 角色 */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 4px 12px' }}>
+        <Avatar
+          size={48} icon={<UserOutlined />}
+          style={{ background: 'linear-gradient(135deg,#3b82f6,#2563eb)' }}
+        />
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: 15, fontWeight: 600, color: '#1f2937' }}>{user.name}</div>
+          <div style={{ marginTop: 4 }}>
+            <Tag color="blue" style={{ marginInlineEnd: 0 }}>{user.role}</Tag>
+          </div>
+        </div>
+      </div>
+
+      <Divider style={{ margin: '4px 0 10px' }} />
+
+      {/* 信息列表 */}
+      <div style={{ fontSize: 12, color: '#475569', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <InfoRow icon={<TeamOutlined />} label="组织" value={user.organization} />
+        <InfoRow icon={<MailOutlined />} label="邮箱" value={user.email} />
+        <InfoRow icon={<IdcardOutlined />} label="用户 ID" value={user.id} />
+        <InfoRow icon={<CalendarOutlined />} label="加入" value={user.joinedAt} />
+      </div>
+
+      <Divider style={{ margin: '10px 0' }} />
+
+      <Button
+        block danger icon={<LogoutOutlined />}
+        onClick={() => {
+          logout();
+          message.success('已退出登录');
+          onClose();
+        }}
+      >
+        退出登录
+      </Button>
+    </div>
+  );
+}
+
+function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <span style={{ color: '#94a3b8' }}>{icon}</span>
+      <span style={{ width: 52, color: '#94a3b8' }}>{label}</span>
+      <span style={{ flex: 1, color: '#1f2937', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {value}
+      </span>
+    </div>
+  );
+}
+
 export default function TopBar() {
   const user = useChatStore((s) => s.currentUser);
-  const openProfile = useChatStore((s) => s.openProfile);
+  const [open, setOpen] = useState(false);
 
   return (
     <header className="qc-topbar">
-      {/* 品牌 */}
       <div
         style={{
           display: 'flex', alignItems: 'center', gap: 10,
@@ -54,17 +117,24 @@ export default function TopBar() {
 
       <div style={{ flex: 1 }} />
 
-      {/* 用户头像：点击查看个人信息 */}
-      <Tooltip title={`${user.name} · 点击查看个人信息`}>
-        <Avatar
-          onClick={openProfile}
-          style={{
-            background: 'linear-gradient(135deg,#3b82f6,#2563eb)',
-            cursor: 'pointer',
-          }}
-          icon={<UserOutlined />}
-        />
-      </Tooltip>
+      <Popover
+        open={open}
+        onOpenChange={setOpen}
+        trigger="click"
+        placement="bottomRight"
+        arrow={false}
+        content={<ProfileContent onClose={() => setOpen(false)} />}
+      >
+        <span title={user.name}>
+          <Avatar
+            style={{
+              background: 'linear-gradient(135deg,#3b82f6,#2563eb)',
+              cursor: 'pointer',
+            }}
+            icon={<UserOutlined />}
+          />
+        </span>
+      </Popover>
     </header>
   );
 }

@@ -61,6 +61,13 @@ interface ChatState {
   renameWsNode: (key: string, newName: string) => void;
   deleteWsNode: (key: string) => void;
   moveWsNode: (dragKey: string, dropKey: string, dropToGap: boolean) => void;
+  /** 在指定父节点下追加新节点（parentKey=null 表示根） */
+  addWsNode: (parentKey: string | null, node: WsNode) => void;
+
+  /* —— 鉴权（mock） —— */
+  loggedOut: boolean;
+  logout: () => void;
+  loginAgain: () => void;
 
   /* —— 消息操作 —— */
   appendMessage: (msg: ChatMessage) => void;
@@ -100,6 +107,7 @@ const useChatStore = create<ChatState>((set, get) => ({
   rightWidth: 340,
   skillCenterOpen: false,
   profileOpen: false,
+  loggedOut: false,
 
   /* ---------- 会话 ---------- */
   setActiveSession: (id) => set({ activeSessionId: id }),
@@ -163,6 +171,17 @@ const useChatStore = create<ChatState>((set, get) => ({
         [s.workspaceId]: moveInTree(s.workspaceTrees[s.workspaceId], dragKey, dropKey, dropToGap),
       },
     })),
+  addWsNode: (parentKey, node) =>
+    set((s) => ({
+      workspaceTrees: {
+        ...s.workspaceTrees,
+        [s.workspaceId]: addToTree(s.workspaceTrees[s.workspaceId], parentKey, node),
+      },
+    })),
+
+  /* ---------- 登录 / 退出（mock） ---------- */
+  logout: () => set({ loggedOut: true }),
+  loginAgain: () => set({ loggedOut: false }),
 
   /* ---------- 消息 ---------- */
   appendMessage: (msg) =>
@@ -314,6 +333,17 @@ function renameInTree(nodes: WsNode[], key: string, name: string): WsNode[] {
   return nodes.map((n) => {
     if (n.key === key) return { ...n, name };
     if (n.children) return { ...n, children: renameInTree(n.children, key, name) };
+    return n;
+  });
+}
+
+function addToTree(nodes: WsNode[], parentKey: string | null, newNode: WsNode): WsNode[] {
+  if (parentKey == null) return [...nodes, newNode];
+  return nodes.map((n) => {
+    if (n.key === parentKey && n.type === 'folder') {
+      return { ...n, children: [...(n.children ?? []), newNode] };
+    }
+    if (n.children) return { ...n, children: addToTree(n.children, parentKey, newNode) };
     return n;
   });
 }
