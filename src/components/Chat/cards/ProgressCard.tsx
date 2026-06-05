@@ -2,6 +2,14 @@ import { Progress, Steps } from 'antd';
 import type { SkillProgressMessage } from '@/types';
 import { CheckCircleFilled, LoadingOutlined, ClockCircleOutlined } from '@ant-design/icons';
 
+/**
+ * 技能执行进度卡。
+ * - 顶部：标题 + 百分比
+ * - 渐变进度条
+ * - 步骤列表：done / running / pending
+ *
+ * 数据由 store.runSkill 模拟分阶段更新；后端就绪后改为 WebSocket 推送即可。
+ */
 interface Props { msg: SkillProgressMessage }
 
 export default function ProgressCard({ msg }: Props) {

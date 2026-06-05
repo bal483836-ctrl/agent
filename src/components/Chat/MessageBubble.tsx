@@ -7,6 +7,12 @@ import ResultCard from './cards/ResultCard';
 import ErrorCard from './cards/ErrorCard';
 import TokenUsage from './cards/TokenUsage';
 
+/**
+ * 单条消息渲染。
+ * - 用户消息：行 flex-direction:row-reverse，气泡 inline-block 靠右
+ * - AI 消息：气泡左对齐，下方挂 TokenUsage 显示本次消耗
+ * - 消息体根据 type 动态渲染：text / skill-confirm / skill-progress / skill-result / skill-error
+ */
 interface Props { msg: ChatMessage }
 
 const AIAvatar = () => (

@@ -1,5 +1,6 @@
 export type Role = 'user' | 'assistant';
 
+/** LLM 调用消耗 — 由后端 LLM gateway 在响应中返回 */
 export interface TokenUsage {
   prompt: number;
   completion: number;
@@ -119,4 +120,15 @@ export interface ContextFile {
   key: string;
   name: string;
   type: WsNodeType;
+}
+
+/** 当前登录用户（mock） */
+export interface CurrentUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;        // 角色：研究员 / 项目经理 / 数据管理员…
+  organization: string;
+  joinedAt: string;
+  avatarColor?: string;
 }

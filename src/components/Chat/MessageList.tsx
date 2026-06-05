@@ -3,6 +3,11 @@ import { Empty } from 'antd';
 import useChatStore from '@/hooks/useChatStore';
 import MessageBubble from './MessageBubble';
 
+/**
+ * 消息流。
+ * - 从 store 读取当前会话的消息数组
+ * - 新消息追加后自动滚动到底部
+ */
 export default function MessageList() {
   const messages = useChatStore((s) => s.messages[s.activeSessionId] ?? []);
   const ref = useRef<HTMLDivElement>(null);

@@ -1,13 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button, Input, Space, Tooltip, Upload, type UploadProps, App as AntApp } from 'antd';
 import {
-  PaperClipOutlined, CloudUploadOutlined, ThunderboltOutlined,
-  SendOutlined,
+  CloudUploadOutlined, ThunderboltOutlined, SendOutlined,
 } from '@ant-design/icons';
 import useChatStore, { mockSkills } from '@/hooks/useChatStore';
 
 const { TextArea } = Input;
 
+/**
+ * 对话输入区。
+ * - 自动高度 textarea，Enter 发送、Shift+Enter 换行
+ * - "/" 触发斜杠菜单：实时过滤可用技能；选中后插入待执行 Skill 卡
+ * - 上传文件：临时上传（仅当次会话有效，24h 后清除）
+ * - 技能中心：打开技能中心弹层
+ */
 export default function InputBox() {
   const { message } = AntApp.useApp();
   const sendUserText = useChatStore((s) => s.sendUserText);
@@ -109,11 +115,8 @@ export default function InputBox() {
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
             <Space size={6}>
-              <Tooltip title="从右侧工作区选择文件作为上下文">
-                <Button size="small" icon={<PaperClipOutlined />}>工作区文件</Button>
-              </Tooltip>
               <Upload {...uploadProps}>
-                <Tooltip title="临时上传，仅当次会话有效">
+                <Tooltip title="临时上传，仅当次会话有效，24h 后自动清理">
                   <Button size="small" icon={<CloudUploadOutlined />}>上传文件</Button>
                 </Tooltip>
               </Upload>

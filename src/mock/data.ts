@@ -112,6 +112,7 @@ export const mockMessages: ChatMessage[] = [
         { label: '仅人口学', value: 'demo' },
       ]},
       { key: 'tol', label: '数值容差', type: 'text', value: '0.01', helper: '小于此值视为一致' },
+      { key: 'note', label: '语言描述', type: 'text', value: '', helper: '可用自然语言补充：例如"仅保留 W22 之后的访视"' },
       { key: 'fmt', label: '输出格式', type: 'select', value: 'excel', options: [
         { label: 'Excel (差异高亮)', value: 'excel' },
         { label: 'PDF 报告', value: 'pdf' },

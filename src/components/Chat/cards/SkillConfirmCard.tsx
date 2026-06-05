@@ -4,6 +4,13 @@ import { ThunderboltOutlined, FileTextOutlined, FolderOpenOutlined, InfoCircleOu
 import type { SkillConfirmMessage } from '@/types';
 import useChatStore from '@/hooks/useChatStore';
 
+/**
+ * 技能确认卡（在 AI 气泡内嵌入）。
+ * - 显示主候选 + 置信度 + 其他候选
+ * - 列出已绑定的上下文文件 chip
+ * - 渲染参数动态表单（含「语言描述」自然语言补充框）
+ * - 操作：执行 / 换一个技能
+ */
 interface Props {
   msg: SkillConfirmMessage;
 }
@@ -95,7 +102,6 @@ export default function SkillConfirmCard({ msg }: Props) {
         <Button type="primary" icon={<ThunderboltOutlined />} onClick={() => runSkill(picked)}>
           执行
         </Button>
-        <Button>修改参数</Button>
         <Tooltip title="如果识别不准确，可换一个技能">
           <Button>换一个技能</Button>
         </Tooltip>

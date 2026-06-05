@@ -5,6 +5,15 @@ import {
 } from '@ant-design/icons';
 import type { SkillResultMessage } from '@/types';
 
+/**
+ * 技能执行结果卡。
+ * - 顶部：成功图标 + Skill 名 + 总耗时
+ * - 摘要文本
+ * - 关键指标矩阵（含 tone：primary/success/danger）
+ * - 预览表格（最多 5 行），超出时显示"查看全部"链接
+ * - 输出文件归档 chip
+ * - 操作：下载、保存到工作区、高亮异常、请人工复核
+ */
 interface Props { msg: SkillResultMessage }
 
 const toneColor = (t?: string) => {

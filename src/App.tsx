@@ -4,8 +4,16 @@ import ChatHistory from './components/Sidebar/ChatHistory';
 import ChatPanel from './components/Chat/ChatPanel';
 import WorkspacePanel from './components/Workspace/WorkspacePanel';
 import SkillCenterModal from './components/SkillCenter/SkillCenterModal';
+import UserProfileModal from './components/UserProfileModal';
 import useChatStore from './hooks/useChatStore';
 
+/**
+ * 三栏布局根组件。
+ * - 左侧：历史对话（可折叠）
+ * - 中：对话流 + 输入区
+ * - 右侧：工作区面板（可折叠 + 可拖拽改宽 240–700px）
+ * - 顶层挂载技能中心、个人信息两个全局弹层
+ */
 export default function App() {
   const leftCollapsed = useChatStore((s) => s.leftCollapsed);
   const rightCollapsed = useChatStore((s) => s.rightCollapsed);
@@ -65,6 +73,7 @@ export default function App() {
       </div>
 
       <SkillCenterModal />
+      <UserProfileModal />
     </div>
   );
 }

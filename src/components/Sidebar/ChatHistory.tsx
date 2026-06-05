@@ -11,6 +11,11 @@ const groupTitle: Record<ChatSession['group'], string> = {
   today: '今天', yesterday: '昨天', week: '7 天内', earlier: '更早',
 };
 
+/**
+ * 左侧历史对话面板。
+ * - 新建对话 / 搜索 / 按时间分组
+ * - 单条悬停显示操作菜单：重命名、删除
+ */
 export default function ChatHistory() {
   const { sessions, activeSessionId, setActiveSession, newSession, renameSession, deleteSession } =
     useChatStore();

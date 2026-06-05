@@ -2,22 +2,32 @@ import { Empty, Tag, Tooltip } from 'antd';
 import { DeleteOutlined, EditOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import type { SkillCandidate } from '@/types';
 
+/**
+ * 技能卡片网格。
+ * - 点卡片 → 打开技能详情弹层
+ * - 自己上传的技能在 hover 时显示编辑/删除按钮（事件不冒泡）
+ */
 interface Props {
   skills: SkillCandidate[];
-  onUse: (sk: SkillCandidate) => void;
+  onOpenDetail: (sk: SkillCandidate) => void;
   onDelete?: (sk: SkillCandidate) => void;
 }
 
-export default function SkillGrid({ skills, onUse, onDelete }: Props) {
+export default function SkillGrid({ skills, onOpenDetail, onDelete }: Props) {
   if (skills.length === 0) return <Empty description="没有匹配的技能" />;
+
   return (
-    <div style={{
-      display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 14,
-    }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+        gap: 14,
+      }}
+    >
       {skills.map((sk) => (
         <div
           key={sk.id}
-          onClick={() => onUse(sk)}
+          onClick={() => onOpenDetail(sk)}
           style={{
             border: '1px solid #dde6f2', borderRadius: 10, padding: 16, background: '#fff',
             cursor: 'pointer', transition: 'all 0.15s', position: 'relative',
@@ -33,6 +43,7 @@ export default function SkillGrid({ skills, onUse, onDelete }: Props) {
             e.currentTarget.style.transform = 'none';
           }}
         >
+          {/* 我上传的：编辑 / 删除 操作 */}
           {sk.mine && onDelete && (
             <div
               style={{ position: 'absolute', top: 12, right: 12, display: 'flex', gap: 4 }}
@@ -50,16 +61,26 @@ export default function SkillGrid({ skills, onUse, onDelete }: Props) {
           )}
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-            <div style={{
-              width: 34, height: 34, background: '#eff6ff', color: '#2563eb',
-              borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16,
-            }}>{sk.icon}</div>
+            <div
+              style={{
+                width: 34, height: 34, background: '#eff6ff', color: '#2563eb',
+                borderRadius: 8, display: 'flex', alignItems: 'center',
+                justifyContent: 'center', fontSize: 16,
+              }}
+            >
+              {sk.icon}
+            </div>
             <div style={{ fontWeight: 600, fontSize: 13, flex: 1, minWidth: 0 }}>
               {sk.name}
             </div>
           </div>
 
-          <div style={{ fontSize: 12, color: '#6b7280', lineHeight: 1.6, marginBottom: 12, minHeight: 38 }}>
+          <div
+            style={{
+              fontSize: 12, color: '#6b7280', lineHeight: 1.6,
+              marginBottom: 12, minHeight: 38,
+            }}
+          >
             {sk.description}
           </div>
 
