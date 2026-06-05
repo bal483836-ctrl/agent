@@ -3,343 +3,779 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>疫苗临床试验 AI 助手 - MVP 原型</title>
+<title>量子链 Quantum Chain - 临床试验智能助手</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 14px; color: #1f2328; background: #f6f8fa; overflow: hidden; }
+  /* ===== 主题变量 ===== */
+  :root {
+    --bg-0: #060914;
+    --bg-1: #0b1024;
+    --bg-2: #111733;
+    --bg-3: #1a2148;
+    --surface: rgba(20, 27, 56, 0.7);
+    --surface-2: rgba(28, 37, 75, 0.65);
+    --border: rgba(99, 132, 255, 0.18);
+    --border-hi: rgba(99, 132, 255, 0.4);
+    --text: #e6ecff;
+    --text-dim: #8794c4;
+    --text-mute: #5a6699;
+    --cyan: #00e5ff;
+    --cyan-glow: rgba(0, 229, 255, 0.5);
+    --violet: #8b5cf6;
+    --pink: #ff4dcd;
+    --green: #00ffa3;
+    --red: #ff5577;
+    --gold: #ffb547;
+    --grad-1: linear-gradient(135deg, #00e5ff 0%, #8b5cf6 50%, #ff4dcd 100%);
+    --grad-2: linear-gradient(135deg, #00e5ff 0%, #5b8cff 100%);
+    --grad-card: linear-gradient(180deg, rgba(28,37,75,0.7) 0%, rgba(15,21,48,0.7) 100%);
+  }
 
-  /* 顶部栏 */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Inter", sans-serif;
+    font-size: 14px; color: var(--text); overflow: hidden;
+    background: var(--bg-0);
+  }
+
+  /* ===== 全局背景：暗色 + 星点 + 渐变光晕 ===== */
+  body::before {
+    content: ""; position: fixed; inset: 0; z-index: -2;
+    background:
+      radial-gradient(900px 600px at 12% -10%, rgba(0,229,255,0.18), transparent 60%),
+      radial-gradient(900px 600px at 92% 110%, rgba(255,77,205,0.16), transparent 60%),
+      radial-gradient(700px 500px at 50% 50%, rgba(139,92,246,0.10), transparent 60%),
+      linear-gradient(180deg, var(--bg-0) 0%, var(--bg-1) 100%);
+  }
+  body::after {
+    content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(99,132,255,0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(99,132,255,0.045) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 80%);
+  }
+
+  /* ===== 顶栏 ===== */
   .topbar {
-    height: 48px; background: #fff; border-bottom: 1px solid #e5e7eb;
-    display: flex; align-items: center; padding: 0 16px; gap: 12px;
+    height: 56px;
+    background: linear-gradient(180deg, rgba(11,16,36,0.85), rgba(11,16,36,0.55));
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 20px; gap: 16px;
     position: relative; z-index: 10;
   }
-  .topbar .logo { font-weight: 600; color: #2563eb; font-size: 15px; }
-  .topbar .org { color: #6b7280; font-size: 13px; padding: 2px 8px; background: #f3f4f6; border-radius: 4px; }
-  .topbar .spacer { flex: 1; }
-  .topbar .nav-tab { padding: 4px 10px; color: #4b5563; border-radius: 4px; cursor: pointer; font-size: 13px; }
-  .topbar .nav-tab:hover { background: #f3f4f6; }
-  .topbar .nav-tab.active { color: #2563eb; background: #eff6ff; }
-  .topbar .user { width: 28px; height: 28px; border-radius: 50%; background: #2563eb; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    padding-right: 16px; border-right: 1px solid var(--border);
+  }
+  .brand-logo {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--grad-1);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 24px rgba(0, 229, 255, 0.45), inset 0 0 14px rgba(255,255,255,0.15);
+    position: relative;
+  }
+  .brand-logo svg { width: 20px; height: 20px; }
+  .brand-text { display: flex; flex-direction: column; line-height: 1; }
+  .brand-cn {
+    font-size: 16px; font-weight: 700; letter-spacing: 2px;
+    background: var(--grad-1); -webkit-background-clip: text;
+    background-clip: text; color: transparent;
+  }
+  .brand-en {
+    font-size: 9px; letter-spacing: 3px; color: var(--text-mute);
+    margin-top: 3px; font-family: "JetBrains Mono", ui-monospace, monospace;
+  }
+  .org {
+    color: var(--text-dim); font-size: 12px; padding: 4px 10px;
+    background: rgba(99,132,255,0.08); border: 1px solid var(--border);
+    border-radius: 20px; display: flex; align-items: center; gap: 6px;
+  }
+  .org::before {
+    content: ""; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green); box-shadow: 0 0 8px var(--green);
+  }
+  .spacer { flex: 1; }
+  .top-stat {
+    display: flex; align-items: center; gap: 6px; font-size: 11px;
+    color: var(--text-mute); padding: 4px 10px;
+    border: 1px solid var(--border); border-radius: 6px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+  }
+  .top-stat .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+  .user {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--grad-2); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    box-shadow: 0 0 0 1px var(--border-hi), 0 0 14px rgba(0,229,255,0.3);
+  }
 
-  /* 主体三栏 */
-  .layout { display: flex; height: calc(100vh - 48px); position: relative; }
+  /* ===== 主体三栏 ===== */
+  .layout { display: flex; height: calc(100vh - 56px); position: relative; }
 
-  /* 左侧 */
+  /* ===== 左侧 ===== */
   .left-panel {
-    width: 260px; background: #fafbfc; border-right: 1px solid #e5e7eb;
-    display: flex; flex-direction: column; transition: width 0.2s ease, min-width 0.2s ease;
+    width: 272px;
+    background: linear-gradient(180deg, rgba(11,16,36,0.6), rgba(8,12,28,0.6));
+    backdrop-filter: blur(14px);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    transition: width 0.25s ease, min-width 0.25s ease;
     flex-shrink: 0; overflow: hidden;
   }
   .left-panel.collapsed { width: 0; min-width: 0; border-right: none; }
 
-  .left-header { padding: 12px; display: flex; gap: 8px; align-items: center; border-bottom: 1px solid #eef0f2; }
+  .left-header { padding: 14px; }
   .new-chat-btn {
-    flex: 1; background: #2563eb; color: #fff; border: none; padding: 8px 12px;
-    border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
+    width: 100%; background: var(--grad-1); color: #fff; border: none;
+    padding: 10px 14px; border-radius: 10px; cursor: pointer;
+    font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 4px 20px rgba(0, 229, 255, 0.25);
+    transition: all 0.2s; position: relative; overflow: hidden;
   }
-  .new-chat-btn:hover { background: #1d4ed8; }
+  .new-chat-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(0, 229, 255, 0.4); }
+  .new-chat-btn::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+  }
+  .new-chat-btn:hover::after { transform: translateX(100%); }
+
   .search-box {
-    margin: 8px 12px; padding: 6px 10px; background: #fff; border: 1px solid #e5e7eb;
-    border-radius: 6px; display: flex; align-items: center; gap: 6px;
+    margin: 0 14px 8px; padding: 8px 12px;
+    background: rgba(99,132,255,0.06); border: 1px solid var(--border);
+    border-radius: 8px; display: flex; align-items: center; gap: 8px;
+    transition: all 0.2s;
   }
-  .search-box input { border: none; outline: none; flex: 1; font-size: 13px; background: transparent; }
-  .chat-list { flex: 1; overflow-y: auto; padding: 4px 8px 12px; }
-  .chat-group-title { font-size: 11px; color: #9ca3af; padding: 8px 8px 4px; font-weight: 500; }
+  .search-box:focus-within { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(0,229,255,0.12); }
+  .search-box input {
+    border: none; outline: none; flex: 1; font-size: 12px;
+    background: transparent; color: var(--text); font-family: inherit;
+  }
+  .search-box input::placeholder { color: var(--text-mute); }
+  .search-box .ic { color: var(--text-mute); font-size: 12px; }
+
+  .chat-list { flex: 1; overflow-y: auto; padding: 6px 10px 14px; }
+  .chat-group-title {
+    font-size: 10px; color: var(--text-mute); padding: 12px 8px 6px;
+    font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+  }
   .chat-item {
-    padding: 8px 10px; border-radius: 6px; cursor: pointer; margin-bottom: 2px;
-    display: flex; align-items: center; gap: 8px; font-size: 13px; color: #374151;
-    position: relative;
+    padding: 9px 10px; border-radius: 8px; cursor: pointer; margin-bottom: 2px;
+    display: flex; align-items: center; gap: 8px; font-size: 13px;
+    color: var(--text-dim); position: relative;
+    transition: all 0.15s; border: 1px solid transparent;
   }
-  .chat-item:hover { background: #eef0f2; }
-  .chat-item.active { background: #e0e7ff; color: #1e40af; }
+  .chat-item:hover { background: rgba(99,132,255,0.08); color: var(--text); }
+  .chat-item.active {
+    background: linear-gradient(90deg, rgba(0,229,255,0.15), rgba(139,92,246,0.1));
+    color: var(--text); border-color: var(--border-hi);
+    box-shadow: inset 0 0 18px rgba(0,229,255,0.06);
+  }
+  .chat-item.active::before {
+    content: ""; position: absolute; left: -10px; top: 50%; transform: translateY(-50%);
+    width: 3px; height: 18px; background: var(--cyan);
+    box-shadow: 0 0 10px var(--cyan); border-radius: 0 3px 3px 0;
+  }
+  .chat-item .ic { color: var(--text-mute); font-size: 12px; }
+  .chat-item.active .ic { color: var(--cyan); }
   .chat-item .title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .chat-item .menu-dot { opacity: 0; font-size: 16px; color: #6b7280; padding: 0 4px; }
+  .chat-item .menu-dot { opacity: 0; font-size: 16px; color: var(--text-mute); }
   .chat-item:hover .menu-dot { opacity: 1; }
 
-  /* 中间 */
-  .center-panel { flex: 1; min-width: 0; display: flex; flex-direction: column; background: #fff; }
+  /* ===== 中间 ===== */
+  .center-panel { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 
   .center-header {
-    height: 44px; border-bottom: 1px solid #e5e7eb; display: flex;
-    align-items: center; padding: 0 16px; gap: 10px;
+    height: 52px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 20px; gap: 12px;
+    background: linear-gradient(180deg, rgba(11,16,36,0.5), transparent);
   }
   .toggle-btn {
-    width: 28px; height: 28px; border: none; background: transparent; cursor: pointer;
-    border-radius: 4px; color: #4b5563; display: flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; border: 1px solid var(--border);
+    background: rgba(99,132,255,0.06); cursor: pointer; border-radius: 8px;
+    color: var(--text-dim); display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
   }
-  .toggle-btn:hover { background: #f3f4f6; }
-  .center-header .title { font-weight: 600; font-size: 14px; }
-  .center-header .ctx-chip {
-    font-size: 12px; color: #2563eb; background: #eff6ff; padding: 2px 8px;
-    border-radius: 10px; border: 1px solid #dbeafe;
+  .toggle-btn:hover { background: rgba(0,229,255,0.1); color: var(--cyan); border-color: var(--border-hi); }
+  .center-header .title { font-weight: 600; font-size: 14px; color: var(--text); }
+  .ctx-chip {
+    font-size: 11px; color: var(--cyan);
+    background: rgba(0,229,255,0.08); padding: 4px 10px;
+    border-radius: 12px; border: 1px solid rgba(0,229,255,0.25);
+    display: flex; align-items: center; gap: 6px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
   }
 
-  .messages { flex: 1; overflow-y: auto; padding: 24px 32px; }
-  .msg { margin-bottom: 24px; display: flex; gap: 12px; }
-  .msg .avatar { width: 32px; height: 32px; border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; }
-  .msg.user .avatar { background: #6b7280; }
-  .msg.ai .avatar { background: #2563eb; }
+  .messages { flex: 1; overflow-y: auto; padding: 28px 36px; }
+  .msg { margin-bottom: 26px; display: flex; gap: 14px; }
+  .msg .avatar {
+    width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #fff;
+  }
+  .msg.user .avatar { background: linear-gradient(135deg, #5a6699, #38406b); }
+  .msg.ai .avatar {
+    background: var(--grad-1); box-shadow: 0 0 18px rgba(0,229,255,0.4);
+    position: relative;
+  }
+  .msg.ai .avatar::before {
+    content: ""; position: absolute; inset: -2px; border-radius: 10px;
+    padding: 1px; background: var(--grad-1);
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude; -webkit-mask-composite: xor;
+    opacity: 0.5;
+  }
   .msg .body { flex: 1; min-width: 0; }
-  .msg .name { font-size: 12px; color: #6b7280; margin-bottom: 4px; }
-  .msg .bubble { background: #f6f8fa; border-radius: 8px; padding: 12px 14px; line-height: 1.6; word-wrap: break-word; }
-  .msg.ai .bubble { background: #fff; border: 1px solid #e5e7eb; }
-  .msg.user .bubble { background: #eff6ff; }
+  .msg .name {
+    font-size: 11px; color: var(--text-mute); margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+  .msg .bubble {
+    border-radius: 12px; padding: 14px 16px; line-height: 1.7;
+    word-wrap: break-word; color: var(--text);
+  }
+  .msg.user .bubble {
+    background: linear-gradient(135deg, rgba(99,132,255,0.12), rgba(139,92,246,0.08));
+    border: 1px solid var(--border);
+  }
+  .msg.ai .bubble {
+    background: var(--surface); border: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+  }
 
-  /* Skill 卡片 */
+  /* ===== Skill 卡片 ===== */
   .skill-card {
-    border: 1px solid #dbeafe; border-radius: 8px; padding: 12px; margin-top: 10px;
-    background: #fafbff;
+    border-radius: 12px; padding: 14px; margin-top: 12px;
+    background: linear-gradient(180deg, rgba(0,229,255,0.06), rgba(139,92,246,0.04));
+    border: 1px solid rgba(0,229,255,0.3);
+    position: relative; overflow: hidden;
   }
-  .skill-card .sk-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .skill-card .sk-icon { width: 28px; height: 28px; background: #2563eb; border-radius: 6px; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-  .skill-card .sk-name { font-weight: 600; font-size: 13px; }
-  .skill-card .sk-tag { font-size: 11px; color: #2563eb; background: #dbeafe; padding: 1px 6px; border-radius: 4px; }
-  .skill-card .sk-desc { font-size: 12px; color: #6b7280; margin-bottom: 8px; }
-  .sk-fields { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
+  .skill-card::before {
+    content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: 0.6;
+  }
+  .skill-card .sk-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .skill-card .sk-icon {
+    width: 36px; height: 36px; background: var(--grad-2);
+    border-radius: 10px; color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+    box-shadow: 0 0 18px rgba(0,229,255,0.3);
+  }
+  .skill-card .sk-name { font-weight: 600; font-size: 13px; color: var(--text); }
+  .sk-tag {
+    font-size: 10px; color: var(--cyan); background: rgba(0,229,255,0.1);
+    padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(0,229,255,0.3);
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    letter-spacing: 1px; margin-left: 4px;
+  }
+  .sk-tag.mine { color: var(--gold); background: rgba(255,181,71,0.1); border-color: rgba(255,181,71,0.3); }
+  .skill-card .sk-desc { font-size: 12px; color: var(--text-dim); margin-bottom: 4px; }
+  .sk-fields { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
   .sk-field { font-size: 12px; }
-  .sk-field label { color: #6b7280; display: block; margin-bottom: 4px; }
-  .sk-field input, .sk-field select {
-    width: 100%; padding: 6px 8px; border: 1px solid #e5e7eb; border-radius: 4px;
-    font-size: 12px; outline: none;
+  .sk-field label {
+    color: var(--text-mute); display: block; margin-bottom: 5px;
+    font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
   }
+  .sk-field input, .sk-field select {
+    width: 100%; padding: 8px 10px;
+    background: rgba(11,16,36,0.6); border: 1px solid var(--border);
+    border-radius: 6px; font-size: 12px; outline: none;
+    color: var(--text); font-family: inherit;
+    transition: all 0.15s;
+  }
+  .sk-field input:focus, .sk-field select:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(0,229,255,0.12); }
   .sk-files { display: flex; flex-wrap: wrap; gap: 6px; }
   .sk-file-chip {
-    font-size: 11px; padding: 3px 8px; background: #fff; border: 1px solid #e5e7eb;
-    border-radius: 10px; display: flex; align-items: center; gap: 4px;
+    font-size: 11px; padding: 4px 9px;
+    background: rgba(99,132,255,0.1); border: 1px solid var(--border);
+    border-radius: 12px; display: flex; align-items: center; gap: 4px;
+    color: var(--text);
   }
-  .sk-actions { display: flex; gap: 8px; margin-top: 10px; }
-  .btn-primary { background: #2563eb; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; }
-  .btn-secondary { background: #fff; color: #374151; border: 1px solid #d1d5db; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; }
-  .btn-primary:hover { background: #1d4ed8; }
-  .btn-secondary:hover { background: #f3f4f6; }
+  .sk-actions { display: flex; gap: 8px; margin-top: 12px; }
 
-  /* 进度条 */
-  .progress-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; margin-top: 10px; }
-  .progress-head { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; }
-  .progress-bar { height: 6px; background: #f3f4f6; border-radius: 3px; overflow: hidden; }
-  .progress-fill { height: 100%; background: #2563eb; width: 65%; border-radius: 3px; transition: width 0.3s; }
+  .btn-primary {
+    background: var(--grad-1); color: #fff; border: none;
+    padding: 8px 18px; border-radius: 8px; cursor: pointer; font-size: 12px;
+    font-weight: 600; transition: all 0.2s;
+    box-shadow: 0 0 18px rgba(0,229,255,0.25);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 0 28px rgba(0,229,255,0.45); }
+  .btn-secondary {
+    background: rgba(99,132,255,0.08); color: var(--text-dim);
+    border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px;
+    cursor: pointer; font-size: 12px; transition: all 0.15s;
+  }
+  .btn-secondary:hover { background: rgba(99,132,255,0.15); color: var(--text); border-color: var(--border-hi); }
+  .btn-danger { color: var(--red); }
+  .btn-danger:hover { background: rgba(255,85,119,0.1); border-color: rgba(255,85,119,0.4); }
 
-  /* 结果卡片 */
-  .result-card { border: 1px solid #d1fae5; border-radius: 8px; padding: 14px; margin-top: 10px; background: #f0fdf4; }
-  .result-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .result-head .icon { color: #10b981; font-size: 16px; }
-  .result-head .title { font-weight: 600; font-size: 13px; }
-  .result-head .time { font-size: 11px; color: #6b7280; margin-left: auto; }
-  .result-summary { font-size: 12px; color: #374151; margin-bottom: 10px; }
-  .result-metrics { display: flex; gap: 16px; margin-bottom: 10px; }
-  .metric { background: #fff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 12px; flex: 1; }
-  .metric .val { font-size: 18px; font-weight: 600; color: #2563eb; }
-  .metric .lbl { font-size: 11px; color: #6b7280; margin-top: 2px; }
-  .result-table { font-size: 12px; border-collapse: collapse; width: 100%; background: #fff; border-radius: 4px; overflow: hidden; }
-  .result-table th, .result-table td { padding: 6px 10px; border: 1px solid #e5e7eb; text-align: left; }
-  .result-table th { background: #f9fafb; font-weight: 500; color: #4b5563; }
-  .result-table .warn { color: #dc2626; background: #fef2f2; }
-  .result-actions { display: flex; gap: 8px; margin-top: 10px; }
+  /* ===== 进度卡 ===== */
+  .progress-card {
+    border: 1px solid var(--border); border-radius: 10px; padding: 14px;
+    margin-top: 12px; background: rgba(11,16,36,0.5);
+  }
+  .progress-head {
+    display: flex; justify-content: space-between; font-size: 12px;
+    margin-bottom: 8px; color: var(--text-dim);
+  }
+  .progress-head .pct { color: var(--cyan); font-family: "JetBrains Mono", ui-monospace, monospace; }
+  .progress-bar {
+    height: 6px; background: rgba(99,132,255,0.1);
+    border-radius: 3px; overflow: hidden; position: relative;
+  }
+  .progress-fill {
+    height: 100%; background: var(--grad-1);
+    width: 65%; border-radius: 3px; position: relative;
+    box-shadow: 0 0 12px var(--cyan-glow);
+  }
+  .progress-fill::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: shimmer 1.6s infinite;
+  }
+  @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+  .progress-card .steps {
+    font-size: 11px; color: var(--text-mute); margin-top: 8px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+  }
+  .progress-card .steps .ok { color: var(--green); }
+  .progress-card .steps .run { color: var(--cyan); }
 
-  /* 输入区 */
-  .input-area { border-top: 1px solid #e5e7eb; padding: 12px 16px 16px; background: #fff; }
+  /* ===== 结果卡 ===== */
+  .result-card {
+    border: 1px solid rgba(0,255,163,0.3); border-radius: 12px; padding: 16px;
+    margin-top: 12px;
+    background: linear-gradient(180deg, rgba(0,255,163,0.05), rgba(0,229,255,0.04));
+    position: relative; overflow: hidden;
+  }
+  .result-card::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--green), transparent);
+  }
+  .result-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .result-head .icon {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: rgba(0,255,163,0.15); color: var(--green);
+    display: flex; align-items: center; justify-content: center; font-size: 12px;
+    box-shadow: 0 0 12px rgba(0,255,163,0.4);
+  }
+  .result-head .title { font-weight: 600; font-size: 13px; color: var(--text); }
+  .result-head .time {
+    font-size: 11px; color: var(--text-mute); margin-left: auto;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+  }
+  .result-metrics { display: flex; gap: 10px; margin-bottom: 12px; }
+  .metric {
+    background: rgba(11,16,36,0.6); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px; flex: 1; position: relative;
+    overflow: hidden;
+  }
+  .metric .val {
+    font-size: 22px; font-weight: 700;
+    background: var(--grad-2); -webkit-background-clip: text;
+    background-clip: text; color: transparent;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+  }
+  .metric.danger .val { background: linear-gradient(135deg, var(--red), var(--pink)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .metric.success .val { background: linear-gradient(135deg, var(--green), var(--cyan)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .metric .lbl {
+    font-size: 10px; color: var(--text-mute); margin-top: 2px;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+
+  .result-table {
+    font-size: 12px; border-collapse: collapse; width: 100%;
+    background: rgba(11,16,36,0.5); border-radius: 8px; overflow: hidden;
+  }
+  .result-table th, .result-table td {
+    padding: 8px 12px; border-bottom: 1px solid var(--border);
+    text-align: left; color: var(--text-dim);
+  }
+  .result-table th {
+    background: rgba(99,132,255,0.08); font-weight: 500;
+    color: var(--text-mute); font-size: 11px;
+    letter-spacing: 1px; text-transform: uppercase;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+  }
+  .result-table .warn { color: var(--red); background: rgba(255,85,119,0.05); }
+  .result-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+
+  /* ===== 输入区 ===== */
+  .input-area {
+    padding: 14px 20px 20px; position: relative;
+    background: linear-gradient(180deg, transparent, rgba(11,16,36,0.5));
+  }
   .input-wrap {
-    border: 1px solid #d1d5db; border-radius: 12px; padding: 8px 10px;
-    transition: border-color 0.15s;
+    border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px;
+    background: rgba(11,16,36,0.7); backdrop-filter: blur(14px);
+    transition: all 0.2s;
   }
-  .input-wrap:focus-within { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
-  .input-toolbar { display: flex; gap: 4px; margin-bottom: 6px; align-items: center; }
-  .tool-btn { background: transparent; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; color: #6b7280; font-size: 12px; display: flex; align-items: center; gap: 4px; }
-  .tool-btn:hover { background: #f3f4f6; color: #374151; }
-  .attached-files { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
-  .attached-files:empty { display: none; }
-  .file-chip { font-size: 11px; padding: 3px 8px; background: #eff6ff; color: #2563eb; border-radius: 10px; display: flex; align-items: center; gap: 4px; }
-  .file-chip .x { cursor: pointer; opacity: 0.6; }
+  .input-wrap:focus-within {
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 4px rgba(0,229,255,0.08), 0 0 30px rgba(0,229,255,0.15);
+  }
+  .input-toolbar { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; }
+  .tool-btn {
+    background: rgba(99,132,255,0.08); border: 1px solid var(--border);
+    padding: 5px 10px; border-radius: 6px; cursor: pointer; color: var(--text-dim);
+    font-size: 11px; display: flex; align-items: center; gap: 4px;
+    transition: all 0.15s;
+  }
+  .tool-btn:hover { background: rgba(0,229,255,0.1); color: var(--cyan); border-color: rgba(0,229,255,0.3); }
+  .tool-btn.primary {
+    background: linear-gradient(135deg, rgba(0,229,255,0.2), rgba(139,92,246,0.2));
+    color: var(--cyan); border-color: rgba(0,229,255,0.3);
+  }
+
   textarea.input {
-    width: 100%; border: none; outline: none; resize: none; font-family: inherit;
-    font-size: 14px; line-height: 1.5; min-height: 24px; max-height: 200px;
+    width: 100%; border: none; outline: none; resize: none;
+    font-family: inherit; font-size: 14px; line-height: 1.6;
+    min-height: 26px; max-height: 200px;
+    background: transparent; color: var(--text);
   }
-  .input-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
-  .input-hint { font-size: 11px; color: #9ca3af; }
+  textarea.input::placeholder { color: var(--text-mute); }
+  .input-bottom {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 6px;
+  }
+  .input-hint {
+    font-size: 10px; color: var(--text-mute);
+    font-family: "JetBrains Mono", ui-monospace, monospace; letter-spacing: 1px;
+  }
   .send-btn {
-    background: #2563eb; color: #fff; border: none; width: 32px; height: 32px;
-    border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    background: var(--grad-1); color: #fff; border: none;
+    width: 36px; height: 36px; border-radius: 10px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 16px rgba(0,229,255,0.4);
+    transition: transform 0.15s;
   }
-  .send-btn:hover { background: #1d4ed8; }
+  .send-btn:hover { transform: translateY(-1px) scale(1.04); }
 
   /* 斜杠菜单 */
   .slash-menu {
-    position: absolute; bottom: 100px; left: 32px; background: #fff;
-    border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-    width: 320px; padding: 6px; z-index: 100; display: none;
+    position: absolute; bottom: 100px; left: 36px;
+    background: rgba(11,16,36,0.95); backdrop-filter: blur(16px);
+    border: 1px solid var(--border-hi); border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(0,229,255,0.15);
+    width: 340px; padding: 6px; z-index: 100; display: none;
   }
   .slash-menu.show { display: block; }
-  .slash-item { padding: 8px 10px; border-radius: 4px; cursor: pointer; display: flex; gap: 10px; align-items: center; }
-  .slash-item:hover { background: #f3f4f6; }
-  .slash-item .ic { width: 28px; height: 28px; background: #eff6ff; color: #2563eb; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-  .slash-item .nm { font-size: 13px; font-weight: 500; }
-  .slash-item .ds { font-size: 11px; color: #6b7280; }
+  .slash-item {
+    padding: 9px 10px; border-radius: 8px; cursor: pointer;
+    display: flex; gap: 10px; align-items: center;
+    transition: all 0.12s;
+  }
+  .slash-item:hover { background: rgba(0,229,255,0.1); }
+  .slash-item .ic {
+    width: 30px; height: 30px; background: rgba(0,229,255,0.1);
+    color: var(--cyan); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center; font-size: 14px;
+    border: 1px solid rgba(0,229,255,0.25);
+  }
+  .slash-item .nm { font-size: 13px; font-weight: 500; color: var(--text); }
+  .slash-item .ds { font-size: 11px; color: var(--text-mute); margin-top: 1px; }
 
-  /* 右侧 */
+  /* ===== 右侧 ===== */
   .right-panel {
-    width: 340px; background: #fafbfc; border-left: 1px solid #e5e7eb;
+    width: 340px;
+    background: linear-gradient(180deg, rgba(11,16,36,0.6), rgba(8,12,28,0.6));
+    backdrop-filter: blur(14px);
+    border-left: 1px solid var(--border);
     display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden;
-    transition: width 0.2s ease, min-width 0.2s ease;
+    transition: width 0.25s ease, min-width 0.25s ease;
     min-width: 240px;
   }
   .right-panel.collapsed { width: 0 !important; min-width: 0; border-left: none; }
 
-  /* 拖拽手柄 */
   .resizer {
     width: 4px; cursor: col-resize; background: transparent;
     flex-shrink: 0; position: relative; z-index: 5;
+    transition: background 0.15s;
   }
-  .resizer:hover, .resizer.dragging { background: #2563eb; }
+  .resizer:hover, .resizer.dragging {
+    background: linear-gradient(180deg, transparent, var(--cyan), transparent);
+    box-shadow: 0 0 12px var(--cyan);
+  }
   .right-panel.collapsed + .resizer, .resizer.hidden { display: none; }
 
-  .right-header { padding: 12px 14px; border-bottom: 1px solid #eef0f2; display: flex; align-items: center; gap: 8px; }
-  .right-header .title { font-weight: 600; font-size: 13px; flex: 1; }
+  .right-header {
+    padding: 14px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .right-header .title {
+    font-weight: 600; font-size: 13px; flex: 1; color: var(--text);
+    letter-spacing: 1px;
+  }
   .ws-selector {
-    padding: 4px 8px; background: #fff; border: 1px solid #e5e7eb; border-radius: 4px;
-    font-size: 12px; cursor: pointer;
+    padding: 5px 10px; background: rgba(11,16,36,0.6);
+    border: 1px solid var(--border); border-radius: 6px;
+    font-size: 11px; cursor: pointer; color: var(--text);
+    font-family: inherit;
   }
   .selected-bar {
-    padding: 8px 14px; background: #eff6ff; border-bottom: 1px solid #dbeafe;
-    font-size: 12px; color: #1e40af;
+    padding: 10px 14px;
+    background: linear-gradient(90deg, rgba(0,229,255,0.08), rgba(139,92,246,0.05));
+    border-bottom: 1px solid var(--border);
+    font-size: 11px; color: var(--text-dim);
     display: flex; justify-content: space-between; align-items: center;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
   }
-  .selected-bar .clear { color: #2563eb; cursor: pointer; font-size: 11px; }
+  .selected-bar b { color: var(--cyan); }
+  .selected-bar .clear { color: var(--text-mute); cursor: pointer; }
+  .selected-bar .clear:hover { color: var(--cyan); }
 
-  .file-tree { flex: 1; overflow-y: auto; padding: 6px 8px; }
-  .tree-node { font-size: 13px; }
+  .file-tree { flex: 1; overflow-y: auto; padding: 8px; }
   .tree-row {
-    display: flex; align-items: center; gap: 6px; padding: 4px 6px;
-    border-radius: 4px; cursor: pointer; user-select: none;
+    display: flex; align-items: center; gap: 6px; padding: 5px 8px;
+    border-radius: 6px; cursor: pointer; user-select: none;
+    font-size: 12px; color: var(--text-dim); transition: all 0.12s;
   }
-  .tree-row:hover { background: #eef0f2; }
-  .tree-row.selected { background: #dbeafe; }
-  .tree-row input[type=checkbox] { margin: 0; cursor: pointer; }
-  .tree-row .icon { font-size: 13px; }
+  .tree-row:hover { background: rgba(99,132,255,0.08); color: var(--text); }
+  .tree-row.selected {
+    background: linear-gradient(90deg, rgba(0,229,255,0.12), transparent);
+    color: var(--cyan);
+  }
+  .tree-row input[type=checkbox] {
+    margin: 0; cursor: pointer; accent-color: var(--cyan);
+    width: 12px; height: 12px;
+  }
+  .tree-row .icon { font-size: 12px; }
   .tree-row .name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .tree-row .size { font-size: 10px; color: #9ca3af; }
-  .tree-children { padding-left: 18px; }
-  .tree-row .arrow { font-size: 9px; color: #6b7280; width: 10px; transition: transform 0.15s; }
+  .tree-row .size {
+    font-size: 9px; color: var(--text-mute);
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+  }
+  .tree-children { padding-left: 16px; }
+  .tree-row .arrow { font-size: 8px; color: var(--text-mute); width: 10px; transition: transform 0.15s; }
   .tree-row.expanded .arrow { transform: rotate(90deg); }
-  .tree-row .desc-icon { color: #f59e0b; font-size: 11px; }
+  .tree-row .desc-icon { color: var(--gold); font-size: 10px; }
 
-  .right-footer { border-top: 1px solid #eef0f2; padding: 10px 14px; display: flex; gap: 6px; }
+  .right-footer {
+    border-top: 1px solid var(--border); padding: 10px 12px;
+    display: flex; gap: 6px;
+  }
   .right-footer button {
-    flex: 1; padding: 6px; background: #fff; border: 1px solid #e5e7eb;
-    border-radius: 4px; cursor: pointer; font-size: 12px; color: #374151;
+    flex: 1; padding: 6px;
+    background: rgba(99,132,255,0.06); border: 1px solid var(--border);
+    border-radius: 6px; cursor: pointer; font-size: 11px;
+    color: var(--text-dim); transition: all 0.15s;
   }
-  .right-footer button:hover { background: #f3f4f6; }
+  .right-footer button:hover { background: rgba(0,229,255,0.1); color: var(--cyan); border-color: rgba(0,229,255,0.3); }
 
-  /* 折叠时浮动按钮 */
-  .float-toggle {
-    position: absolute; top: 50%; transform: translateY(-50%);
-    width: 20px; height: 60px; background: #fff; border: 1px solid #e5e7eb;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    font-size: 10px; color: #6b7280; z-index: 6;
-  }
-  .float-toggle.left { left: 0; border-radius: 0 4px 4px 0; border-left: none; display: none; }
-  .float-toggle.right { right: 0; border-radius: 4px 0 0 4px; border-right: none; display: none; }
-  .left-panel.collapsed ~ .center-panel .float-toggle.left { display: flex; }
-
-  /* 技能中心弹层 */
+  /* ===== 弹层 ===== */
   .modal-mask {
-    position: fixed; inset: 0; background: rgba(15,23,42,0.45); z-index: 1000;
-    display: none; align-items: center; justify-content: center;
+    position: fixed; inset: 0;
+    background: rgba(3, 6, 16, 0.7); backdrop-filter: blur(8px);
+    z-index: 1000; display: none; align-items: center; justify-content: center;
+    animation: fadeIn 0.2s;
   }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   .modal-mask.show { display: flex; }
   .modal {
-    background: #fff; width: 880px; max-width: 92vw; max-height: 86vh;
-    border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    background: linear-gradient(180deg, rgba(20,27,56,0.95), rgba(11,16,36,0.95));
+    backdrop-filter: blur(18px);
+    width: 920px; max-width: 92vw; max-height: 86vh;
+    border-radius: 16px; border: 1px solid var(--border-hi);
+    box-shadow: 0 30px 90px rgba(0,0,0,0.6), 0 0 60px rgba(0,229,255,0.1);
     display: flex; flex-direction: column; overflow: hidden;
+    position: relative;
+  }
+  .modal::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--violet), var(--pink), transparent);
   }
   .modal-head {
-    padding: 14px 20px; border-bottom: 1px solid #e5e7eb; display: flex;
-    align-items: center; gap: 12px;
+    padding: 16px 22px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
   }
-  .modal-head .title { font-weight: 600; font-size: 15px; flex: 1; }
-  .modal-head .close { background: transparent; border: none; font-size: 18px; cursor: pointer; color: #6b7280; }
-  .modal-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
-  .modal-tabs { display: flex; gap: 16px; padding: 0 20px; border-bottom: 1px solid #e5e7eb; }
-  .modal-tab { padding: 10px 4px; font-size: 13px; color: #6b7280; cursor: pointer; border-bottom: 2px solid transparent; }
-  .modal-tab.active { color: #2563eb; border-bottom-color: #2563eb; }
+  .modal-head .ic-big {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--grad-1);
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+    box-shadow: 0 0 18px rgba(0,229,255,0.4);
+  }
+  .modal-head .title { font-weight: 600; font-size: 15px; flex: 1; color: var(--text); letter-spacing: 1px; }
+  .modal-head .sub {
+    font-size: 11px; color: var(--text-mute);
+    font-family: "JetBrains Mono", ui-monospace, monospace; letter-spacing: 1px;
+  }
+  .modal-head .sub b { color: var(--cyan); }
+  .modal-head .close {
+    background: rgba(99,132,255,0.06); border: 1px solid var(--border);
+    color: var(--text-dim); width: 28px; height: 28px; border-radius: 6px;
+    cursor: pointer; font-size: 14px;
+  }
+  .modal-head .close:hover { color: var(--red); border-color: rgba(255,85,119,0.3); }
 
-  .skill-toolbar { display: flex; gap: 10px; margin-bottom: 14px; align-items: center; }
-  .skill-toolbar input { flex: 1; padding: 7px 10px; border: 1px solid #e5e7eb; border-radius: 6px; outline: none; font-size: 13px; }
+  .modal-tabs {
+    display: flex; gap: 24px; padding: 0 22px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-tab {
+    padding: 12px 4px; font-size: 13px; color: var(--text-mute);
+    cursor: pointer; border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .modal-tab:hover { color: var(--text-dim); }
+  .modal-tab.active {
+    color: var(--cyan); border-bottom-color: var(--cyan);
+    text-shadow: 0 0 12px var(--cyan-glow);
+  }
+
+  .modal-body { flex: 1; overflow-y: auto; padding: 18px 22px; }
+  .skill-toolbar { display: flex; gap: 10px; margin-bottom: 16px; align-items: center; }
+  .skill-toolbar input, .skill-toolbar select {
+    padding: 8px 12px; background: rgba(11,16,36,0.6);
+    border: 1px solid var(--border); border-radius: 8px;
+    font-size: 12px; outline: none; color: var(--text); font-family: inherit;
+  }
+  .skill-toolbar input { flex: 1; }
+  .skill-toolbar input:focus, .skill-toolbar select:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(0,229,255,0.12); }
   .upload-skill-btn {
-    background: #2563eb; color: #fff; border: none; padding: 7px 14px;
-    border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500;
-    display: flex; align-items: center; gap: 4px;
+    background: var(--grad-1); color: #fff; border: none;
+    padding: 8px 16px; border-radius: 8px; cursor: pointer;
+    font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px;
+    box-shadow: 0 0 18px rgba(0,229,255,0.3);
   }
-  .upload-skill-btn:hover { background: #1d4ed8; }
 
-  .skill-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  .skill-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 14px;
+  }
   .skill-tile {
-    border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; background: #fff;
-    cursor: pointer; transition: all 0.15s; position: relative;
+    border: 1px solid var(--border); border-radius: 12px; padding: 16px;
+    background: var(--grad-card); cursor: pointer; transition: all 0.2s;
+    position: relative; overflow: hidden;
   }
-  .skill-tile:hover { border-color: #2563eb; box-shadow: 0 4px 12px rgba(37,99,235,0.08); transform: translateY(-1px); }
-  .skill-tile .row1 { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .skill-tile::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .skill-tile:hover {
+    border-color: rgba(0,229,255,0.4); transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0,229,255,0.15);
+  }
+  .skill-tile:hover::before { opacity: 1; }
+  .skill-tile .row1 { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
   .skill-tile .ic {
-    width: 32px; height: 32px; background: #eff6ff; color: #2563eb;
-    border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 16px;
+    width: 36px; height: 36px;
+    background: rgba(0,229,255,0.1); color: var(--cyan);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; border: 1px solid rgba(0,229,255,0.3);
   }
-  .skill-tile .nm { font-weight: 600; font-size: 13px; flex: 1; }
-  .skill-tile .desc { font-size: 12px; color: #6b7280; line-height: 1.5; margin-bottom: 10px; min-height: 36px; }
-  .skill-tile .meta { display: flex; gap: 8px; font-size: 11px; color: #9ca3af; flex-wrap: wrap; }
-  .skill-tile .tag { background: #f3f4f6; padding: 2px 6px; border-radius: 3px; }
-  .skill-tile .tag.mine { background: #fef3c7; color: #92400e; }
-  .skill-tile .actions { position: absolute; top: 10px; right: 10px; display: none; gap: 4px; }
+  .skill-tile .nm { font-weight: 600; font-size: 13px; flex: 1; color: var(--text); }
+  .skill-tile .desc {
+    font-size: 12px; color: var(--text-dim); line-height: 1.6;
+    margin-bottom: 12px; min-height: 38px;
+  }
+  .skill-tile .meta {
+    display: flex; gap: 8px; font-size: 10px; color: var(--text-mute);
+    flex-wrap: wrap; align-items: center;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+  }
+  .skill-tile .tag {
+    background: rgba(99,132,255,0.1); padding: 2px 7px; border-radius: 4px;
+    border: 1px solid var(--border); color: var(--text-dim);
+  }
+  .skill-tile .tag.mine { background: rgba(255,181,71,0.1); color: var(--gold); border-color: rgba(255,181,71,0.3); }
+  .skill-tile .actions {
+    position: absolute; top: 12px; right: 12px;
+    display: none; gap: 4px;
+  }
   .skill-tile:hover .actions { display: flex; }
   .skill-tile .actions button {
-    background: #fff; border: 1px solid #e5e7eb; padding: 2px 6px; border-radius: 4px;
-    font-size: 11px; cursor: pointer; color: #4b5563;
+    background: rgba(11,16,36,0.8); border: 1px solid var(--border);
+    padding: 3px 7px; border-radius: 4px; font-size: 11px;
+    cursor: pointer; color: var(--text-dim);
   }
-  .skill-tile .actions button:hover { background: #f3f4f6; }
-  .skill-tile .actions .danger:hover { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+  .skill-tile .actions button:hover { color: var(--cyan); border-color: rgba(0,229,255,0.3); }
+  .skill-tile .actions .danger:hover { color: var(--red); border-color: rgba(255,85,119,0.4); }
 
-  /* 上传技能表单 */
+  /* ===== 上传技能 ===== */
   .upload-form { display: flex; flex-direction: column; gap: 14px; }
   .upload-dropzone {
-    border: 2px dashed #cbd5e1; border-radius: 8px; padding: 28px; text-align: center;
-    background: #f8fafc; cursor: pointer; transition: all 0.15s;
+    border: 2px dashed var(--border-hi); border-radius: 12px; padding: 32px;
+    text-align: center; background: rgba(11,16,36,0.4); cursor: pointer;
+    transition: all 0.2s; position: relative; overflow: hidden;
   }
-  .upload-dropzone:hover { border-color: #2563eb; background: #eff6ff; }
-  .upload-dropzone .big { font-size: 32px; margin-bottom: 8px; }
-  .upload-dropzone .hint { font-size: 12px; color: #6b7280; margin-top: 4px; }
-  .form-row { display: flex; flex-direction: column; gap: 4px; }
-  .form-row label { font-size: 12px; color: #374151; font-weight: 500; }
-  .form-row label .req { color: #dc2626; }
+  .upload-dropzone::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(circle at center, rgba(0,229,255,0.08), transparent 60%);
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .upload-dropzone:hover {
+    border-color: var(--cyan);
+    box-shadow: 0 0 30px rgba(0,229,255,0.15) inset;
+  }
+  .upload-dropzone:hover::before { opacity: 1; }
+  .upload-dropzone .big {
+    font-size: 38px; margin-bottom: 10px;
+    background: var(--grad-1); -webkit-background-clip: text;
+    background-clip: text; color: transparent;
+  }
+  .upload-dropzone .lbl { font-weight: 600; color: var(--text); font-size: 13px; }
+  .upload-dropzone .hint { font-size: 11px; color: var(--text-mute); margin-top: 6px; }
+  .upload-dropzone code {
+    background: rgba(0,229,255,0.1); padding: 1px 6px; border-radius: 3px;
+    color: var(--cyan); font-size: 10px;
+  }
+
+  .form-row { display: flex; flex-direction: column; gap: 6px; }
+  .form-row label {
+    font-size: 11px; color: var(--text-dim); font-weight: 500;
+    letter-spacing: 1px; text-transform: uppercase;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+  }
+  .form-row label .req { color: var(--red); }
   .form-row input, .form-row select, .form-row textarea {
-    padding: 7px 10px; border: 1px solid #d1d5db; border-radius: 6px; outline: none;
-    font-size: 13px; font-family: inherit;
+    padding: 9px 12px; background: rgba(11,16,36,0.6);
+    border: 1px solid var(--border); border-radius: 8px; outline: none;
+    font-size: 13px; font-family: inherit; color: var(--text);
+  }
+  .form-row input:focus, .form-row textarea:focus, .form-row select:focus {
+    border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(0,229,255,0.12);
   }
   .form-row textarea { resize: vertical; min-height: 60px; }
-  .form-row .helper { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+  .form-row .helper { font-size: 10px; color: var(--text-mute); margin-top: 2px; }
+
   .manifest-check {
-    background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 10px 12px;
-    font-size: 12px; color: #166534;
+    background: rgba(0,255,163,0.06); border: 1px solid rgba(0,255,163,0.3);
+    border-radius: 8px; padding: 12px; font-size: 12px; color: var(--green);
   }
-  .manifest-check ul { margin: 4px 0 0 16px; }
+  .manifest-check ul {
+    margin: 6px 0 0 18px; color: var(--text-dim);
+    font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 11px;
+  }
+  .manifest-check code { color: var(--cyan); }
+
+  .warn-banner {
+    background: rgba(255,181,71,0.06); border: 1px solid rgba(255,181,71,0.3);
+    border-radius: 8px; padding: 10px 14px; font-size: 12px; color: var(--gold);
+  }
+
   .modal-foot {
-    padding: 12px 20px; border-top: 1px solid #e5e7eb; display: flex;
-    justify-content: flex-end; gap: 10px; background: #fafbfc;
+    padding: 14px 22px; border-top: 1px solid var(--border);
+    display: flex; justify-content: flex-end; gap: 10px;
+    background: rgba(8,12,28,0.5);
   }
 
-  /* 技能详情 */
-  .skill-detail h3 { font-size: 14px; margin: 14px 0 6px; color: #1f2937; }
-  .skill-detail p, .skill-detail li { font-size: 13px; color: #4b5563; line-height: 1.7; }
-  .skill-detail ul { margin-left: 18px; }
-  .skill-detail .code {
-    background: #f6f8fa; border: 1px solid #e5e7eb; border-radius: 4px;
-    padding: 8px 10px; font-family: ui-monospace, Menlo, monospace; font-size: 12px;
-    white-space: pre-wrap; color: #1f2328;
-  }
-
-  /* 滚动条 */
+  /* ===== 滚动条 ===== */
   ::-webkit-scrollbar { width: 8px; height: 8px; }
-  ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
-  ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(99,132,255,0.2); border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(0,229,255,0.4); }
   ::-webkit-scrollbar-track { background: transparent; }
 </style>
 </head>
@@ -347,81 +783,95 @@
 
 <!-- 顶部栏 -->
 <div class="topbar">
-  <div class="logo">🧬 VaccineTrial AI</div>
+  <div class="brand">
+    <div class="brand-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="2.5"/>
+        <ellipse cx="12" cy="12" rx="10" ry="4"/>
+        <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/>
+        <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <div class="brand-cn">量子链</div>
+      <div class="brand-en">QUANTUM CHAIN</div>
+    </div>
+  </div>
   <div class="org">协和疫苗研究中心</div>
-  <div class="nav-tab active">对话</div>
   <div class="spacer"></div>
+  <div class="top-stat"><span class="dot"></span>NODES 6/6</div>
+  <div class="top-stat">TOKENS 1.2K</div>
   <div class="user" title="张研究员">张</div>
 </div>
 
 <!-- 主体 -->
 <div class="layout" id="layout">
 
-  <!-- 左侧：历史对话 -->
+  <!-- 左侧 -->
   <aside class="left-panel" id="leftPanel">
     <div class="left-header">
       <button class="new-chat-btn">＋ 新建对话</button>
     </div>
     <div class="search-box">
-      🔍 <input type="text" placeholder="搜索对话历史…" />
+      <span class="ic">🔍</span>
+      <input type="text" placeholder="搜索对话历史…" />
     </div>
     <div class="chat-list">
-      <div class="chat-group-title">今天</div>
+      <div class="chat-group-title">// TODAY</div>
       <div class="chat-item active">
-        <span>💬</span>
+        <span class="ic">◆</span>
         <span class="title">中心01与中心02 CRF比对</span>
         <span class="menu-dot">⋯</span>
       </div>
       <div class="chat-item">
-        <span>💬</span>
+        <span class="ic">◆</span>
         <span class="title">SAE 周报草稿</span>
         <span class="menu-dot">⋯</span>
       </div>
 
-      <div class="chat-group-title">昨天</div>
+      <div class="chat-group-title">// YESTERDAY</div>
       <div class="chat-item">
-        <span>💬</span>
+        <span class="ic">◇</span>
         <span class="title">疫苗 V-203 不良反应汇总</span>
         <span class="menu-dot">⋯</span>
       </div>
       <div class="chat-item">
-        <span>💬</span>
+        <span class="ic">◇</span>
         <span class="title">受试者入组数据提取</span>
         <span class="menu-dot">⋯</span>
       </div>
 
-      <div class="chat-group-title">7 天前</div>
+      <div class="chat-group-title">// 7 DAYS AGO</div>
       <div class="chat-item">
-        <span>💬</span>
+        <span class="ic">◇</span>
         <span class="title">三期临床方案要点摘录</span>
         <span class="menu-dot">⋯</span>
       </div>
       <div class="chat-item">
-        <span>💬</span>
+        <span class="ic">◇</span>
         <span class="title">实验室检查异常值复核</span>
         <span class="menu-dot">⋯</span>
       </div>
       <div class="chat-item">
-        <span>💬</span>
+        <span class="ic">◇</span>
         <span class="title">DSMB 月度安全报告</span>
         <span class="menu-dot">⋯</span>
       </div>
     </div>
   </aside>
 
-  <!-- 中间：对话执行 -->
+  <!-- 中间 -->
   <main class="center-panel">
     <div class="center-header">
       <button class="toggle-btn" id="toggleLeft" title="折叠/展开左栏">☰</button>
       <span class="title">中心01与中心02 CRF比对</span>
-      <span class="ctx-chip">📁 工作区：V-203 三期临床 · 已选 3 项</span>
+      <span class="ctx-chip">⚡ WORKSPACE · V-203 · 3 FILES</span>
       <div style="flex:1"></div>
       <button class="toggle-btn" id="toggleRight" title="折叠/展开右栏">📂</button>
     </div>
 
     <div class="messages" id="messages">
 
-      <!-- 用户 -->
       <div class="msg user">
         <div class="avatar">张</div>
         <div class="body">
@@ -432,30 +882,29 @@
         </div>
       </div>
 
-      <!-- AI 识别意图 + Skill 确认卡 -->
       <div class="msg ai">
-        <div class="avatar">AI</div>
+        <div class="avatar">QC</div>
         <div class="body">
-          <div class="name">VaccineTrial 助手 · 09:42</div>
+          <div class="name">QUANTUM CHAIN · 09:42</div>
           <div class="bubble">
-            已识别到您要执行 <b>CRF 数据比对</b>（匹配置信度 <b>92%</b>）。我从右侧工作区找到了以下文件作为输入，请确认参数后执行：
+            已识别到您要执行 <b style="color:var(--cyan);">CRF 数据比对</b>（匹配置信度 <b style="color:var(--green);">92%</b>）。已自动绑定右侧上下文文件，请确认参数后执行：
             <div class="skill-card">
               <div class="sk-head">
                 <div class="sk-icon">📊</div>
                 <div style="flex:1;">
-                  <div class="sk-name">CRF 跨中心数据比对 <span class="sk-tag">Skill</span> <span class="sk-tag" style="background:#fef3c7;color:#92400e;">本组织上传</span></div>
+                  <div class="sk-name">CRF 跨中心数据比对 <span class="sk-tag">SKILL</span> <span class="sk-tag mine">本组织</span></div>
                   <div class="sk-desc">对两个研究中心相同字段进行行级比对，输出差异报告</div>
                 </div>
-                <button class="btn-secondary" style="font-size:11px;padding:3px 8px;">查看详情</button>
+                <button class="btn-secondary" style="font-size:11px;">详情</button>
               </div>
-              <div style="margin:8px 0 4px;font-size:11px;color:#6b7280;">
+              <div style="margin:8px 0 4px;font-size:11px;color:var(--text-mute);font-family:'JetBrains Mono',monospace;">
                 其他候选：
-                <a href="#" style="color:#2563eb;text-decoration:none;">数据一致性核查 (76%)</a>　·
-                <a href="#" style="color:#2563eb;text-decoration:none;">字段差异统计 (61%)</a>
+                <a href="#" style="color:var(--cyan);text-decoration:none;">数据一致性核查 [76%]</a>
+                <a href="#" style="color:var(--cyan);text-decoration:none;">字段差异统计 [61%]</a>
               </div>
               <div class="sk-fields">
                 <div class="sk-field">
-                  <label>输入文件（来自右侧上下文）</label>
+                  <label>// INPUT FILES</label>
                   <div class="sk-files">
                     <span class="sk-file-chip">📄 Site01_CRF_W23.xlsx</span>
                     <span class="sk-file-chip">📄 Site02_CRF_W23.xlsx</span>
@@ -463,7 +912,7 @@
                   </div>
                 </div>
                 <div class="sk-field">
-                  <label>比对维度</label>
+                  <label>// 比对维度</label>
                   <select>
                     <option>主要疗效 + 不良事件（推荐）</option>
                     <option>全字段</option>
@@ -471,18 +920,20 @@
                   </select>
                 </div>
                 <div class="sk-field">
-                  <label>数值容差</label>
+                  <label>// 数值容差</label>
                   <input type="text" value="0.01" />
                 </div>
                 <div class="sk-field">
-                  <label>输出格式</label>
+                  <label>// 输出格式</label>
                   <select>
                     <option>Excel (差异高亮)</option>
                     <option>PDF 报告</option>
                   </select>
                 </div>
               </div>
-              <div style="font-size:11px;color:#6b7280;">预估耗时 ~ 45 秒　|　预估消耗 ~ 1.2k tokens</div>
+              <div style="font-size:11px;color:var(--text-mute);font-family:'JetBrains Mono',monospace;">
+                ⏱ ETA ~ 45s　|　⚡ ~1.2k tokens
+              </div>
               <div class="sk-actions">
                 <button class="btn-primary">▶ 执行</button>
                 <button class="btn-secondary">修改参数</button>
@@ -493,47 +944,47 @@
         </div>
       </div>
 
-      <!-- 进度 -->
       <div class="msg ai">
-        <div class="avatar">AI</div>
+        <div class="avatar">QC</div>
         <div class="body">
           <div class="name">CRF 跨中心数据比对 · 执行中</div>
           <div class="bubble">
             <div class="progress-card">
               <div class="progress-head">
                 <span>正在解析 3 个文件 · 比对字段中…</span>
-                <span style="color:#2563eb;">65%</span>
+                <span class="pct">65%</span>
               </div>
               <div class="progress-bar"><div class="progress-fill"></div></div>
-              <div style="font-size:11px;color:#9ca3af;margin-top:6px;">
-                ✓ 文件加载完成　✓ 字段映射完成　⏳ 行级比对中（412 / 632 行）
+              <div class="steps">
+                <span class="ok">✓</span> 文件加载完成
+                <span class="ok">✓</span> 字段映射完成
+                <span class="run">●</span> 行级比对中 [412 / 632]
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 结果卡 -->
       <div class="msg ai">
-        <div class="avatar">AI</div>
+        <div class="avatar">QC</div>
         <div class="body">
           <div class="name">CRF 跨中心数据比对 · 已完成</div>
           <div class="bubble">
-            比对完成，共扫描 <b>632</b> 条受试者记录，发现 <b>17</b> 处差异，其中 <b>3</b> 处为关键字段不一致，建议优先复核。
+            比对完成，共扫描 <b style="color:var(--cyan);">632</b> 条记录，发现 <b style="color:var(--gold);">17</b> 处差异，其中 <b style="color:var(--red);">3</b> 处为关键字段不一致，建议优先复核。
             <div class="result-card">
               <div class="result-head">
                 <span class="icon">✓</span>
                 <span class="title">比对结果摘要</span>
-                <span class="time">耗时 42s</span>
+                <span class="time">RUNTIME 42s</span>
               </div>
               <div class="result-metrics">
-                <div class="metric"><div class="val">632</div><div class="lbl">总比对记录</div></div>
+                <div class="metric"><div class="val">632</div><div class="lbl">总记录</div></div>
                 <div class="metric"><div class="val">17</div><div class="lbl">字段差异</div></div>
-                <div class="metric"><div class="val" style="color:#dc2626;">3</div><div class="lbl">关键差异</div></div>
-                <div class="metric"><div class="val">97.3%</div><div class="lbl">一致率</div></div>
+                <div class="metric danger"><div class="val">3</div><div class="lbl">关键差异</div></div>
+                <div class="metric success"><div class="val">97.3%</div><div class="lbl">一致率</div></div>
               </div>
               <table class="result-table">
-                <thead><tr><th>受试者ID</th><th>字段</th><th>中心01</th><th>中心02</th><th>差异级别</th></tr></thead>
+                <thead><tr><th>受试者ID</th><th>字段</th><th>中心01</th><th>中心02</th><th>级别</th></tr></thead>
                 <tbody>
                   <tr class="warn"><td>S203-0117</td><td>SAE发生时间</td><td>2026-05-30 14:20</td><td>2026-05-30 14:00</td><td>关键</td></tr>
                   <tr class="warn"><td>S203-0204</td><td>主要疗效评分</td><td>8.4</td><td>8.7</td><td>关键</td></tr>
@@ -541,19 +992,20 @@
                   <tr><td>S203-0418</td><td>访视日期</td><td>2026-05-28</td><td>2026-05-29</td><td>一般</td></tr>
                 </tbody>
               </table>
-              <div style="font-size:11px;color:#6b7280;margin-top:6px;">仅显示前 4 行 · <a href="#" style="color:#2563eb;">查看全部 17 行 →</a></div>
+              <div style="font-size:11px;color:var(--text-mute);margin-top:8px;font-family:'JetBrains Mono',monospace;">
+                仅显示前 4 行 · <a href="#" style="color:var(--cyan);">查看全部 17 行 →</a>
+              </div>
               <div class="result-actions">
                 <button class="btn-primary">⬇ 下载 Excel</button>
                 <button class="btn-secondary">📁 保存到工作区</button>
                 <button class="btn-secondary">📌 把异常值高亮</button>
-                <button class="btn-secondary" style="color:#dc2626;">👤 请人工复核</button>
+                <button class="btn-secondary btn-danger">👤 请人工复核</button>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 用户追问 -->
       <div class="msg user">
         <div class="avatar">张</div>
         <div class="body">
@@ -563,12 +1015,12 @@
       </div>
 
       <div class="msg ai">
-        <div class="avatar">AI</div>
+        <div class="avatar">QC</div>
         <div class="body">
-          <div class="name">VaccineTrial 助手 · 09:44</div>
+          <div class="name">QUANTUM CHAIN · 09:44</div>
           <div class="bubble">
-            理解为基于刚才的比对结果生成待复核清单。匹配到技能 <b>「数据复核清单生成」</b>，将以 3 条关键差异为输入…
-            <div style="margin-top:8px;">
+            理解为基于刚才的比对结果生成待复核清单。匹配到技能 <b style="color:var(--cyan);">「数据复核清单生成」</b>，将以 3 条关键差异为输入…
+            <div style="margin-top:10px;">
               <button class="btn-primary">▶ 立即执行</button>
               <button class="btn-secondary">先看参数</button>
             </div>
@@ -579,7 +1031,7 @@
     </div>
 
     <!-- 输入区 -->
-    <div class="input-area" style="position:relative;">
+    <div class="input-area">
       <div class="slash-menu" id="slashMenu">
         <div class="slash-item"><div class="ic">📊</div><div><div class="nm">CRF 跨中心比对</div><div class="ds">两个中心 CRF 字段级差异</div></div></div>
         <div class="slash-item"><div class="ic">⚠️</div><div><div class="nm">SAE 报告生成</div><div class="ds">基于不良事件原始记录生成报告</div></div></div>
@@ -588,16 +1040,15 @@
       </div>
 
       <div class="input-wrap">
-        <div class="attached-files" id="attached"></div>
-        <textarea class="input" id="chatInput" rows="1" placeholder="输入消息，输入 / 调起技能，Enter 发送，Shift+Enter 换行"></textarea>
+        <textarea class="input" id="chatInput" rows="1" placeholder="输入消息，输入 / 调起技能，Enter 发送 · Shift+Enter 换行"></textarea>
         <div class="input-bottom">
           <div class="input-toolbar">
-            <button class="tool-btn" title="从工作区选择">📎 工作区文件</button>
-            <button class="tool-btn" title="上传文件">📤 上传文件</button>
-            <button class="tool-btn" id="skillCenterBtn" title="技能中心">⚡ 技能中心 ▾</button>
+            <button class="tool-btn">📎 工作区文件</button>
+            <button class="tool-btn">📤 上传文件</button>
+            <button class="tool-btn primary" id="skillCenterBtn">⚡ 技能中心 ▾</button>
           </div>
-          <div style="display:flex;gap:10px;align-items:center;">
-            <span class="input-hint">已选 3 个上下文文件</span>
+          <div style="display:flex;gap:12px;align-items:center;">
+            <span class="input-hint">CONTEXT · 3 FILES</span>
             <button class="send-btn" title="发送">➤</button>
           </div>
         </div>
@@ -605,13 +1056,12 @@
     </div>
   </main>
 
-  <!-- 拖拽手柄 -->
   <div class="resizer" id="resizer"></div>
 
-  <!-- 右侧：工作区 -->
+  <!-- 右侧 -->
   <aside class="right-panel" id="rightPanel" style="width: 340px;">
     <div class="right-header">
-      <span class="title">工作区</span>
+      <span class="title">// WORKSPACE</span>
       <select class="ws-selector">
         <option>V-203 三期临床</option>
         <option>V-188 二期</option>
@@ -619,14 +1069,10 @@
       </select>
     </div>
     <div class="selected-bar">
-      <span>已选 <b>3</b> 项作为对话上下文</span>
+      <span>SELECTED &gt; <b>3</b> ITEMS · 已绑定上下文</span>
       <span class="clear">清空</span>
     </div>
-
-    <div class="file-tree" id="fileTree">
-      <!-- 由 JS 渲染 -->
-    </div>
-
+    <div class="file-tree" id="fileTree"></div>
     <div class="right-footer">
       <button>⬆ 上传</button>
       <button>📁 新建文件夹</button>
@@ -640,9 +1086,9 @@
 <div class="modal-mask" id="skillModal">
   <div class="modal">
     <div class="modal-head">
-      <span style="font-size:20px;">⚡</span>
-      <span class="title">技能中心</span>
-      <span style="font-size:12px;color:#6b7280;">本组织共 <b>12</b> 个技能 · 任意成员可用</span>
+      <div class="ic-big">⚡</div>
+      <span class="title">技能中心 · SKILL HUB</span>
+      <span class="sub">本组织共 <b>12</b> 个技能 · 全员可用</span>
       <button class="close" data-close>✕</button>
     </div>
     <div class="modal-tabs">
@@ -651,11 +1097,10 @@
       <div class="modal-tab" data-tab="upload">上传技能</div>
     </div>
 
-    <!-- Tab: 浏览 -->
     <div class="modal-body" data-pane="browse">
       <div class="skill-toolbar">
         <input type="text" placeholder="搜索技能名称、描述、标签…" />
-        <select style="padding:7px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:13px;">
+        <select>
           <option>全部分类</option>
           <option>数据比对</option>
           <option>安全报告</option>
@@ -664,29 +1109,28 @@
         </select>
         <button class="upload-skill-btn" data-goto-upload>＋ 上传技能</button>
       </div>
-
       <div class="skill-grid" id="skillGrid"></div>
     </div>
 
-    <!-- Tab: 我上传的 -->
     <div class="modal-body" data-pane="mine" style="display:none;">
-      <div style="font-size:12px;color:#6b7280;margin-bottom:12px;">您可以删除自己上传的技能，删除后本组织其他成员也将不可见。</div>
+      <div style="font-size:12px;color:var(--text-mute);margin-bottom:14px;font-family:'JetBrains Mono',monospace;">
+        // 您可以删除自己上传的技能，删除后本组织其他成员不可见
+      </div>
       <div class="skill-grid" id="mySkillGrid"></div>
     </div>
 
-    <!-- Tab: 上传 -->
     <div class="modal-body" data-pane="upload" style="display:none;">
       <div class="upload-form">
         <div class="upload-dropzone" id="dropzone">
           <div class="big">📦</div>
-          <div style="font-weight:500;">点击或拖拽上传技能包（.zip）</div>
+          <div class="lbl">点击或拖拽上传技能包（.zip）</div>
           <div class="hint">必须包含 <code>manifest.json</code> · 执行脚本 · 依赖清单 <code>requirements.txt</code></div>
         </div>
 
         <div class="manifest-check" style="display:none;" id="manifestCheck">
           ✓ 技能包格式校验通过
           <ul>
-            <li>manifest.json — 已识别（v1.0 schema）</li>
+            <li>manifest.json — 已识别 [v1.0 schema]</li>
             <li>main.py — 执行入口</li>
             <li>requirements.txt — 6 个依赖</li>
             <li>SHA-256: <code>3a7f...c91e</code></li>
@@ -694,37 +1138,32 @@
         </div>
 
         <div class="form-row">
-          <label>技能名称 <span class="req">*</span></label>
+          <label>// 技能名称 <span class="req">*</span></label>
           <input type="text" placeholder="例如：受试者依从性评估" />
         </div>
         <div class="form-row">
-          <label>简介 <span class="req">*</span></label>
+          <label>// 简介 <span class="req">*</span></label>
           <textarea placeholder="一句话说明技能用途，将展示在技能卡片上"></textarea>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
           <div class="form-row">
-            <label>分类</label>
+            <label>// 分类</label>
             <select>
               <option>数据比对</option><option>安全报告</option>
               <option>数据提取</option><option>统计分析</option><option>其他</option>
             </select>
           </div>
           <div class="form-row">
-            <label>输入文件类型</label>
+            <label>// 输入文件类型</label>
             <input type="text" placeholder="如：.xlsx, .csv, .pdf" />
           </div>
         </div>
         <div class="form-row">
-          <label>参数说明</label>
+          <label>// 参数说明</label>
           <textarea placeholder="逐项说明参数名、含义、默认值"></textarea>
         </div>
-        <div class="form-row">
-          <label>输出示例</label>
-          <input type="file" />
-          <div class="helper">可选，上传一张缩略图作为技能卡封面</div>
-        </div>
 
-        <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:10px 12px;font-size:12px;color:#92400e;">
+        <div class="warn-banner">
           ⚠ 上传后将<b>立即对本组织全部成员可见可用</b>，无需审批。请确保不包含未脱敏的受试者数据。
         </div>
       </div>
@@ -738,24 +1177,19 @@
 </div>
 
 <script>
-  // ====== 折叠/展开 ======
   const leftPanel = document.getElementById('leftPanel');
   const rightPanel = document.getElementById('rightPanel');
   const resizer = document.getElementById('resizer');
 
-  document.getElementById('toggleLeft').onclick = () => {
-    leftPanel.classList.toggle('collapsed');
-  };
+  document.getElementById('toggleLeft').onclick = () => leftPanel.classList.toggle('collapsed');
   document.getElementById('toggleRight').onclick = () => {
     rightPanel.classList.toggle('collapsed');
     resizer.classList.toggle('hidden', rightPanel.classList.contains('collapsed'));
   };
 
-  // ====== 右栏拖拽调整宽度 ======
   let dragging = false;
   resizer.addEventListener('mousedown', e => {
-    dragging = true;
-    resizer.classList.add('dragging');
+    dragging = true; resizer.classList.add('dragging');
     document.body.style.cursor = 'col-resize';
     document.body.style.userSelect = 'none';
     e.preventDefault();
@@ -764,19 +1198,15 @@
     if (!dragging) return;
     const layoutRect = document.getElementById('layout').getBoundingClientRect();
     const newWidth = layoutRect.right - e.clientX;
-    const clamped = Math.max(240, Math.min(700, newWidth));
-    rightPanel.style.width = clamped + 'px';
+    rightPanel.style.width = Math.max(240, Math.min(700, newWidth)) + 'px';
   });
   document.addEventListener('mouseup', () => {
     if (dragging) {
-      dragging = false;
-      resizer.classList.remove('dragging');
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
+      dragging = false; resizer.classList.remove('dragging');
+      document.body.style.cursor = ''; document.body.style.userSelect = '';
     }
   });
 
-  // ====== 文件树渲染 ======
   const tree = [
     { type: 'folder', name: '01_原始数据', desc: true, children: [
       { type: 'folder', name: 'CRF', children: [
@@ -805,7 +1235,6 @@
       ]},
     ]},
   ];
-
   function renderTree(nodes, container, depth=0) {
     nodes.forEach(node => {
       const row = document.createElement('div');
@@ -816,7 +1245,7 @@
         <input type="checkbox" ${node.selected ? 'checked' : ''} />
         <span class="icon">${isFolder ? '📁' : '📄'}</span>
         <span class="name">${node.name}</span>
-        ${node.desc ? '<span class="desc-icon" title="有描述">📝</span>' : ''}
+        ${node.desc ? '<span class="desc-icon" title="有描述">●</span>' : ''}
         ${node.size ? `<span class="size">${node.size}</span>` : ''}
       `;
       container.appendChild(row);
@@ -836,7 +1265,6 @@
   }
   renderTree(tree, document.getElementById('fileTree'));
 
-  // ====== 输入区：斜杠菜单 + 自动高度 ======
   const input = document.getElementById('chatInput');
   const slashMenu = document.getElementById('slashMenu');
   input.addEventListener('input', () => {
@@ -850,14 +1278,11 @@
   });
   document.querySelectorAll('.slash-item').forEach(item => {
     item.onclick = () => {
-      const name = item.querySelector('.nm').textContent;
-      insertSkillCard(name);
-      input.value = '';
-      slashMenu.classList.remove('show');
+      insertSkillCard(item.querySelector('.nm').textContent);
+      input.value = ''; slashMenu.classList.remove('show');
     };
   });
 
-  // ====== 技能中心弹层 ======
   const skills = [
     { ic: '📊', nm: 'CRF 跨中心数据比对', desc: '对两个研究中心相同字段进行行级比对，输出差异报告', cat: '数据比对', uses: 128, mine: true },
     { ic: '⚠️', nm: 'SAE 报告生成', desc: '基于不良事件原始记录生成监管要求的严重不良事件报告', cat: '安全报告', uses: 87 },
@@ -890,14 +1315,13 @@
         <div class="desc">${s.desc}</div>
         <div class="meta">
           <span class="tag">${s.cat}</span>
-          ${s.mine ? '<span class="tag mine">我上传</span>' : ''}
-          <span style="margin-left:auto;">使用 ${s.uses} 次</span>
+          ${s.mine ? '<span class="tag mine">MINE</span>' : ''}
+          <span style="margin-left:auto;">⚡ ${s.uses}</span>
         </div>
       `;
       tile.onclick = (e) => {
         if (e.target.closest('.actions')) return;
-        closeModal();
-        insertSkillCard(s.nm);
+        closeModal(); insertSkillCard(s.nm);
       };
       container.appendChild(tile);
     });
@@ -906,10 +1330,7 @@
   renderSkillGrid(document.getElementById('mySkillGrid'), skills.filter(s => s.mine));
 
   const skillModal = document.getElementById('skillModal');
-  function openModal(tab='browse') {
-    skillModal.classList.add('show');
-    switchTab(tab);
-  }
+  function openModal(tab='browse') { skillModal.classList.add('show'); switchTab(tab); }
   function closeModal() { skillModal.classList.remove('show'); }
   function switchTab(t) {
     document.querySelectorAll('.modal-tab').forEach(el => el.classList.toggle('active', el.dataset.tab === t));
@@ -921,33 +1342,31 @@
   document.querySelectorAll('.modal-tab').forEach(t => t.onclick = () => switchTab(t.dataset.tab));
   document.querySelector('[data-goto-upload]').onclick = () => switchTab('upload');
   skillModal.addEventListener('click', e => { if (e.target === skillModal) closeModal(); });
-
   document.getElementById('dropzone').onclick = () => {
     document.getElementById('manifestCheck').style.display = 'block';
   };
 
-  // ====== 把一个 Skill 主动插入到对话中作为「待执行卡」 ======
   function insertSkillCard(name) {
     const messages = document.getElementById('messages');
     const wrap = document.createElement('div');
     wrap.className = 'msg ai';
     wrap.innerHTML = `
-      <div class="avatar">AI</div>
+      <div class="avatar">QC</div>
       <div class="body">
-        <div class="name">VaccineTrial 助手 · 主动调用</div>
+        <div class="name">QUANTUM CHAIN · 主动调用</div>
         <div class="bubble">
-          您从技能中心选择了 <b>${name}</b>，已加载参数表单（默认使用右侧上下文中已选的 3 个文件）：
+          您从技能中心选择了 <b style="color:var(--cyan);">${name}</b>，已加载参数表单（默认使用右侧上下文中已选的 3 个文件）：
           <div class="skill-card">
             <div class="sk-head">
               <div class="sk-icon">⚡</div>
               <div style="flex:1;">
-                <div class="sk-name">${name} <span class="sk-tag">Skill</span></div>
+                <div class="sk-name">${name} <span class="sk-tag">SKILL</span></div>
                 <div class="sk-desc">点击「执行」立即运行，或先在下方调整参数</div>
               </div>
             </div>
             <div class="sk-fields">
               <div class="sk-field">
-                <label>输入文件</label>
+                <label>// INPUT FILES</label>
                 <div class="sk-files">
                   <span class="sk-file-chip">📄 Site01_CRF_W23.xlsx</span>
                   <span class="sk-file-chip">📄 Site02_CRF_W23.xlsx</span>
@@ -955,7 +1374,7 @@
                 </div>
               </div>
               <div class="sk-field">
-                <label>用自然语言补充参数（可选）</label>
+                <label>// 自然语言参数补充（可选）</label>
                 <input type="text" placeholder="例如：仅保留 W22 之后的访视，按受试者排序" />
               </div>
             </div>
