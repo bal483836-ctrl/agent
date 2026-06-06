@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { Spin } from 'antd';
 import TopBar from './components/TopBar';
 import ChatHistory from './components/Sidebar/ChatHistory';
 import ChatPanel from './components/Chat/ChatPanel';
@@ -6,6 +7,7 @@ import WorkspacePanel from './components/Workspace/WorkspacePanel';
 import SkillCenterModal from './components/SkillCenter/SkillCenterModal';
 import LoginGate from './components/LoginGate';
 import useChatStore from './hooks/useChatStore';
+import { setUnauthorizedHandler } from './api';
 
 /**
  * 三栏布局根组件。
@@ -20,6 +22,18 @@ export default function App() {
   const rightWidth = useChatStore((s) => s.rightWidth);
   const setRightWidth = useChatStore((s) => s.setRightWidth);
   const loggedOut = useChatStore((s) => s.loggedOut);
+  const loading = useChatStore((s) => s.loading);
+  const bootstrap = useChatStore((s) => s.bootstrap);
+  const currentUser = useChatStore((s) => s.currentUser);
+
+  // 应用启动时拉取用户/会话/工作区/技能
+  useEffect(() => {
+    setUnauthorizedHandler(() => useChatStore.setState({ loggedOut: true }));
+    bootstrap().catch((e) => {
+      // bootstrap 失败时也不阻塞渲染，由错误边界 / 登录页接管
+      console.error('bootstrap failed', e);
+    });
+  }, [bootstrap]);
 
   const resizing = useRef(false);
   useEffect(() => {
@@ -42,6 +56,16 @@ export default function App() {
       window.removeEventListener('mouseup', onUp);
     };
   }, [setRightWidth]);
+
+  if (loading && !currentUser) {
+    return (
+      <div style={{
+        height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        <Spin size="large" tip="加载中..." />
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>

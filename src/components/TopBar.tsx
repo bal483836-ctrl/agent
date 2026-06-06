@@ -29,6 +29,8 @@ function ProfileContent({ onClose }: { onClose: () => void }) {
   const logout = useChatStore((s) => s.logout);
   const { message } = AntApp.useApp();
 
+  if (!user) return null;
+
   return (
     <div style={{ width: 280 }}>
       {/* 头像 + 姓名 + 角色 */}
@@ -59,8 +61,8 @@ function ProfileContent({ onClose }: { onClose: () => void }) {
 
       <Button
         block danger icon={<LogoutOutlined />}
-        onClick={() => {
-          logout();
+        onClick={async () => {
+          await logout();
           message.success('已退出登录');
           onClose();
         }}
@@ -86,6 +88,8 @@ function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string;
 export default function TopBar() {
   const user = useChatStore((s) => s.currentUser);
   const [open, setOpen] = useState(false);
+
+  // 未加载用户时也允许 TopBar 渲染（只是不显示弹层）
 
   return (
     <header className="qc-topbar">
@@ -125,7 +129,7 @@ export default function TopBar() {
         arrow={false}
         content={<ProfileContent onClose={() => setOpen(false)} />}
       >
-        <span title={user.name}>
+        <span title={user?.name ?? ''}>
           <Avatar
             style={{
               background: 'linear-gradient(135deg,#3b82f6,#2563eb)',

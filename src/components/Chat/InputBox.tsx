@@ -3,7 +3,7 @@ import { Button, Input, Space, Tooltip, Upload, type UploadProps, App as AntApp 
 import {
   CloudUploadOutlined, ThunderboltOutlined, SendOutlined,
 } from '@ant-design/icons';
-import useChatStore, { mockSkills } from '@/hooks/useChatStore';
+import useChatStore from '@/hooks/useChatStore';
 
 const { TextArea } = Input;
 
@@ -20,6 +20,7 @@ export default function InputBox() {
   const openSkillCenter = useChatStore((s) => s.openSkillCenter);
   const insertSkillTrigger = useChatStore((s) => s.insertSkillTrigger);
   const selected = useChatStore((s) => s.selectedContext);
+  const allSkills = useChatStore((s) => s.skills);
 
   const [value, setValue] = useState('');
   const [showSlash, setShowSlash] = useState(false);
@@ -44,7 +45,7 @@ export default function InputBox() {
     if (e.key === 'Escape') setShowSlash(false);
   };
 
-  const slashItems = mockSkills.slice(0, 6).filter((s) => {
+  const slashItems = allSkills.slice(0, 6).filter((s) => {
     const q = value.replace(/^\/+/, '').toLowerCase();
     return !q || s.name.toLowerCase().includes(q) || s.description.toLowerCase().includes(q);
   });

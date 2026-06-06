@@ -12,7 +12,6 @@ import {
   EditOutlined, DeleteOutlined,
 } from '@ant-design/icons';
 import useChatStore from '@/hooks/useChatStore';
-import { mockWorkspaces } from '@/mock/data';
 import type { WsNode } from '@/types';
 
 /** 把字节数格式化为可读字符串 */
@@ -91,7 +90,7 @@ function findNode(nodes: WsNode[], key: string): WsNode | undefined {
 
 export default function WorkspacePanel() {
   const {
-    workspaceId, setWorkspace,
+    workspaceId, setWorkspace, workspaces,
     workspaceTrees, selectedContext, setSelectedContext,
     renameWsNode, deleteWsNode, moveWsNode, addWsNode,
   } = useChatStore();
@@ -185,20 +184,22 @@ export default function WorkspacePanel() {
     moveWsNode(dragKey, dropKey, info.dropToGap);
   };
 
-  /* —— 上传：mock 把文件真的加进树根 —— */
+  /* —— 上传：调 files API（mock 模式直接返回；real 模式走后端） —— */
   const uploadProps: UploadProps = {
     multiple: true, showUploadList: false,
-    beforeUpload: (file) => {
-      addWsNode(null, {
-        key: `f-${nanoid(6)}`,
-        name: file.name,
-        type: 'file',
-        size: fmtSize(file.size),
-      });
-      message.success(`已上传：${file.name}`);
-      return false;
+    beforeUpload: async (file) => {
+      try {
+        const { filesApi } = await import('@/api/files');
+        const node = await filesApi.uploadToWorkspace(workspaceId, null, file);
+        addWsNode(null, node);
+        message.success(`已上传：${node.name}`);
+      } catch (e) {
+        message.error(`上传失败：${(e as Error).message}`);
+      }
+      return false; // 阻止 AntD 默认上传
     },
   };
+  void fmtSize;
 
   /* —— 新建文件夹 —— */
   const handleNewFolder = () => {
@@ -239,7 +240,7 @@ export default function WorkspacePanel() {
           value={workspaceId}
           onChange={setWorkspace}
           style={{ width: 160 }}
-          options={mockWorkspaces.map((w) => ({ label: w.name, value: w.id }))}
+          options={workspaces.map((w) => ({ label: w.name, value: w.id }))}
         />
       </div>
 

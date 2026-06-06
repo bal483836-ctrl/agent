@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Modal, Tabs, Input, Select, Button, Space, App as AntApp } from 'antd';
 import { PlusOutlined, ThunderboltOutlined } from '@ant-design/icons';
-import useChatStore, { mockSkills } from '@/hooks/useChatStore';
+import useChatStore from '@/hooks/useChatStore';
 import SkillGrid from './SkillGrid';
 import UploadSkillForm from './UploadSkillForm';
 import SkillDetailModal from './SkillDetailModal';
@@ -21,6 +21,7 @@ export default function SkillCenterModal() {
   const open = useChatStore((s) => s.skillCenterOpen);
   const close = useChatStore((s) => s.closeSkillCenter);
   const insert = useChatStore((s) => s.insertSkillTrigger);
+  const allSkills = useChatStore((s) => s.skills);
   const { message } = AntApp.useApp();
 
   const [tab, setTab] = useState('browse');
@@ -28,12 +29,12 @@ export default function SkillCenterModal() {
   const [category, setCategory] = useState<string>('all');
   const [detail, setDetail] = useState<SkillCandidate | null>(null);
 
-  const filtered = mockSkills.filter((s) => {
+  const filtered = allSkills.filter((s) => {
     if (search && !s.name.includes(search) && !s.description.includes(search)) return false;
     if (category !== 'all' && s.category !== category) return false;
     return true;
   });
-  const mine = mockSkills.filter((s) => s.mine);
+  const mine = allSkills.filter((s) => s.mine);
 
   /** 详情中确认使用后，关闭技能中心 + 插入待执行卡 */
   const handleApproved = (sk: SkillCandidate) => {
@@ -56,7 +57,7 @@ export default function SkillCenterModal() {
             </div>
             <span>技能中心</span>
             <span style={{ fontSize: 12, color: '#6b7280', fontWeight: 400 }}>
-              · 本组织共 <b style={{ color: '#2563eb' }}>{mockSkills.length}</b> 个技能，全员可用
+              · 本组织共 <b style={{ color: '#2563eb' }}>{allSkills.length}</b> 个技能，全员可用
             </span>
           </Space>
         }

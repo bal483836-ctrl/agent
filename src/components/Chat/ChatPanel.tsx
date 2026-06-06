@@ -4,7 +4,6 @@ import { MenuOutlined, FolderOpenOutlined, FolderOutlined, ThunderboltOutlined }
 import useChatStore from '@/hooks/useChatStore';
 import MessageList from './MessageList';
 import InputBox from './InputBox';
-import { mockWorkspaces } from '@/mock/data';
 
 /**
  * 对话主面板。
@@ -17,11 +16,11 @@ export default function ChatPanel() {
     sessions, activeSessionId, messages,
     leftCollapsed, rightCollapsed,
     toggleLeft, toggleRight,
-    selectedContext, workspaceId,
+    selectedContext, workspaceId, workspaces,
   } = useChatStore();
 
   const session = sessions.find((s) => s.id === activeSessionId);
-  const ws = mockWorkspaces.find((w) => w.id === workspaceId);
+  const ws = workspaces.find((w) => w.id === workspaceId);
 
   // 累计当前会话所有 AI 消息的 token 使用量
   const sessionTokens = useMemo(() => {

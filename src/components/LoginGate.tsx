@@ -9,6 +9,9 @@ import useChatStore from '@/hooks/useChatStore';
 export default function LoginGate() {
   const loginAgain = useChatStore((s) => s.loginAgain);
   const user = useChatStore((s) => s.currentUser);
+  const handleRelogin = async () => {
+    try { await loginAgain(); } catch (e) { console.error(e); }
+  };
 
   return (
     <div style={{
@@ -19,9 +22,9 @@ export default function LoginGate() {
         <Result
           status="info"
           title="已退出登录"
-          subTitle={`当前账号：${user.name} · ${user.organization}`}
+          subTitle={user ? `当前账号：${user.name} · ${user.organization}` : '请重新登录'}
           extra={
-            <Button type="primary" icon={<LoginOutlined />} onClick={loginAgain}>
+            <Button type="primary" icon={<LoginOutlined />} onClick={handleRelogin}>
               重新登录
             </Button>
           }

@@ -21,6 +21,7 @@
 
 ```bash
 npm install
+cp .env.example .env.local        # 调整环境变量（默认 mock 模式）
 npm run dev      # 开发：http://localhost:5173
 npm run build    # 生产构建产物在 dist/
 npm run preview  # 预览生产产物
@@ -28,9 +29,50 @@ npm run preview  # 预览生产产物
 
 Node ≥ 18。
 
+### 切换 mock / 真后端
+
+`.env.local`：
+
+```
+VITE_USE_MOCK=true              # 默认离线 mock
+# VITE_USE_MOCK=false            # 连真后端
+VITE_API_BASE_URL=/api
+VITE_DEV_BACKEND=http://localhost:8080  # vite proxy 目标
+```
+
+切换不需要改任何业务代码，所有副作用都收敛在 `src/api/`。
+
 ---
 
-## 3. 目录结构
+## 3. 与后端对接
+
+**接口契约见 [`BACKEND_CONTRACT.md`](./BACKEND_CONTRACT.md)**（按资源逐个列了请求/响应示例）。
+
+`src/api/` 中每个文件都定义了 `interface XxxApi`，并提供 `mockApi` 和 `realApi` 两种实现，由 `USE_MOCK` 开关选择：
+
+```
+src/api/
+├── env.ts          # 环境开关
+├── http.ts         # fetch 封装 + JWT + 401 拦截 + SSE 流解析 + WS URL 构造
+├── types.ts        # API 专属类型（LoginResponse, StreamEvent...）
+├── auth.ts
+├── sessions.ts
+├── messages.ts     # SSE 流式回复
+├── skills.ts
+├── workspaces.ts
+├── files.ts        # 上传 + SHA-256 + 业务约束
+├── runs.ts         # 技能执行 + WS 进度
+└── index.ts        # `api.{auth,sessions,messages,skills,workspaces,files,runs}` 总出口
+```
+
+后端就绪时：
+
+1. 先实现 `BACKEND_CONTRACT.md` 中的任意接口；
+2. 把 `.env.local` 中 `VITE_USE_MOCK` 设为 `false`；
+3. **业务代码不动**，前端会自动走 real 实现。
+4. 未实现的接口可保留 mock —— 因为 `mockApi` / `realApi` 是按资源粒度的，可单独切换（在 `src/api/<resource>.ts` 中临时硬编码 `mockApi`）。
+
+## 4. 目录结构
 
 ```
 src/
