@@ -261,8 +261,8 @@ const useChatStore = create<ChatState>((set, get) => ({
     get().appendMessage(assistantMsg);
 
     let buffer = '';
-    let stream: Closeable | null = null;
-    stream = api.messages.send(sessionId, content, (e) => {
+    const streamRef: { current: Closeable | null } = { current: null };
+    streamRef.current = api.messages.send(sessionId, content, (e) => {
       if (e.type === 'text-delta') {
         buffer += e.chunk;
         set((s) => ({
@@ -283,12 +283,31 @@ const useChatStore = create<ChatState>((set, get) => ({
           },
         }));
       } else if (e.type === 'tool-call') {
-        // 后端识别到要调技能：替换占位为 skill-confirm
-        // MVP：交给上层 UI 决定，此处仅追加一条文本提示
+        // 后端识别到要调技能：把当前占位 assistant 替换成 skill-confirm
+        const tc = e as unknown as { skillName: string; payload: any };
+        const skill = get().skills.find((s) => s.id === (e as any).toolCallId || s.name === tc.skillName);
+        if (skill) {
+          set((s) => ({
+            messages: {
+              ...s.messages,
+              [sessionId]: (s.messages[sessionId] ?? []).map((m) =>
+                m.id === assistantId
+                  ? {
+                      ...m, type: 'skill-confirm' as const,
+                      candidate: { ...skill, confidence: 95 },
+                      alternatives: [],
+                      inputFiles: get().selectedContext,
+                      fields: [], etaSeconds: 30, etaTokens: 800,
+                    } as any
+                  : m,
+              ),
+            },
+          }));
+        }
       } else if (e.type === 'done' || e.type === 'error') {
-        stream?.close();
+        streamRef.current?.close();
       }
-    });
+    }, get().selectedContext);
   },
 
   async insertSkillTrigger(skill) {

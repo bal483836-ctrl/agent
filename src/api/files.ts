@@ -1,5 +1,5 @@
-import { USE_MOCK } from './env';
-import { request } from './http';
+import { USE_MOCK, API_BASE } from './env';
+import { request, getToken } from './http';
 import type { WsNode } from '@/types';
 
 export interface FilesApi {
@@ -24,16 +24,20 @@ const realApi: FilesApi = {
     // 多部分表单 + XHR 以支持上传进度（fetch 暂不支持）
     return new Promise<WsNode>((resolve, reject) => {
       const fd = new FormData();
-      fd.append('file', file);
       if (parentKey) fd.append('parentKey', parentKey);
+      fd.append('file', file);
       const xhr = new XMLHttpRequest();
-      xhr.open('POST', `${(import.meta as any).env.VITE_API_BASE_URL ?? '/api'}/workspaces/${workspaceId}/files`);
-      const token = localStorage.getItem('qc_jwt');
+      xhr.open('POST', `${API_BASE.replace(/\/$/, '')}/workspaces/${workspaceId}/files`);
+      const token = getToken();
       if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
       xhr.upload.onprogress = (e) => onProgress?.(e.loaded, e.total);
       xhr.onload = () => {
-        if (xhr.status >= 200 && xhr.status < 300) resolve(JSON.parse(xhr.responseText));
-        else reject(new Error(`HTTP ${xhr.status}`));
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try { resolve(JSON.parse(xhr.responseText)); }
+          catch (e) { reject(e); }
+        } else {
+          reject(new Error(`HTTP ${xhr.status}: ${xhr.responseText}`));
+        }
       };
       xhr.onerror = () => reject(new Error('network error'));
       xhr.send(fd);

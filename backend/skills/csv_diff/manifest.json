@@ -1,0 +1,27 @@
+{
+  "id": "csv_diff",
+  "name": "CSV 跨中心数据比对",
+  "description": "对两个 CSV/Excel 同字段进行行级比对，输出差异报告。",
+  "category": "数据比对",
+  "icon": "📊",
+  "entry": "main.py",
+  "uses": 0,
+  "mine": false,
+  "inputs": [".csv", ".xlsx"],
+  "params": [
+    {
+      "key": "tol",
+      "label": "数值容差",
+      "type": "text",
+      "value": "0.01",
+      "helper": "小于此值视为一致"
+    },
+    {
+      "key": "note",
+      "label": "语言描述",
+      "type": "text",
+      "value": "",
+      "helper": "可用自然语言补充"
+    }
+  ]
+}

@@ -1,6 +1,42 @@
-# 量子链 Quantum Chain · 前端
+# 量子链 Quantum Chain
 
-面向疫苗临床试验数据管理与安全监察场景的 LLM 助手。MVP 阶段，前端单页应用。
+面向疫苗临床试验数据管理与安全监察场景的 LLM 助手。
+
+仓库包含：
+- **前端**：根目录（本 README），React + TypeScript + Ant Design
+- **后端**：`backend/`，Fastify + TypeScript + Anthropic Claude SDK
+
+## 一键跑通
+
+```bash
+# 后端
+cd backend
+cp .env.example .env
+# 编辑 .env，至少填 ANTHROPIC_API_KEY=sk-...
+npm install
+npm run dev           # http://localhost:8080
+
+# 另开一个终端 → 前端
+cd ..
+cp .env.example .env.local
+# .env.local 里设置：
+#   VITE_USE_MOCK=false
+#   VITE_API_BASE_URL=/api
+#   VITE_DEV_BACKEND=http://localhost:8080
+npm install
+npm run dev           # http://localhost:5173
+```
+
+打开浏览器即可进入 UI，登录页面输入任意邮箱/密码均通过（mock 鉴权），登录后即可：
+- 发送消息走真实 Claude 流式回复
+- 上传文件落到 `backend/data/<orgId>/<userId>/`
+- 触发 `csv_diff` Skill，看到实时 WS 进度 + 结果卡
+
+后端能力与协议详见 [`backend/README.md`](./backend/README.md)，接口契约详见 [`BACKEND_CONTRACT.md`](./BACKEND_CONTRACT.md)。
+
+---
+
+## 前端
 
 ---
 

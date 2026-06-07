@@ -12,17 +12,18 @@ export interface MessagesApi {
     sessionId: string,
     content: string,
     onEvent: (e: MessageStreamEvent) => void,
+    contextFiles?: { key: string; name: string; type: 'folder' | 'file' }[],
   ): Closeable;
 }
 
 /* ---------- real：SSE 流 ---------- */
 const realApi: MessagesApi = {
   list: (sessionId) => request<ChatMessage[]>(`/sessions/${sessionId}/messages`),
-  send(sessionId, content, onEvent) {
+  send(sessionId, content, onEvent, contextFiles) {
     const ctrl = new AbortController();
     streamSSE(
       `/sessions/${sessionId}/messages`,
-      { content },
+      { content, contextFiles: contextFiles ?? [] },
       ({ event, data }) => {
         try {
           const parsed = JSON.parse(data);
@@ -43,7 +44,7 @@ const mockApi: MessagesApi = {
     // 仅默认会话返回示例消息，其它会话从空开始
     return sessionId === mockMessages[0]?.id ? mockMessages : [];
   },
-  send(_sessionId, content, onEvent) {
+  send(_sessionId, content, onEvent, _ctx) {
     let stopped = false;
     const replyChunks = mockReply(content);
     let i = 0;
