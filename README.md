@@ -6,6 +6,29 @@
 - **前端**：根目录（本 README），React + TypeScript + Ant Design
 - **后端**：`backend/`，Fastify + TypeScript + Anthropic Claude SDK
 
+## 测试
+
+```bash
+bash scripts/test-all.sh              # 全套件：前端 + 后端 + Python
+```
+
+或单独：
+
+```bash
+npm test                              # 前端 vitest（11 个）
+( cd backend && npm test )            # 后端 vitest（23 个）
+python3 -m pytest backend/skills/test_skills.py    # Python skill（8 个）
+```
+
+覆盖关键路径：
+- 路径越权防护（safeResolve）
+- 多租户隔离（不同 orgId/userId 数据互不可见）
+- Skill manifest 校验
+- 会话/消息/工作区树形持久化
+- 审计日志 JSONL 格式
+- Skill 子进程协议（事件流、进度单调性、文件夹批处理）
+- Store 关键状态机（bootstrap / newSession / handover / logout）
+
 ## 一键跑通
 
 ```bash
