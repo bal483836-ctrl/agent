@@ -1,51 +1,47 @@
 /**
- * LLM 适配器。默认对接 Anthropic Claude。
+ * LLM 适配器。每个 Gateway 拥有自己的 Anthropic 客户端实例。
  *  - streamReply(): 流式产出 text-delta / tool-call / usage 事件
- *  - 上下文：会话历史 + 系统提示 + 用户已选文件清单
+ *  - 上下文：历史消息 + 系统提示 + 用户已选文件的元信息和**部分内容**
  *
  * 模型回复中如包含 `<tool_call>{ skillId, params, reason }</tool_call>` 段，
- * 视为请求执行某个 skill；上层据此构造 skill-confirm 消息推给前端。
+ * 视为请求执行某个 skill，由上层据此构造 skill-confirm 推给前端。
  */
-import Anthropic from '@anthropic-ai/sdk';
 import { config } from './config.js';
+import type { Gateway } from './gateway.js';
 import type { PersistedMessage } from './store.js';
 
 export interface LlmTokenUsage {
   prompt: number; completion: number; total: number; durationMs: number;
 }
 
-export interface LlmEvent {
-  /** 文本 delta */
-  type: 'text-delta';
-  chunk: string;
-}
-export interface ToolCallEvent {
-  type: 'tool-call';
-  skillId: string;
-  reason: string;
-  params: Record<string, unknown>;
-}
-export interface UsageEvent {
-  type: 'usage';
-  usage: LlmTokenUsage;
-}
-export interface DoneEvent { type: 'done'; messageId: string }
-export interface ErrorEvent { type: 'error'; reason: string }
-
-export type StreamEvent = LlmEvent | ToolCallEvent | UsageEvent | DoneEvent | ErrorEvent;
-
-const client = new Anthropic({
-  apiKey: config.llm.apiKey,
-  baseURL: config.llm.baseUrl,
-});
+export type StreamEvent =
+  | { type: 'text-delta'; chunk: string }
+  | { type: 'tool-call'; skillId: string; reason: string; params: Record<string, unknown> }
+  | { type: 'usage'; usage: LlmTokenUsage }
+  | { type: 'done'; messageId: string }
+  | { type: 'error'; reason: string };
 
 export interface SkillSummary {
   id: string; name: string; description: string;
 }
 
-/** 把历史对话格式化成 Anthropic 接口需要的 messages 数组 */
+/** 注入到对话的上下文文件项 */
+export interface CtxFile {
+  key: string;
+  name: string;
+  type: 'folder' | 'file';
+  /** 物理路径（用于读取内容） */
+  fsPath?: string;
+  /** 已读出的小型文本片段，会嵌入到 user message */
+  preview?: string;
+  /** 字节数 */
+  size?: number;
+}
+
 function buildMessages(
-  history: PersistedMessage[], userText: string, contextFiles: { name: string; type: string }[],
+  history: PersistedMessage[],
+  userText: string,
+  ctxFiles: CtxFile[],
 ): { role: 'user' | 'assistant'; content: string }[] {
   const msgs: { role: 'user' | 'assistant'; content: string }[] = [];
   for (const h of history) {
@@ -55,34 +51,35 @@ function buildMessages(
       msgs.push({ role: 'assistant', content: h.content });
     }
   }
-  // 当前 user：附带上下文文件
+
+  // 上下文：先列清单，再嵌入小型文本文件的内容
   let ctxBlock = '';
-  if (contextFiles.length) {
-    ctxBlock = `\n[CONTEXT FILES]\n${contextFiles
-      .map((f) => `- ${f.name} (${f.type})`)
-      .join('\n')}\n[END CONTEXT FILES]\n`;
+  if (ctxFiles.length) {
+    ctxBlock = `\n[CONTEXT FILES]\n${ctxFiles
+      .map((f) => `- ${f.name} (${f.type}${f.size != null ? `, ${f.size}B` : ''})`)
+      .join('\n')}\n`;
+    const previews = ctxFiles.filter((f) => f.preview);
+    if (previews.length) {
+      ctxBlock += '\n以下为部分文件内容（截断后）：\n';
+      for (const f of previews) {
+        ctxBlock += `\n<<<FILE name="${f.name}">>>\n${f.preview}\n<<<END>>>\n`;
+      }
+    }
+    ctxBlock += '[END CONTEXT]\n\n';
   }
   msgs.push({ role: 'user', content: ctxBlock + userText });
   return msgs;
 }
 
-/**
- * 流式 chat。回调形式推送事件给上层。
- *
- * @param history    已经持久化的历史
- * @param userText   本次用户输入
- * @param contextFiles 当前对话上下文文件清单
- * @param skills     已注册 skills 摘要（注入 system，让模型有机会发起 tool_call）
- * @param onEvent    事件回调
- */
 export async function streamReply(opts: {
+  gateway: Gateway;
   history: PersistedMessage[];
   userText: string;
-  contextFiles: { name: string; type: string }[];
+  ctxFiles: CtxFile[];
   skills: SkillSummary[];
   onEvent: (e: StreamEvent) => void;
 }): Promise<void> {
-  const { history, userText, contextFiles, skills, onEvent } = opts;
+  const { gateway, history, userText, ctxFiles, skills, onEvent } = opts;
   const t0 = Date.now();
 
   if (!config.llm.apiKey) {
@@ -91,15 +88,15 @@ export async function streamReply(opts: {
   }
 
   const skillsBlock = skills.length
-    ? `\n\n[AVAILABLE SKILLS]\n${skills.map((s) => `- ${s.id}: ${s.name} — ${s.description}`).join('\n')}\n[END SKILLS]\n如需调用其中一个，在回答末尾用一行输出：\n<tool_call>{"skillId":"<id>","reason":"why","params":{...}}</tool_call>`
+    ? `\n\n[AVAILABLE SKILLS]\n${skills.map((s) => `- ${s.id}: ${s.name} — ${s.description}`).join('\n')}\n[END SKILLS]\n如需调用其中一个 Skill，在回答末尾用一行输出：\n<tool_call>{"skillId":"<id>","reason":"原因","params":{...}}</tool_call>`
     : '';
 
   try {
-    const stream = await client.messages.stream({
+    const stream = await gateway.llm.messages.stream({
       model: config.llm.model,
       max_tokens: 1024,
       system: config.llm.systemPrompt + skillsBlock,
-      messages: buildMessages(history, userText, contextFiles),
+      messages: buildMessages(history, userText, ctxFiles),
     });
 
     let full = '';
@@ -111,7 +108,6 @@ export async function streamReply(opts: {
       }
     }
 
-    // 解析尾部的 tool_call（如果有）
     const m = full.match(/<tool_call>([\s\S]*?)<\/tool_call>/);
     if (m) {
       try {
@@ -122,17 +118,19 @@ export async function streamReply(opts: {
           reason: String(parsed.reason ?? ''),
           params: parsed.params ?? {},
         });
-      } catch { /* ignore parse errors */ }
+      } catch { /* ignore */ }
     }
 
     const finalMsg = await stream.finalMessage();
-    const usage: LlmTokenUsage = {
-      prompt: finalMsg.usage.input_tokens,
-      completion: finalMsg.usage.output_tokens,
-      total: finalMsg.usage.input_tokens + finalMsg.usage.output_tokens,
-      durationMs: Date.now() - t0,
-    };
-    onEvent({ type: 'usage', usage });
+    onEvent({
+      type: 'usage',
+      usage: {
+        prompt: finalMsg.usage.input_tokens,
+        completion: finalMsg.usage.output_tokens,
+        total: finalMsg.usage.input_tokens + finalMsg.usage.output_tokens,
+        durationMs: Date.now() - t0,
+      },
+    });
     onEvent({ type: 'done', messageId: finalMsg.id });
   } catch (e: any) {
     onEvent({ type: 'error', reason: e?.message ?? String(e) });

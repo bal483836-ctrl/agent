@@ -42,6 +42,12 @@ app.get('/api/health', async () => ({
   hasLlmKey: Boolean(config.llm.apiKey),
 }));
 
+/** 管理：列出当前活跃的 per-user gateway 实例（用于观察隔离与生命周期） */
+app.get('/api/admin/gateways', async () => {
+  const { gatewayManager } = await import('./gateway.js');
+  return { instances: gatewayManager.list() };
+});
+
 const port = config.port;
 try {
   await app.listen({ port, host: '0.0.0.0' });

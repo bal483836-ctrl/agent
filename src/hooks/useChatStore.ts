@@ -341,8 +341,8 @@ const useChatStore = create<ChatState>((set, get) => ({
     get().appendMessage(progressMsg);
 
     const params = {};
-    const fileKeys = get().selectedContext.map((c) => c.key);
-    const { runId } = await api.runs.start(skill.id, params, fileKeys);
+    const ctx = get().selectedContext;
+    const { runId } = await api.runs.start(skill.id, params, ctx);
 
     const sessionId = get().activeSessionId;
     let resultPayload: Partial<SkillResultMessage> | null = null;

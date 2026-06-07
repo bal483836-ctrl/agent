@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""CSV 跨中心数据比对（演示用 skill）。
+"""CSV 跨中心数据比对 / 批量信息提取（演示 skill）。
 
-调用约定：
-    python3 main.py --params <json> --files <json> --out <dir>
+体现"工作区勾选生效"的关键点：
+  - --files 传入的是一个 JSON 数组：[{"key","name","path","size"}, ...]
+  - path 是后端解析后的**绝对路径**，子进程直接打开即可
+  - 如果勾选的是一个文件夹，后端会展开为该文件夹下的所有文件（最多 20 个）
 
 输出（stdout，逐行 JSON）：
-    {"type":"step","label":"...","status":"running"}
-    {"type":"progress","percent":30,"caption":"..."}
-    {"type":"result","payload":{...}}
-
-无外部依赖（纯标准库），便于在没安装 pandas 时也能跑通端到端流程。
+  {"type":"step","label":"...","status":"running"}
+  {"type":"progress","percent":30,"caption":"..."}
+  {"type":"result","payload":{...}}
 """
 import argparse
 import json
@@ -36,33 +36,67 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
 
     emit({"type": "step", "label": "输入文件加载", "status": "running"})
-    time.sleep(0.4)
-    emit({"type": "progress", "percent": 25, "caption": f"已识别 {len(files)} 个输入"})
+    emit({"type": "progress", "percent": 10,
+          "caption": f"接收到 {len(files)} 个输入文件"})
+
+    # ===== 真实读取每个文件 =====
+    per_file = []
+    n = len(files) if files else 1
+    for i, f in enumerate(files):
+        emit({
+            "type": "progress",
+            "percent": 10 + int(60 * (i + 1) / n),
+            "caption": f"读取 [{i + 1}/{n}] {f.get('name')}",
+        })
+        info = {"key": f.get("key"), "name": f.get("name"), "size": f.get("size")}
+        p = f.get("path")
+        if not p or not os.path.exists(p):
+            info["status"] = "missing"
+            per_file.append(info)
+            continue
+        try:
+            st = os.stat(p)
+            info["bytes"] = st.st_size
+            # 读前 200 行，逐行计 token 行数
+            with open(p, "rb") as fp:
+                head = fp.read(64 * 1024)
+            lines = head.splitlines()
+            info["lineCount"] = len(lines)
+            info["firstLine"] = (lines[0][:120].decode("utf-8", errors="replace")
+                                 if lines else "")
+            info["status"] = "ok"
+        except Exception as e:
+            info["status"] = "error"
+            info["error"] = str(e)
+        per_file.append(info)
+        time.sleep(0.1)  # 演示效果
 
     emit({"type": "step", "label": "输入文件加载", "status": "done"})
-    emit({"type": "step", "label": "参数校验", "status": "running"})
+    emit({"type": "step", "label": "聚合分析", "status": "running"})
     time.sleep(0.3)
-    emit({"type": "progress", "percent": 45, "caption": "校验参数中…"})
-    emit({"type": "step", "label": "参数校验", "status": "done"})
 
-    emit({"type": "step", "label": "主流程执行", "status": "running"})
-    time.sleep(0.6)
-    emit({"type": "progress", "percent": 75, "caption": "比对字段…"})
-    emit({"type": "step", "label": "主流程执行", "status": "done"})
+    total_bytes = sum(x.get("bytes", 0) or 0 for x in per_file)
+    total_lines = sum(x.get("lineCount", 0) or 0 for x in per_file)
+    ok_count = sum(1 for x in per_file if x.get("status") == "ok")
+    missing_count = sum(1 for x in per_file if x.get("status") == "missing")
 
+    emit({"type": "step", "label": "聚合分析", "status": "done"})
     emit({"type": "step", "label": "输出归档", "status": "running"})
-    # 写一个假报告，演示输出归档
-    report_path = os.path.join(out_dir, "diff_report.json")
-    report = {
-        "skill": "csv_diff",
-        "params": params,
-        "files": files,
-        "totalRows": 632,
-        "diffRows": 17,
-        "criticalRows": 3,
-    }
+
+    report_path = os.path.join(out_dir, "report.json")
     with open(report_path, "w", encoding="utf-8") as fp:
-        json.dump(report, fp, ensure_ascii=False, indent=2)
+        json.dump({
+            "skill": "csv_diff",
+            "params": params,
+            "files": per_file,
+            "summary": {
+                "totalFiles": len(per_file),
+                "ok": ok_count,
+                "missing": missing_count,
+                "totalBytes": total_bytes,
+                "totalLines": total_lines,
+            },
+        }, fp, ensure_ascii=False, indent=2)
 
     params_path = os.path.join(out_dir, "run_params.json")
     with open(params_path, "w", encoding="utf-8") as fp:
@@ -71,42 +105,47 @@ def main():
     emit({"type": "step", "label": "输出归档", "status": "done"})
     emit({"type": "progress", "percent": 100, "caption": "完成"})
 
+    table_rows = [
+        {
+            "name": x.get("name", ""),
+            "size": str(x.get("bytes", "")) if x.get("bytes") is not None else "-",
+            "lines": str(x.get("lineCount", "-")),
+            "first": x.get("firstLine", "")[:60],
+            "status": x.get("status", ""),
+        }
+        for x in per_file[:50]
+    ]
+
     emit({
         "type": "result",
         "payload": {
-            "summary": "比对完成。共扫描 632 条记录，发现 17 处差异，其中 3 处为关键字段。",
+            "summary": f"已批量处理 {len(per_file)} 个文件，{ok_count} 成功 / {missing_count} 缺失，"
+                       f"累计 {total_bytes} 字节 / {total_lines} 行。",
             "metrics": [
-                {"label": "总记录", "value": "632", "tone": "primary"},
-                {"label": "字段差异", "value": "17"},
-                {"label": "关键差异", "value": "3", "tone": "danger"},
-                {"label": "一致率", "value": "97.3%", "tone": "success"},
+                {"label": "文件数", "value": str(len(per_file)), "tone": "primary"},
+                {"label": "成功", "value": str(ok_count), "tone": "success"},
+                {"label": "缺失", "value": str(missing_count),
+                 "tone": "danger" if missing_count else "primary"},
+                {"label": "总字节", "value": str(total_bytes)},
             ],
             "table": {
                 "columns": [
-                    {"key": "sid", "title": "受试者ID"},
-                    {"key": "field", "title": "字段"},
-                    {"key": "s1", "title": "中心01"},
-                    {"key": "s2", "title": "中心02"},
-                    {"key": "level", "title": "级别"},
+                    {"key": "name", "title": "文件名"},
+                    {"key": "size", "title": "字节"},
+                    {"key": "lines", "title": "行数"},
+                    {"key": "first", "title": "首行预览"},
+                    {"key": "status", "title": "状态"},
                 ],
-                "rows": [
-                    {"sid": "S203-0117", "field": "SAE发生时间",
-                     "s1": "2026-05-30 14:20", "s2": "2026-05-30 14:00", "level": "关键"},
-                    {"sid": "S203-0204", "field": "主要疗效评分",
-                     "s1": "8.4", "s2": "8.7", "level": "关键"},
-                    {"sid": "S203-0301", "field": "体温(°C)",
-                     "s1": "37.2", "s2": "37.21", "level": "容差内"},
-                ],
-                "warnKeys": ["S203-0117", "S203-0204"],
+                "rows": table_rows,
             },
-            "totalRows": 17,
-            "previewRows": 3,
+            "totalRows": len(per_file),
+            "previewRows": min(50, len(per_file)),
             "outputs": [
-                {"name": "diff_report.json", "path": report_path},
+                {"name": "report.json", "path": report_path},
                 {"name": "run_params.json", "path": params_path},
             ],
             "runtimeMs": 0,
-            "needsHumanReview": True,
+            "needsHumanReview": False,
         },
     })
 

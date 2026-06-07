@@ -1,0 +1,31 @@
+{
+  "id": "batch_extract",
+  "name": "目录批量信息提取",
+  "description": "勾选一个文件夹后批量遍历其中所有文件，输出元信息表（大小、类型、首行）。也适用于图片/PDF 批量处理（占位实现）。",
+  "category": "数据提取",
+  "icon": "🗂️",
+  "entry": "main.py",
+  "uses": 0,
+  "mine": false,
+  "inputs": ["*"],
+  "params": [
+    {
+      "key": "scope",
+      "label": "处理范围",
+      "type": "select",
+      "value": "all",
+      "options": [
+        { "label": "全部文件", "value": "all" },
+        { "label": "仅图片", "value": "images" },
+        { "label": "仅文本", "value": "text" }
+      ]
+    },
+    {
+      "key": "note",
+      "label": "语言描述",
+      "type": "text",
+      "value": "",
+      "helper": "可用自然语言补充，例如：每个文件输出尺寸 + 拍摄时间"
+    }
+  ]
+}

@@ -17,9 +17,29 @@ Fastify + TypeScript + Anthropic Claude SDK，承载前端所需的全部接口�
 
 按需求："组织间物理隔离（独立 VM）+ 组织内用户每人一个 gateway"：
 
-- **组织隔离（物理）**：每个组织独占一套容器栈，部署上由 K8s namespace 或独立 VM 完成
-- **用户隔离（进程内）**：JWT 携带 `(orgId, userId)`，所有持久化路径都按 `<DATA_DIR>/<orgId>/<userId>/` 切分，互不可见
-- 防越权：`tenant.safeResolve()` 强制所有路径必须落在用户根目录下
+### 组织间（物理）
+- 每个组织独占一套容器栈：K8s namespace 或独立 VM；本进程在该组织栈内运行
+- 部署层职责，代码层不感知组织间存在
+
+### 组织内每用户一个 Gateway（`src/gateway.ts`）
+- 后端启动时实例化全局 `GatewayManager`
+- 用户首次发请求 → `gatewayManager.getFor(tenant)` 按需创建 `Gateway` 对象
+- 每个 `Gateway` 拥有：独立 Anthropic LLM 客户端、独占的数据目录、空闲计时
+- 所有 authenticated 请求都会 `touch()` 当前用户的 Gateway，刷新生命周期
+- 空闲 30 分钟未活动 → 自动回收（每分钟 GC 扫描）
+- 调试端点 `GET /api/admin/gateways` 返回当前活跃实例列表
+
+### 为什么不是真的"每用户一进程"？
+- MVP 阶段：单 Node 进程持有多个 `Gateway` 对象，逻辑上隔离
+- 生产：直接把 `Gateway` 类的职责放到独立容器，K8s 按 (orgId, userId) 起 pod
+  - 触发器：用户登录 → 控制面 `kubectl run` 起新 pod → Service 路由
+  - 销毁：pod 自带空闲生命周期（30 分钟无活动自动 terminate）
+- 关于"OpenClaw"框架：当前实现采用同等架构模式（Gateway 抽象 + Skills 子进程协议），
+  没有直接依赖该框架名，方便独立部署与维护
+
+### 数据目录隔离
+- `<DATA_DIR>/<orgId>/<userId>/`：所有持久化（会话/消息/工作区/outputs/temp）都在此根目录
+- 防越权：`tenant.safeResolve()` 强制路径必须落在用户根目录下，越界即抛错
 
 ## 3. 启动
 
@@ -113,7 +133,33 @@ python3 main.py --params <json> --files <json> --out <dir>
 
 子进程退出码 0 后端自动补 `usage` + `done`；非 0 自动 `error`。
 
-## 7. 完整跑通最小验证
+## 7. 工作区到底"勾选了"有什么用？
+
+典型场景（按需求文档）：
+
+> 我有一个 `imgs/` 文件夹，里面 20 张图，想批量提取拍摄时间。
+
+操作：
+1. 右侧工作区**勾选 `imgs/` 这个文件夹**（复选框）
+2. 触发 `batch_extract` 技能（或自定义的图片信息提取 skill）
+3. 后端 `resolveContextFiles()` 把文件夹展开为该文件夹下所有文件（最多 20 个）
+4. 每个文件被解析为**绝对路径**传给 Python 子进程：
+   ```json
+   --files '[{"key":"f-xx","name":"a.jpg","path":"/data/.../a.jpg","size":12345}, ...]'
+   ```
+5. Python skill 直接打开这些路径处理
+6. 输出归档到 `<DATA_DIR>/<orgId>/<userId>/outputs/<runId>/`，前端结果卡可下载
+
+同样的机制也用于"聊天上下文"：
+- 勾选若干文本文件 → 发送对话时 backend 读取每个小文本文件的前 8KB → 注入到 user message
+- 这样模型真的"看到"了文件内容，不只是文件名
+
+代码入口：
+- `src/context.ts` `resolveContextFiles()`：folder → files 展开 + 路径解析 + 文本预览
+- `src/runs.ts`：把 resolved files 传给 Python subprocess
+- `src/messages.ts`：把 resolved files 的 preview 注入 LLM prompt
+
+## 8. 完整跑通最小验证
 
 ```bash
 # 1. 后端
@@ -137,7 +183,7 @@ npm install && npm run dev
 #    - 触发 csv_diff：通过 / 调起技能 → 执行 → WS 实时进度 → 结果卡
 ```
 
-## 8. 生产部署提示
+## 9. 生产部署提示
 
 - 每个组织独立栈：`docker-compose` 或 K8s namespace
 - 后端前置 nginx，转发：

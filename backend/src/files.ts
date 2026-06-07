@@ -86,9 +86,9 @@ export async function registerFiles(app: FastifyInstance) {
 async function persistUpload(
   tenant: any, wsId: string, parentKey: string | null, part: any,
 ): Promise<WsNode> {
+  void parentKey; // 物理路径与逻辑树解耦：文件永远以扁平 key 直接落在工作区根目录
   const key = `f-${nanoid(8)}`;
-  const targetRel = parentKey ? path.join(parentKey, key) : key;
-  const target = safeResolve(tenant, 'workspaces', wsId, targetRel);
+  const target = safeResolve(tenant, 'workspaces', wsId, key);
   await fsp.mkdir(path.dirname(target), { recursive: true });
 
   // stream 写入 + 限大小 + 算 SHA256

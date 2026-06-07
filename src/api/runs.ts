@@ -4,16 +4,24 @@ import type { SkillCandidate, SkillResultMessage } from '@/types';
 import type { Closeable, RunStreamEvent } from './types';
 
 export interface RunsApi {
-  /** 异步启动一次技能执行，返回 runId */
-  start(skillId: string, params: Record<string, unknown>, fileKeys: string[]): Promise<{ runId: string }>;
+  /** 异步启动一次技能执行，返回 runId
+   *  contextFiles 携带完整 {key,name,type}，后端可据此展开文件夹 */
+  start(
+    skillId: string,
+    params: Record<string, unknown>,
+    contextFiles: { key: string; name: string; type: 'folder' | 'file' }[],
+  ): Promise<{ runId: string }>;
   /** 订阅执行进度（WebSocket）。事件通过 onEvent 推送 */
   subscribe(runId: string, onEvent: (e: RunStreamEvent) => void): Closeable;
 }
 
 /* ---------- real：HTTP 启动 + WebSocket 订阅 ---------- */
 const realApi: RunsApi = {
-  start: (skillId, params, fileKeys) =>
-    request<{ runId: string }>(`/skills/${skillId}/run`, { method: 'POST', body: { params, fileKeys } }),
+  start: (skillId, params, contextFiles) =>
+    request<{ runId: string }>(`/skills/${skillId}/run`, {
+      method: 'POST',
+      body: { params, contextFiles, fileKeys: contextFiles.map((c) => c.key) },
+    }),
   subscribe(runId, onEvent) {
     const ws = new WebSocket(buildWsUrl(`/runs/${runId}/events`));
     ws.onmessage = (ev) => {
@@ -27,7 +35,7 @@ const realApi: RunsApi = {
 
 /* ---------- mock：定时器模拟进度推送 ---------- */
 const mockApi: RunsApi = {
-  async start(skillId) { return { runId: `run-${Date.now()}-${skillId}` }; },
+  async start(skillId, _params, _ctx) { return { runId: `run-${Date.now()}-${skillId}` }; },
   subscribe(runId, onEvent) {
     let stopped = false;
     const phases: { p: number; c: string; steps: { label: string; status: 'done' | 'running' | 'pending' }[] }[] = [

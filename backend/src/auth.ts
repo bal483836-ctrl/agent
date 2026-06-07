@@ -6,6 +6,7 @@ import { FastifyInstance } from 'fastify';
 import fastifyJwt from '@fastify/jwt';
 import { config } from './config.js';
 import type { TenantCtx } from './tenant.js';
+import { gatewayManager } from './gateway.js';
 
 export async function registerAuth(app: FastifyInstance) {
   await app.register(fastifyJwt, { secret: config.jwt.secret });
@@ -23,6 +24,8 @@ export async function registerAuth(app: FastifyInstance) {
     try {
       const payload = await req.jwtVerify<TenantCtx>();
       (req as any).tenant = payload;
+      // 每个 authenticated 请求都 touch 一次该用户的 gateway，刷新空闲计时
+      await gatewayManager.getFor(payload);
     } catch {
       reply.code(401).send({ message: '未登录或登录已过期' });
     }
