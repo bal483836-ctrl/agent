@@ -9,9 +9,10 @@ import {
   UploadOutlined, FolderAddOutlined, ReloadOutlined, SearchOutlined,
   FileTextOutlined, FolderOutlined, FolderOpenOutlined,
   InfoCircleOutlined, CloseCircleOutlined,
-  EditOutlined, DeleteOutlined,
+  EditOutlined, DeleteOutlined, FileMarkdownOutlined,
 } from '@ant-design/icons';
 import useChatStore from '@/hooks/useChatStore';
+import { api } from '@/api';
 import type { WsNode } from '@/types';
 
 /** 把字节数格式化为可读字符串 */
@@ -160,10 +161,42 @@ export default function WorkspacePanel() {
     });
   };
 
+  /** 编辑文件夹描述（description.md）—— 仅对 folder 类型节点有意义 */
+  const onEditDescription = async (key: string) => {
+    const node = findNode(tree, key);
+    if (!node || node.type !== 'folder') return;
+    let content = '';
+    try { content = await api.workspaces.getFolderDescription(workspaceId, key); }
+    catch { /* 新建即空 */ }
+    let next = content;
+    Modal.confirm({
+      title: `编辑「${node.name}」描述`,
+      width: 520,
+      content: (
+        <Input.TextArea
+          defaultValue={content}
+          rows={8}
+          placeholder="支持 Markdown，会保存到 description.md，并在文件树显示标记"
+          onChange={(e) => { next = e.target.value; }}
+        />
+      ),
+      okText: '保存', cancelText: '取消',
+      onOk: async () => {
+        await api.workspaces.setFolderDescription(workspaceId, key, next);
+        message.success('描述已更新');
+        await useChatStore.getState().refreshWorkspaceTree();
+      },
+    });
+  };
+
   const ctxMenu: MenuProps = {
     items: [
       { key: 'rename', icon: <EditOutlined />, label: '重命名',
         onClick: () => ctxKey && onRename(ctxKey) },
+      { key: 'desc', icon: <FileMarkdownOutlined />, label: '编辑描述（仅文件夹）',
+        onClick: () => ctxKey && onEditDescription(ctxKey),
+        disabled: !ctxKey || findNode(tree, ctxKey)?.type !== 'folder' },
+      { type: 'divider' },
       { key: 'delete', icon: <DeleteOutlined />, danger: true, label: '删除',
         onClick: () => ctxKey && onDelete(ctxKey) },
     ],
@@ -184,24 +217,25 @@ export default function WorkspacePanel() {
     moveWsNode(dragKey, dropKey, info.dropToGap);
   };
 
-  /* —— 上传：调 files API（mock 模式直接返回；real 模式走后端） —— */
+  /* —— 上传：multipart 到后端，后端写树后再 refresh —— */
   const uploadProps: UploadProps = {
     multiple: true, showUploadList: false,
     beforeUpload: async (file) => {
       try {
         const { filesApi } = await import('@/api/files');
-        const node = await filesApi.uploadToWorkspace(workspaceId, null, file);
-        addWsNode(null, node);
-        message.success(`已上传：${node.name}`);
+        await filesApi.uploadToWorkspace(workspaceId, null, file);
+        message.success(`已上传：${file.name}`);
+        await useChatStore.getState().refreshWorkspaceTree();
       } catch (e) {
         message.error(`上传失败：${(e as Error).message}`);
       }
-      return false; // 阻止 AntD 默认上传
+      return false;
     },
   };
   void fmtSize;
+  void addWsNode;
 
-  /* —— 新建文件夹 —— */
+  /* —— 新建文件夹：先调后端，再刷新本地树 —— */
   const handleNewFolder = () => {
     let name = '新建文件夹';
     Modal.confirm({
@@ -213,16 +247,21 @@ export default function WorkspacePanel() {
           maxLength={64}
         />
       ),
-      onOk: () => {
+      onOk: async () => {
         const finalName = (name || '新建文件夹').trim();
-        addWsNode(null, { key: `d-${nanoid(6)}`, name: finalName, type: 'folder', children: [] });
+        await api.workspaces.createFolder(workspaceId, null, finalName);
+        await useChatStore.getState().refreshWorkspaceTree();
         message.success(`已创建文件夹：${finalName}`);
       },
     });
   };
+  void nanoid;
 
-  /* —— 刷新（mock：当前 store 已是最新） —— */
-  const handleRefresh = () => message.success('已刷新');
+  /* —— 刷新：真从后端重新拉树 —— */
+  const handleRefresh = async () => {
+    await useChatStore.getState().refreshWorkspaceTree();
+    message.success('已刷新');
+  };
 
   return (
     <>

@@ -3,28 +3,46 @@ import {
   Alert, Button, Col, Form, Input, Row, Select, Space, Upload, type UploadProps, App as AntApp,
 } from 'antd';
 import { InboxOutlined, CheckCircleFilled } from '@ant-design/icons';
+import { api } from '@/api';
 
 const { Dragger } = Upload;
 
 interface Props { onSuccess: () => void }
 
+/**
+ * 技能上传表单。真实流程：
+ *   - 用户选 zip → 立刻上传到 /api/skills（multipart）
+ *   - 后端解压、校验 manifest、注册到组织 skills 库
+ *   - 成功后回调上层刷新列表
+ */
 export default function UploadSkillForm({ onSuccess }: Props) {
   const { message } = AntApp.useApp();
   const [form] = Form.useForm();
-  const [checked, setChecked] = useState(false);
+  const [uploaded, setUploaded] = useState<{ id: string; name: string } | null>(null);
+  const [busy, setBusy] = useState(false);
 
   const uploadProps: UploadProps = {
-    name: 'skill',
+    name: 'file',
     multiple: false,
     accept: '.zip',
     showUploadList: false,
-    beforeUpload: (file) => {
+    beforeUpload: async (file) => {
       if (!file.name.endsWith('.zip')) {
         message.error('请上传 zip 格式的技能包');
         return Upload.LIST_IGNORE;
       }
-      setChecked(true);
-      message.success(`技能包 ${file.name} 校验通过`);
+      setBusy(true);
+      try {
+        const fd = new FormData();
+        fd.append('file', file);
+        const result = await api.skills.upload(fd);
+        setUploaded({ id: result.id, name: result.name });
+        message.success(`已上传：${result.name}`);
+      } catch (e) {
+        message.error(`上传失败：${(e as Error).message}`);
+      } finally {
+        setBusy(false);
+      }
       return false;
     },
   };
@@ -33,7 +51,7 @@ export default function UploadSkillForm({ onSuccess }: Props) {
     <Form
       form={form} layout="vertical"
       onFinish={() => {
-        if (!checked) {
+        if (!uploaded) {
           message.warning('请先上传技能包');
           return;
         }
@@ -41,29 +59,27 @@ export default function UploadSkillForm({ onSuccess }: Props) {
       }}
     >
       <Form.Item>
-        <Dragger {...uploadProps}>
+        <Dragger {...uploadProps} disabled={busy}>
           <p className="ant-upload-drag-icon">
             <InboxOutlined style={{ color: '#2563eb' }} />
           </p>
           <p className="ant-upload-text">点击或拖拽上传技能包（.zip）</p>
           <p className="ant-upload-hint">
-            技能包须包含 <code>manifest.json</code>、执行脚本与 <code>requirements.txt</code>
+            技能包须包含 <code>manifest.json</code>、执行脚本，可选 <code>requirements.txt</code>
           </p>
         </Dragger>
       </Form.Item>
 
-      {checked && (
+      {uploaded && (
         <Alert
           type="success" showIcon icon={<CheckCircleFilled />}
           style={{ marginBottom: 14 }}
-          message="技能包格式校验通过"
+          message="技能包注册成功"
           description={
-            <ul style={{ margin: 0, paddingInlineStart: 18, fontSize: 12, color: '#4b5563' }}>
-              <li>manifest.json — 已识别（v1.0 schema）</li>
-              <li>main.py — 执行入口</li>
-              <li>requirements.txt — 6 个依赖</li>
-              <li>SHA-256: <code>3a7f…c91e</code></li>
-            </ul>
+            <div style={{ fontSize: 12, color: '#4b5563' }}>
+              ID: <code>{uploaded.id}</code> · 名称: <b>{uploaded.name}</b>
+              <br />已对本组织所有成员可见。
+            </div>
           }
         />
       )}

@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  Modal, Descriptions, Button, Tag, Space, Divider, Input, Alert, App as AntApp,
+  Modal, Descriptions, Button, Tag, Space, Divider, Input, Alert, App as AntApp, Spin,
 } from 'antd';
 import {
   ThunderboltOutlined, SendOutlined, ArrowLeftOutlined,
 } from '@ant-design/icons';
 import type { SkillCandidate } from '@/types';
+import { api } from '@/api';
 
 /**
  * 技能详情弹层。
@@ -25,13 +26,31 @@ export default function SkillDetailModal({ skill, onClose, onApprovedUse }: Prop
   const { message } = AntApp.useApp();
   const [view, setView] = useState<'detail' | 'apply'>('detail');
   const [reason, setReason] = useState('');
+  const [detail, setDetail] = useState<any | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!skill?.id) { setDetail(null); return; }
+    setLoading(true);
+    api.skills.detail(skill.id)
+      .then(setDetail)
+      .catch(() => setDetail(skill))
+      .finally(() => setLoading(false));
+  }, [skill?.id]);
 
   if (!skill) return null;
+  const showSkill = detail ?? skill;
 
-  const handleApply = () => {
+  const handleApply = async () => {
+    try {
+      await api.skills.apply(skill.id, reason);
+    } catch (e) {
+      message.error((e as Error).message);
+      return;
+    }
     setView('detail');
     setReason('');
-    message.success(`已提交「${skill.name}」的使用申请，审批通过后可直接调用`);
+    message.success(`已提交「${skill.name}」的使用申请`);
     onApprovedUse(skill);
     onClose();
   };
@@ -56,32 +75,41 @@ export default function SkillDetailModal({ skill, onClose, onApprovedUse }: Prop
       destroyOnClose
     >
       {view === 'detail' ? (
-        <>
-          <p style={{ color: '#4b5563', marginBottom: 16 }}>{skill.description}</p>
+        <Spin spinning={loading}>
+          <p style={{ color: '#4b5563', marginBottom: 16 }}>{showSkill.description}</p>
 
           <Descriptions column={2} bordered size="small" labelStyle={{ width: 110 }}>
-            <Descriptions.Item label="分类">{skill.category}</Descriptions.Item>
+            <Descriptions.Item label="ID">{showSkill.id}</Descriptions.Item>
+            <Descriptions.Item label="分类">{showSkill.category}</Descriptions.Item>
             <Descriptions.Item label="使用次数">
               <ThunderboltOutlined style={{ marginInlineEnd: 4, color: '#2563eb' }} />
-              {skill.uses}
+              {showSkill.uses ?? 0}
+            </Descriptions.Item>
+            <Descriptions.Item label="入口">
+              <code>{(showSkill as any).entry ?? 'main.py'}</code>
             </Descriptions.Item>
             <Descriptions.Item label="输入类型" span={2}>
-              <Tag>.xlsx</Tag><Tag>.csv</Tag><Tag>.pdf</Tag>
+              {(((showSkill as any).inputs as string[] | undefined) ?? ['.csv', '.xlsx']).map((t) => (
+                <Tag key={t}>{t}</Tag>
+              ))}
             </Descriptions.Item>
             <Descriptions.Item label="主要参数" span={2}>
+              {(((showSkill as any).params as any[] | undefined) ?? []).length === 0 && (
+                <span style={{ color: '#9ca3af', fontSize: 12 }}>该技能无可配置参数</span>
+              )}
               <ul style={{ margin: 0, paddingInlineStart: 18, color: '#4b5563', fontSize: 13 }}>
-                <li><b>比对维度</b>：选择要比对的字段范围</li>
-                <li><b>数值容差</b>：小于此值视为一致（默认 0.01）</li>
-                <li><b>输出格式</b>：Excel（推荐）/ PDF</li>
+                {((showSkill as any).params as any[] | undefined)?.map((p: any) => (
+                  <li key={p.key}>
+                    <b>{p.label}</b>（<code>{p.key}</code>）
+                    {p.helper && <>：{p.helper}</>}
+                  </li>
+                ))}
               </ul>
             </Descriptions.Item>
-            <Descriptions.Item label="输出示例" span={2}>
-              <div style={{
-                background: '#f8fafc', border: '1px dashed #cbd5e1',
-                padding: '10px 12px', borderRadius: 6, fontSize: 12, color: '#475569',
-              }}>
-                📑 diff_report.xlsx · 差异高亮 · 含字段比对明细 + 汇总统计
-              </div>
+            <Descriptions.Item label="上传者" span={2}>
+              {(showSkill as any).uploadedBy
+                ? <>{(showSkill as any).uploadedBy} · 于 {(showSkill as any).uploadedAt?.slice(0, 10)}</>
+                : <span style={{ color: '#9ca3af' }}>系统内置</span>}
             </Descriptions.Item>
           </Descriptions>
 
@@ -95,7 +123,7 @@ export default function SkillDetailModal({ skill, onClose, onApprovedUse }: Prop
               申请使用
             </Button>
           </Space>
-        </>
+        </Spin>
       ) : (
         <>
           <Alert

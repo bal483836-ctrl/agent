@@ -7,6 +7,7 @@ import {
 } from '@ant-design/icons';
 import type { ChatMessage, SkillResultMessage } from '@/types';
 import useChatStore from '@/hooks/useChatStore';
+import { api } from '@/api';
 
 /**
  * 技能执行结果卡。
@@ -46,24 +47,25 @@ export default function ResultCard({ msg }: Props) {
 
   /* —— 操作 —— */
 
-  /** 下载：生成 JSON Blob 触发浏览器下载 */
+  /** 下载：优先下载 skill 输出的第一个文件；没有就 fallback 到结果 JSON */
   const handleDownload = () => {
+    const first = msg.outputs?.[0];
+    if (first?.path) {
+      const url = api.files.downloadOutput(first.path);
+      window.open(url, '_blank');
+      message.success(`正在下载：${first.name}`);
+      return;
+    }
     const payload = {
-      skill: msg.skillName,
-      summary: msg.summary,
-      metrics: msg.metrics,
-      table: msg.table,
-      runtimeMs: msg.runtimeMs,
-      generatedAt: new Date().toISOString(),
+      skill: msg.skillName, summary: msg.summary, metrics: msg.metrics,
+      table: msg.table, runtimeMs: msg.runtimeMs, generatedAt: new Date().toISOString(),
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = `${msg.skillName}_result.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    message.success('结果已下载');
+    a.href = url; a.download = `${msg.skillName}_result.json`;
+    a.click(); URL.revokeObjectURL(url);
+    message.success('结果摘要已下载');
   };
 
   /** 保存到工作区：在 Outputs/ 下追加文件夹 + 文件 */
@@ -157,8 +159,13 @@ export default function ResultCard({ msg }: Props) {
         输出已归档：
         <Space wrap size={[6, 6]} style={{ marginInlineStart: 6 }}>
           {msg.outputs.map((o) => (
-            <Tooltip key={o.path} title={o.path}>
-              <Tag style={{ borderRadius: 4 }}>{o.name}</Tag>
+            <Tooltip key={o.path} title={`点击下载 · ${o.path}`}>
+              <Tag
+                style={{ borderRadius: 4, cursor: 'pointer' }}
+                onClick={() => {
+                  window.open(api.files.downloadOutput(o.path), '_blank');
+                }}
+              >{o.name}</Tag>
             </Tooltip>
           ))}
         </Space>

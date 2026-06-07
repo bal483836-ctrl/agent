@@ -45,9 +45,26 @@ export async function runSkill(opts: RunnerOpts): Promise<void> {
   const writeLog = async (line: string) => log.write(line + '\n');
   await writeLog(`# Skill ${skill.id} | run ${call.runId} | started ${new Date().toISOString()}`);
 
+  // 将 result.payload.outputs[].path 改写为相对 user outputs/ 根的相对路径
+  // 这样前端可通过 /api/outputs/download?path=<run>/<file> 下载
+  const userOutputsRoot = path.dirname(call.outDir);
+  const rewriteResult = (e: ClawEvent): ClawEvent => {
+    if (e.type !== 'result') return e;
+    const payload = e.payload as any;
+    if (Array.isArray(payload?.outputs)) {
+      payload.outputs = payload.outputs.map((o: any) => {
+        if (typeof o?.path === 'string' && o.path.startsWith(userOutputsRoot)) {
+          return { ...o, path: path.relative(userOutputsRoot, o.path) };
+        }
+        return o;
+      });
+    }
+    return e;
+  };
+
   const wrapped = async (e: ClawEvent) => {
     await writeLog(JSON.stringify(e));
-    onEvent(e);
+    onEvent(rewriteResult(e));
   };
 
   // 3) 启动子进程

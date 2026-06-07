@@ -12,8 +12,10 @@ export interface FilesApi {
   ): Promise<WsNode>;
   /** 临时上传（仅当次会话有效，24h 自动清理） */
   uploadTemp(file: File): Promise<{ tempKey: string; name: string; expireAt: string }>;
-  /** 下载文件 */
+  /** 下载工作区文件 */
   download(key: string): Promise<Blob>;
+  /** 下载技能执行输出文件（相对 outputs/ 根的路径，如 "report_xxx/diff.xlsx"） */
+  downloadOutput(relPath: string): string;
   /** 计算 SHA-256（前端做，传给后端比对） */
   sha256(file: File): Promise<string>;
 }
@@ -49,6 +51,11 @@ const realApi: FilesApi = {
     return request('/temp-files', { method: 'POST', body: fd });
   },
   download: (key) => request<Blob>(`/files/${key}/download`, { raw: true }) as unknown as Promise<Blob>,
+  downloadOutput: (relPath: string) => {
+    const token = getToken();
+    const q = `path=${encodeURIComponent(relPath)}${token ? `&token=${encodeURIComponent(token)}` : ''}`;
+    return `${API_BASE.replace(/\/$/, '')}/outputs/download?${q}`;
+  },
   sha256,
 };
 
@@ -73,6 +80,7 @@ const mockApi: FilesApi = {
     };
   },
   async download(_key) { return new Blob([]); },
+  downloadOutput: (relPath: string) => `data:application/json,${encodeURIComponent(JSON.stringify({ mockOutput: relPath }))}`,
   sha256,
 };
 

@@ -22,9 +22,14 @@ export async function registerAuth(app: FastifyInstance) {
       req.url.startsWith('/ws/')
     ) return;
     try {
-      const payload = await req.jwtVerify<TenantCtx>();
+      // 优先 Authorization header；下载链接允许 ?token= 兜底
+      let token: string | null = null;
+      const auth = req.headers.authorization;
+      if (auth?.startsWith('Bearer ')) token = auth.slice(7);
+      else if ((req.query as any)?.token) token = String((req.query as any).token);
+      if (!token) throw new Error('no token');
+      const payload = await (req as any).server.jwt.verify(token) as TenantCtx;
       (req as any).tenant = payload;
-      // 每个 authenticated 请求都 touch 一次该用户的 gateway，刷新空闲计时
       await gatewayManager.getFor(payload);
     } catch {
       reply.code(401).send({ message: '未登录或登录已过期' });

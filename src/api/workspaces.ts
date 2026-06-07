@@ -10,6 +10,8 @@ export interface WorkspacesApi {
   rename(id: string, key: string, name: string): Promise<WsNode>;
   remove(id: string, key: string): Promise<void>;
   move(id: string, dragKey: string, dropKey: string, dropToGap: boolean): Promise<void>;
+  getFolderDescription(id: string, key: string): Promise<string>;
+  setFolderDescription(id: string, key: string, content: string): Promise<void>;
 }
 
 const realApi: WorkspacesApi = {
@@ -25,9 +27,18 @@ const realApi: WorkspacesApi = {
     request<void>(`/workspaces/${id}/nodes/${dragKey}/move`, {
       method: 'POST', body: { dropKey, dropToGap },
     }),
+  getFolderDescription: async (id, key) => {
+    const r = await request<{ content: string }>(`/workspaces/${id}/folders/${key}/description`);
+    return r.content;
+  },
+  setFolderDescription: (id, key, content) =>
+    request<void>(`/workspaces/${id}/folders/${key}/description`, {
+      method: 'PUT', body: { content },
+    }),
 };
 
 /* ---------- mock ---------- */
+const mockDescs = new Map<string, string>();
 const mockApi: WorkspacesApi = {
   async list() { return mockWorkspaces; },
   async tree(id) { return mockWorkspaces.find((w) => w.id === id)?.tree ?? []; },
@@ -37,6 +48,8 @@ const mockApi: WorkspacesApi = {
   async rename(_id, key, name) { return { key, name, type: 'file' }; },
   async remove() { /* no-op */ },
   async move() { /* no-op */ },
+  async getFolderDescription(id, key) { return mockDescs.get(`${id}:${key}`) ?? ''; },
+  async setFolderDescription(id, key, content) { mockDescs.set(`${id}:${key}`, content); },
 };
 
 export const workspacesApi: WorkspacesApi = USE_MOCK ? mockApi : realApi;

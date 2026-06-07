@@ -85,23 +85,47 @@ export async function registerFiles(app: FastifyInstance) {
     reply.code(400).send({ message: 'no file' });
   });
 
-  // 下载
+  // 工作区文件下载（按节点 key）
   app.get<{ Params: { id: string; key: string } }>(
     '/api/workspaces/:id/files/:key/download',
     async (req, reply) => {
       const tenant = (req as any).tenant;
       const target = nodeFsPath(tenant, req.params.id, req.params.key);
+      return streamFile(target, reply);
+    },
+  );
+
+  /**
+   * 输出文件下载：按相对路径，限制在当前用户的 outputs/ 目录下
+   *   GET /api/outputs/download?path=run-xxx/diff_report.xlsx
+   */
+  app.get<{ Querystring: { path: string } }>(
+    '/api/outputs/download',
+    async (req, reply) => {
+      const tenant = (req as any).tenant;
+      const rel = req.query.path || '';
       try {
-        const stat = await fsp.stat(target);
-        if (!stat.isFile()) return reply.code(404).send({ message: 'not file' });
-        reply.header('Content-Length', String(stat.size));
-        reply.header('Content-Type', 'application/octet-stream');
-        return reply.send(fs.createReadStream(target));
+        const target = safeResolve(tenant, 'outputs', rel);
+        return streamFile(target, reply);
       } catch {
-        return reply.code(404).send({ message: 'not found' });
+        return reply.code(400).send({ message: 'invalid path' });
       }
     },
   );
+
+  async function streamFile(target: string, reply: any) {
+    try {
+      const stat = await fsp.stat(target);
+      if (!stat.isFile()) return reply.code(404).send({ message: 'not file' });
+      reply.header('Content-Length', String(stat.size));
+      reply.header('Content-Type', 'application/octet-stream');
+      reply.header('Content-Disposition',
+        `attachment; filename="${encodeURIComponent(path.basename(target))}"`);
+      return reply.send(fs.createReadStream(target));
+    } catch {
+      return reply.code(404).send({ message: 'not found' });
+    }
+  }
 
   // 文件夹描述（按需求 3.3.2）
   app.get<{ Params: { id: string; key: string } }>(

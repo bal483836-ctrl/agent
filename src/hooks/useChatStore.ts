@@ -60,6 +60,7 @@ interface ChatState {
   /* —— 工作区 —— */
   setSelectedContext: (files: ContextFile[]) => void;
   setWorkspace: (id: string) => Promise<void>;
+  refreshWorkspaceTree: () => Promise<void>;
   renameWsNode: (key: string, newName: string) => Promise<void>;
   deleteWsNode: (key: string) => Promise<void>;
   moveWsNode: (dragKey: string, dropKey: string, dropToGap: boolean) => Promise<void>;
@@ -182,6 +183,13 @@ const useChatStore = create<ChatState>((set, get) => ({
       const tree = await api.workspaces.tree(id);
       set((s) => ({ workspaceTrees: { ...s.workspaceTrees, [id]: tree } }));
     }
+  },
+
+  async refreshWorkspaceTree() {
+    const id = get().workspaceId;
+    if (!id) return;
+    const tree = await api.workspaces.tree(id);
+    set((s) => ({ workspaceTrees: { ...s.workspaceTrees, [id]: tree } }));
   },
 
   async renameWsNode(key, newName) {
