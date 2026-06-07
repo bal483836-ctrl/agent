@@ -1,131 +1,113 @@
 /**
- * Skills 注册：扫描 SKILLS_DIR 下的目录，每个目录需包含 manifest.json。
- *
- * manifest.json 示例：
- * {
- *   "id": "csv_diff",
- *   "name": "CSV 跨中心数据比对",
- *   "description": "对两个 CSV 字段级行级比对",
- *   "category": "数据比对",
- *   "icon": "📊",
- *   "entry": "main.py",
- *   "inputs": [".csv", ".xlsx"],
- *   "params": [
- *     { "key": "tol", "label": "数值容差", "type": "text", "value": "0.01" }
- *   ]
- * }
+ * Skills REST 路由 —— 暴露 OpenClaw 注册表 + zip 上传 + 删除 + 意图识别。
  */
-import fs from 'node:fs/promises';
-import path from 'node:path';
 import { FastifyInstance } from 'fastify';
-import { config } from './config.js';
+import { loadAllSkills, getSkillByIdForOrg, type LoadedSkill } from './openclaw/registry.js';
+import { uploadSkillZip, deleteSkill } from './openclaw/uploader.js';
+import { audit } from './audit.js';
 
-export interface SkillManifest {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  icon?: string;
-  entry: string;          // 相对 manifest 的脚本路径，目前只支持 .py
-  inputs?: string[];
-  params?: SkillParam[];
-  uses?: number;
-  mine?: boolean;
-}
-
-export interface SkillParam {
-  key: string; label: string;
-  type: 'text' | 'select' | 'number';
-  value: string | number;
-  options?: { label: string; value: string }[];
-  helper?: string;
-}
-
-const cache: { skills: (SkillManifest & { dir: string })[] | null } = { skills: null };
-
-export async function loadSkills(): Promise<(SkillManifest & { dir: string })[]> {
-  if (cache.skills) return cache.skills;
-  const root = config.paths.skillsDir;
-  try {
-    const entries = await fs.readdir(root, { withFileTypes: true });
-    const result: (SkillManifest & { dir: string })[] = [];
-    for (const ent of entries) {
-      if (!ent.isDirectory()) continue;
-      const dir = path.join(root, ent.name);
-      const m = path.join(dir, 'manifest.json');
-      try {
-        const raw = await fs.readFile(m, 'utf-8');
-        const manifest = JSON.parse(raw) as SkillManifest;
-        result.push({ ...manifest, dir });
-      } catch (e) {
-        console.warn(`[skills] failed to load ${ent.name}: ${(e as Error).message}`);
-      }
-    }
-    cache.skills = result;
-    return result;
-  } catch (e: any) {
-    if (e.code === 'ENOENT') return [];
-    throw e;
-  }
-}
-
-export async function getSkill(id: string) {
-  const all = await loadSkills();
-  return all.find((s) => s.id === id);
-}
-
-/** 供 LLM 注入到 system prompt 的紧凑摘要 */
-export async function listSkillSummaries() {
-  const all = await loadSkills();
+/** 给 LLM 注入 system 用的摘要 */
+export async function listSkillSummaries(orgId: string) {
+  const all = await loadAllSkills(orgId);
   return all.map((s) => ({ id: s.id, name: s.name, description: s.description }));
+}
+
+/** 对外暴露用 */
+export async function getSkillForOrg(orgId: string, id: string) {
+  return getSkillByIdForOrg(orgId, id);
 }
 
 export async function registerSkills(app: FastifyInstance) {
   app.get<{ Querystring: { q?: string; category?: string } }>('/api/skills', async (req) => {
-    let list = await loadSkills();
+    const tenant = (req as any).tenant;
+    let list = await loadAllSkills(tenant.orgId);
     const { q, category } = req.query;
     if (q) list = list.filter((s) => s.name.includes(q) || s.description.includes(q));
     if (category && category !== 'all') list = list.filter((s) => s.category === category);
-    return list.map(stripDir);
+    return list.map((s) => toApi(s, tenant.userId));
   });
 
   app.get<{ Params: { id: string } }>('/api/skills/:id', async (req, reply) => {
-    const s = await getSkill(req.params.id);
+    const tenant = (req as any).tenant;
+    const s = await getSkillByIdForOrg(tenant.orgId, req.params.id);
     if (!s) { reply.code(404).send({ message: 'not found' }); return; }
-    return stripDir(s);
+    return toApi(s, tenant.userId);
   });
 
   app.post<{ Params: { id: string }; Body: { reason?: string } }>(
     '/api/skills/:id/apply',
     async (req) => {
-      return { applyId: `apply-${Date.now()}`, status: 'pending' as const, reason: req.body?.reason };
+      const tenant = (req as any).tenant;
+      await audit(tenant, {
+        action: 'skill.apply', skillId: req.params.id, extra: { reason: req.body?.reason },
+      });
+      return { applyId: `apply-${Date.now()}`, status: 'pending' as const };
     },
   );
 
-  /** 意图识别：MVP 走 keyword 简易匹配；真实场景由 LLM 出 tool_call */
+  /** 上传 zip：multipart 单文件 */
+  app.post('/api/skills', async (req, reply) => {
+    const tenant = (req as any).tenant;
+    const parts = req.parts();
+    for await (const p of parts) {
+      if (p.type === 'file') {
+        try {
+          const result = await uploadSkillZip(tenant, p.file);
+          await audit(tenant, { action: 'skill.upload', skillId: result.id, status: 'success' });
+          return result;
+        } catch (e) {
+          await audit(tenant, {
+            action: 'skill.upload', status: 'failure', reason: (e as Error).message,
+          });
+          return reply.code(400).send({ message: (e as Error).message });
+        }
+      }
+    }
+    return reply.code(400).send({ message: '未携带 zip 文件' });
+  });
+
+  /** 删除（仅上传者本人） */
+  app.delete<{ Params: { id: string } }>('/api/skills/:id', async (req, reply) => {
+    const tenant = (req as any).tenant;
+    try {
+      await deleteSkill(tenant, req.params.id);
+      await audit(tenant, { action: 'skill.delete', skillId: req.params.id, status: 'success' });
+      reply.code(204).send();
+    } catch (e) {
+      reply.code(403).send({ message: (e as Error).message });
+    }
+  });
+
+  /** 意图识别（关键词命中 + 上下文 hint） */
   app.post<{ Body: { text: string; contextKeys: string[] } }>('/api/intent/parse', async (req) => {
-    const all = await loadSkills();
+    const tenant = (req as any).tenant;
+    const all = await loadAllSkills(tenant.orgId);
     const text = req.body.text || '';
     const scored = all.map((s) => ({
-      s,
-      score: scoreMatch(text, s.name) + scoreMatch(text, s.description),
+      s, score: scoreMatch(text, s.name) + scoreMatch(text, s.description),
     })).sort((a, b) => b.score - a.score);
     const main = scored[0]?.s ?? all[0];
-    const alts = scored.slice(1, 3).map((x) => ({ ...stripDir(x.s), confidence: Math.min(95, x.score * 18) }));
+    const alts = scored.slice(1, 3).map((x) => ({
+      ...toApi(x.s, tenant.userId), confidence: Math.min(95, x.score * 18),
+    }));
     return {
-      main: { ...stripDir(main), confidence: Math.min(99, (scored[0]?.score ?? 1) * 20) },
+      main: { ...toApi(main, tenant.userId), confidence: Math.min(99, (scored[0]?.score ?? 1) * 20) },
       alternatives: alts,
-      fields: main.params ?? [],
+      fields: main?.params ?? [],
       etaSeconds: 30,
       etaTokens: 800,
     };
   });
 }
 
-function stripDir(s: SkillManifest & { dir: string }) {
-  const { dir, ...rest } = s;
-  void dir;
-  return rest;
+function toApi(s: LoadedSkill, currentUserId: string) {
+  const { dir, source, ...rest } = s;
+  void dir; void source;
+  return {
+    ...rest,
+    /** 是否为当前用户上传 → 决定能否删除/显示标签 */
+    mine: !!s.uploadedBy && s.uploadedBy === currentUserId,
+  };
 }
 
 function scoreMatch(text: string, needle: string): number {

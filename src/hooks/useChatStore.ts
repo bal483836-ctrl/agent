@@ -74,6 +74,8 @@ interface ChatState {
   sendUserText: (content: string) => Promise<void>;
   insertSkillTrigger: (skill: SkillCandidate) => Promise<void>;
   runSkill: (skill: SkillCandidate) => Promise<void>;
+  /** 转人工 —— 落地一条系统消息，记录用户请求 */
+  requestHumanHandover: (reason: string) => void;
 }
 
 const useChatStore = create<ChatState>((set, get) => ({
@@ -243,6 +245,15 @@ const useChatStore = create<ChatState>((set, get) => ({
       const list = s.messages[s.activeSessionId] ?? [];
       return { messages: { ...s.messages, [s.activeSessionId]: [...list, msg] } };
     }),
+
+  requestHumanHandover: (reason) => {
+    const msg: ChatMessage = {
+      id: nanoid(), role: 'assistant', type: 'text',
+      content: `✅ 已为您发起人工协助请求。\n\n问题描述：${reason}\n\n专家通常会在 1 小时内响应，期间可继续在本会话留言。`,
+      createdAt: nowHHMM(),
+    };
+    get().appendMessage(msg);
+  },
 
   async sendUserText(content) {
     const sessionId = get().activeSessionId;

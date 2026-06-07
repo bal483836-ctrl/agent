@@ -37,6 +37,10 @@ await registerWorkspaces(app);
 await registerFiles(app);
 await registerRuns(app);
 
+// 启动 24h 临时文件清理
+const { startTempCleanup } = await import('./cleanup.js');
+startTempCleanup();
+
 app.get('/api/health', async () => ({
   status: 'ok', time: new Date().toISOString(),
   hasLlmKey: Boolean(config.llm.apiKey),
@@ -46,6 +50,24 @@ app.get('/api/health', async () => ({
 app.get('/api/admin/gateways', async () => {
   const { gatewayManager } = await import('./gateway.js');
   return { instances: gatewayManager.list() };
+});
+
+/** 管理：查看当天审计日志（每用户仅看自己的） */
+app.get('/api/admin/audit', async (req) => {
+  const tenant = (req as any).tenant;
+  const fsp = await import('node:fs/promises');
+  const path = await import('node:path');
+  const day = new Date().toISOString().slice(0, 10);
+  const file = path.join(
+    config.paths.dataDir,
+    tenant.orgId.replace(/[^A-Za-z0-9_-]/g, '_'),
+    '_audit', `${day}.jsonl`,
+  );
+  try {
+    const data = await fsp.readFile(file, 'utf-8');
+    const lines = data.split('\n').filter(Boolean);
+    return { records: lines.slice(-100).map((l) => JSON.parse(l)).filter((r) => r.userId === tenant.userId) };
+  } catch { return { records: [] }; }
 });
 
 const port = config.port;

@@ -21,6 +21,7 @@ export default function InputBox() {
   const insertSkillTrigger = useChatStore((s) => s.insertSkillTrigger);
   const selected = useChatStore((s) => s.selectedContext);
   const allSkills = useChatStore((s) => s.skills);
+  const requestHandover = useChatStore((s) => s.requestHumanHandover);
 
   const [value, setValue] = useState('');
   const [showSlash, setShowSlash] = useState(false);
@@ -33,6 +34,13 @@ export default function InputBox() {
   const send = () => {
     const text = value.trim();
     if (!text) return;
+    // 用户主动转人工
+    if (/^(转人工|连接专家|找人工|人工客服)$/.test(text)) {
+      sendUserText(text);                            // 仍把消息落到对话流
+      requestHandover(text);
+      setValue('');
+      return;
+    }
     sendUserText(text);
     setValue('');
   };

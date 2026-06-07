@@ -76,19 +76,27 @@ backend/
 │   ├── server.ts        # 入口
 │   ├── config.ts        # 环境变量
 │   ├── tenant.ts        # (orgId, userId) 路径隔离
+│   ├── gateway.ts       # GatewayManager：per-user gateway 生命周期
 │   ├── auth.ts          # JWT plugin + /auth/* 路由
+│   ├── audit.ts         # 审计日志（JSONL，不可删）
+│   ├── cleanup.ts       # 临时文件 24h 清理 cron
 │   ├── store.ts         # 会话 / 消息 / 工作区 JSON 持久化
+│   ├── context.ts       # 上下文文件解析（folder 展开 + 文本预览）
 │   ├── sessions.ts      # /sessions CRUD
 │   ├── llm.ts           # Anthropic Claude 流式包装
 │   ├── messages.ts      # SSE 路由（调 llm.ts）
-│   ├── skills.ts        # 扫描 manifest + /skills + /intent/parse
+│   ├── skills.ts        # /skills + 上传/删除/意图识别
 │   ├── workspaces.ts    # 工作区树形 CRUD
-│   ├── files.ts         # 上传/下载/临时
-│   └── runs.ts          # 技能执行 + WebSocket
+│   ├── files.ts         # 上传/下载/临时/文件夹描述/版本管理
+│   ├── runs.ts          # 技能执行 HTTP + WebSocket
+│   └── openclaw/        # ★ OpenClaw 子系统
+│       ├── protocol.ts  # ACP-lite 事件类型
+│       ├── registry.ts  # 内置 + 组织上传 skills 注册
+│       ├── runner.ts    # 子进程 + 协议解析 + 输出归档
+│       └── uploader.ts  # 真正的 zip 上传 + manifest 校验
 └── skills/
-    └── csv_diff/
-        ├── manifest.json
-        └── main.py      # 示例：跨中心比对（纯标准库）
+    ├── csv_diff/        # 内置示例：跨中心比对
+    └── batch_extract/   # 内置示例：文件夹批量信息提取
 ```
 
 ## 6. 加一个 Skill

@@ -51,7 +51,7 @@ export async function registerMessages(app: FastifyInstance) {
 
       // 4) 历史 + 已注册 skills + **真实读取勾选文件内容**
       const history = await listMessages(tenant, sessionId);
-      const skills = await listSkillSummaries();
+      const skills = await listSkillSummaries(tenant.orgId);
       const ctxFiles = await resolveContextFiles(tenant, contextFiles);
 
       // 5) 跑 LLM
