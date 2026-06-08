@@ -16,9 +16,28 @@ export const config = {
   },
 
   llm: {
-    apiKey: process.env.ANTHROPIC_API_KEY ?? '',
-    model: process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-6',
-    baseUrl: process.env.ANTHROPIC_BASE_URL,
+    /** 'openai'（OpenAI 兼容协议，含 DeepSeek/Kimi/Qwen 等）| 'anthropic' */
+    provider: (process.env.LLM_PROVIDER ?? 'openai') as 'openai' | 'anthropic',
+    /** 通用 API key（多个备选环境变量都识别） */
+    apiKey:
+      process.env.LLM_API_KEY
+      ?? process.env.DEEPSEEK_API_KEY
+      ?? process.env.OPENAI_API_KEY
+      ?? process.env.ANTHROPIC_API_KEY
+      ?? '',
+    /** Base URL；不填走对应 provider 默认 */
+    baseUrl:
+      process.env.LLM_BASE_URL
+      ?? process.env.DEEPSEEK_BASE_URL
+      ?? process.env.OPENAI_BASE_URL
+      ?? process.env.ANTHROPIC_BASE_URL,
+    /** 模型 id；不填用默认 */
+    model:
+      process.env.LLM_MODEL
+      ?? process.env.DEEPSEEK_MODEL
+      ?? process.env.OPENAI_MODEL
+      ?? process.env.ANTHROPIC_MODEL
+      ?? 'deepseek-chat',
     /** 系统提示词 — 引导模型用"工具调用"形式调用 skills */
     systemPrompt: `你是「量子链 Quantum Chain」临床试验智能助手，服务于疫苗临床试验数据管理。
 你的能力：

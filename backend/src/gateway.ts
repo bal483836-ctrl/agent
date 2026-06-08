@@ -13,8 +13,19 @@
  *    生产部署用 K8s pod-per-user，把当前 Gateway 类的全部职责放到独立容器即可。
  */
 import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
 import { config } from './config.js';
 import { ensureTenantDirs, type TenantCtx } from './tenant.js';
+
+/** 把 provider 默认 base URL 兜底，避免每次都填 */
+function resolveBaseUrl(): string | undefined {
+  if (config.llm.baseUrl) return config.llm.baseUrl;
+  if (config.llm.provider === 'openai') {
+    // 默认走 DeepSeek（国内最易接入）
+    return 'https://api.deepseek.com';
+  }
+  return undefined; // anthropic 走官方默认
+}
 
 export class Gateway {
   readonly orgId: string;
@@ -24,8 +35,9 @@ export class Gateway {
   readonly createdAt: Date;
   lastActiveAt: Date;
 
-  /** 该 gateway 独占的 LLM 客户端（独立用量统计与重试栈） */
-  readonly llm: Anthropic;
+  /** 该 gateway 独占的 LLM 客户端 —— 按 provider 实例化对应 SDK */
+  readonly llm: OpenAI | Anthropic;
+  readonly provider: 'openai' | 'anthropic';
 
   constructor(ctx: TenantCtx) {
     this.orgId = ctx.orgId;
@@ -34,10 +46,19 @@ export class Gateway {
     this.userName = ctx.name;
     this.createdAt = new Date();
     this.lastActiveAt = new Date();
-    this.llm = new Anthropic({
-      apiKey: config.llm.apiKey,
-      baseURL: config.llm.baseUrl,
-    });
+    this.provider = config.llm.provider;
+
+    if (this.provider === 'anthropic') {
+      this.llm = new Anthropic({
+        apiKey: config.llm.apiKey,
+        baseURL: resolveBaseUrl(),
+      });
+    } else {
+      this.llm = new OpenAI({
+        apiKey: config.llm.apiKey,
+        baseURL: resolveBaseUrl(),
+      });
+    }
   }
 
   touch() { this.lastActiveAt = new Date(); }

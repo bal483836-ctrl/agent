@@ -42,8 +42,13 @@ const { startTempCleanup } = await import('./cleanup.js');
 startTempCleanup();
 
 app.get('/api/health', async () => ({
-  status: 'ok', time: new Date().toISOString(),
-  hasLlmKey: Boolean(config.llm.apiKey),
+  status: 'ok',
+  time: new Date().toISOString(),
+  llm: {
+    provider: config.llm.provider,
+    model: config.llm.model,
+    hasKey: Boolean(config.llm.apiKey),
+  },
 }));
 
 /** 管理：列出当前活跃的 per-user gateway 实例（用于观察隔离与生命周期） */
@@ -74,7 +79,7 @@ const port = config.port;
 try {
   await app.listen({ port, host: '0.0.0.0' });
   console.log(`量子链后端已启动: http://localhost:${port}`);
-  console.log(`  LLM:    ${config.llm.apiKey ? '已配置' : '⚠ 未配置 ANTHROPIC_API_KEY，对话功能不可用'}`);
+  console.log(`  LLM:    provider=${config.llm.provider} · model=${config.llm.model} · ${config.llm.apiKey ? '已配置 API key' : '⚠ 未配置 API key，对话功能不可用'}`);
   console.log(`  数据:   ${config.paths.dataDir}`);
   console.log(`  Skills: ${config.paths.skillsDir}`);
 } catch (e) {

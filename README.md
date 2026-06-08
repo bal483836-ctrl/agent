@@ -35,7 +35,11 @@ python3 -m pytest backend/skills/test_skills.py    # Python skill（8 个）
 # 后端
 cd backend
 cp .env.example .env
-# 编辑 .env，至少填 ANTHROPIC_API_KEY=sk-...
+# 编辑 .env，至少填一个 LLM API key（默认走 DeepSeek）：
+#   LLM_PROVIDER=openai
+#   LLM_API_KEY=sk-xxxx           # 从 https://platform.deepseek.com 申请
+#   LLM_MODEL=deepseek-chat
+# 也可切换 OpenAI / Anthropic（详见 backend/README.md）
 npm install
 npm run dev           # http://localhost:8080
 

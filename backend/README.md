@@ -61,12 +61,40 @@ npm run build && npm start
 | --- | --- |
 | `PORT` | 监听端口（默认 8080） |
 | `JWT_SECRET` | JWT 签名密钥，生产必须改 |
-| `ANTHROPIC_API_KEY` | LLM 调用必需 |
-| `ANTHROPIC_MODEL` | 模型 ID，默认 `claude-sonnet-4-6` |
+| `LLM_PROVIDER` | `openai`（OpenAI 兼容，含 DeepSeek/Kimi/Qwen）或 `anthropic`，默认 `openai` |
+| `LLM_API_KEY` | LLM API key（必填）。兼容 `DEEPSEEK_API_KEY` / `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` |
+| `LLM_MODEL` | 模型 id，默认 `deepseek-chat` |
+| `LLM_BASE_URL` | 自定义 endpoint；不填走 provider 默认（DeepSeek 默认 `https://api.deepseek.com`） |
 | `DATA_DIR` | 数据根目录，默认 `./data` |
 | `SKILLS_DIR` | Skills 根目录，默认 `./skills` |
 | `MAX_FILE_BYTES` / `MAX_TOTAL_BYTES` / `MAX_FILES_PER_BATCH` | 上传约束 |
 | `DEV_DEFAULT_*` | dev 模式默认用户身份 |
+
+### 常用 LLM 厂商配置
+
+**DeepSeek（推荐，国内最易接入）**
+```
+LLM_PROVIDER=openai
+LLM_API_KEY=sk-xxxx
+LLM_MODEL=deepseek-chat
+```
+
+**OpenAI**
+```
+LLM_PROVIDER=openai
+LLM_API_KEY=sk-xxxx
+LLM_BASE_URL=https://api.openai.com/v1
+LLM_MODEL=gpt-4o-mini
+```
+
+**月之暗面 Kimi / 智谱 GLM / 阿里通义** —— 同样用 OpenAI 兼容协议，改 `LLM_BASE_URL` 与 `LLM_MODEL` 即可。
+
+**Anthropic Claude**
+```
+LLM_PROVIDER=anthropic
+LLM_API_KEY=sk-ant-xxxx
+LLM_MODEL=claude-sonnet-4-6
+```
 
 ## 5. 目录结构
 
