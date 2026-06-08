@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Avatar, Button, Divider, Popover, Tag, App as AntApp } from 'antd';
+import { Avatar, Button, Divider, Popover, Tag, Tooltip, App as AntApp } from 'antd';
 import {
   UserOutlined, MailOutlined, IdcardOutlined, CalendarOutlined,
   TeamOutlined, LogoutOutlined,
 } from '@ant-design/icons';
 import useChatStore from '@/hooks/useChatStore';
+import { BACKEND_MODE } from '@/api/env';
 
 /**
  * 顶部品牌栏。
@@ -120,6 +121,15 @@ export default function TopBar() {
       </div>
 
       <div style={{ flex: 1 }} />
+
+      <Tooltip title={`后端模式：${BACKEND_MODE}`}>
+        <Tag
+          color={BACKEND_MODE === 'external' ? 'purple' : BACKEND_MODE === 'local' ? 'blue' : 'default'}
+          style={{ marginInlineEnd: 8, fontWeight: 500 }}
+        >
+          {BACKEND_MODE === 'external' ? '🌐 OpenClaw' : BACKEND_MODE === 'local' ? '🏠 本地' : '📦 Mock'}
+        </Tag>
+      </Tooltip>
 
       <Popover
         open={open}

@@ -1,7 +1,8 @@
-import { USE_MOCK } from './env';
+import { BACKEND_MODE } from './env';
 import { request } from './http';
 import type { ChatSession } from '@/types';
 import { mockSessions } from '@/mock/data';
+import { externalSessionsApi } from './external';
 
 export interface SessionsApi {
   list(): Promise<ChatSession[]>;
@@ -35,4 +36,9 @@ const mockApi: SessionsApi = {
   async remove(id) { memSessions = memSessions.filter((x) => x.id !== id); },
 };
 
-export const sessionsApi: SessionsApi = USE_MOCK ? mockApi : realApi;
+function pickSessionsApi(): SessionsApi {
+  if (BACKEND_MODE === 'external') return externalSessionsApi;
+  if (BACKEND_MODE === 'local') return realApi;
+  return mockApi;
+}
+export const sessionsApi: SessionsApi = pickSessionsApi();

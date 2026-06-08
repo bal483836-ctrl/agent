@@ -1,7 +1,8 @@
-import { USE_MOCK } from './env';
+import { BACKEND_MODE } from './env';
 import { request } from './http';
 import type { Workspace, WsNode } from '@/types';
 import { mockWorkspaces } from '@/mock/data';
+import { externalWorkspacesApi } from './external';
 
 export type PreviewResult =
   | { kind: 'image'; name: string; mime: string; totalBytes: number }
@@ -64,4 +65,9 @@ const mockApi: WorkspacesApi = {
   },
 };
 
-export const workspacesApi: WorkspacesApi = USE_MOCK ? mockApi : realApi;
+function pickWorkspacesApi(): WorkspacesApi {
+  if (BACKEND_MODE === 'external') return externalWorkspacesApi;
+  if (BACKEND_MODE === 'local') return realApi;
+  return mockApi;
+}
+export const workspacesApi: WorkspacesApi = pickWorkspacesApi();

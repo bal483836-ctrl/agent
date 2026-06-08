@@ -1,7 +1,8 @@
-import { USE_MOCK } from './env';
+import { BACKEND_MODE } from './env';
 import { request } from './http';
 import type { SkillCandidate } from '@/types';
 import { mockSkills } from '@/mock/data';
+import { externalSkillsApi } from './external';
 
 export interface SkillsApi {
   list(opts?: { q?: string; category?: string }): Promise<SkillCandidate[]>;
@@ -81,4 +82,9 @@ const mockApi: SkillsApi = {
   },
 };
 
-export const skillsApi: SkillsApi = USE_MOCK ? mockApi : realApi;
+function pickSkillsApi(): SkillsApi {
+  if (BACKEND_MODE === 'external') return externalSkillsApi;
+  if (BACKEND_MODE === 'local') return realApi;
+  return mockApi;
+}
+export const skillsApi: SkillsApi = pickSkillsApi();

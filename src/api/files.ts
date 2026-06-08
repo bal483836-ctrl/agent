@@ -1,6 +1,7 @@
-import { USE_MOCK, API_BASE } from './env';
+import { BACKEND_MODE, API_BASE } from './env';
 import { request, getToken } from './http';
 import type { WsNode } from '@/types';
+import { externalFilesApi } from './external';
 
 export interface FilesApi {
   /** 上传文件到指定工作区。后端建议返回创建后的 WsNode */
@@ -105,4 +106,9 @@ export const UPLOAD_LIMITS = {
   maxFiles: 200,
 };
 
-export const filesApi: FilesApi = USE_MOCK ? mockApi : realApi;
+function pickFilesApi(): FilesApi {
+  if (BACKEND_MODE === 'external') return externalFilesApi;
+  if (BACKEND_MODE === 'local') return realApi;
+  return mockApi;
+}
+export const filesApi: FilesApi = pickFilesApi();

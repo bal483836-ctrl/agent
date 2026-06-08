@@ -1,7 +1,8 @@
-import { USE_MOCK } from './env';
+import { BACKEND_MODE } from './env';
 import { request, buildWsUrl } from './http';
 import type { SkillCandidate, SkillResultMessage } from '@/types';
 import type { Closeable, RunStreamEvent } from './types';
+import { externalRunsApi } from './external';
 
 export interface RunsApi {
   /** 异步启动一次技能执行，返回 runId
@@ -113,4 +114,9 @@ const mockApi: RunsApi = {
   },
 };
 
-export const runsApi: RunsApi = USE_MOCK ? mockApi : realApi;
+function pickRunsApi(): RunsApi {
+  if (BACKEND_MODE === 'external') return externalRunsApi;
+  if (BACKEND_MODE === 'local') return realApi;
+  return mockApi;
+}
+export const runsApi: RunsApi = pickRunsApi();

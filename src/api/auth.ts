@@ -1,4 +1,4 @@
-import { USE_MOCK } from './env';
+import { BACKEND_MODE } from './env';
 import { request, setToken, clearToken } from './http';
 import type { CurrentUser } from '@/types';
 import type { LoginRequest, LoginResponse } from './types';
@@ -44,4 +44,12 @@ const mockApi: AuthApi = {
   async logout() { clearToken(); },
 };
 
-export const authApi: AuthApi = USE_MOCK ? mockApi : realApi;
+import { externalAuthApi } from './external';
+
+function pickApi(): AuthApi {
+  if (BACKEND_MODE === 'external') return externalAuthApi;
+  if (BACKEND_MODE === 'local') return realApi;
+  return mockApi;
+}
+
+export const authApi: AuthApi = pickApi();

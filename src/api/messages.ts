@@ -1,8 +1,9 @@
-import { USE_MOCK } from './env';
+import { BACKEND_MODE } from './env';
 import { request, streamSSE } from './http';
 import type { ChatMessage } from '@/types';
 import type { Closeable, MessageStreamEvent } from './types';
 import { mockMessages } from '@/mock/data';
+import { externalMessagesApi } from './external';
 
 export interface MessagesApi {
   /** 拉取一个会话的历史消息 */
@@ -72,4 +73,9 @@ function mockReply(input: string): string[] {
   return text.match(/.{1,4}/g) ?? [text];
 }
 
-export const messagesApi: MessagesApi = USE_MOCK ? mockApi : realApi;
+function pickMessagesApi(): MessagesApi {
+  if (BACKEND_MODE === 'external') return externalMessagesApi;
+  if (BACKEND_MODE === 'local') return realApi;
+  return mockApi;
+}
+export const messagesApi: MessagesApi = pickMessagesApi();
