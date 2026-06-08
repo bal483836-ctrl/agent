@@ -7,3 +7,4 @@ data/
 .DS_Store
 *.pyc
 __pycache__/
+backend/tsconfig.tsbuildinfo
