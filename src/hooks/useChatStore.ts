@@ -6,6 +6,7 @@ import type {
 } from '@/types';
 import { api } from '@/api';
 import type { Closeable } from '@/api';
+import { getToken, setToken } from '@/api';
 
 /**
  * 全局对话状态 + 业务动作。
@@ -104,6 +105,16 @@ const useChatStore = create<ChatState>((set, get) => ({
   async bootstrap() {
     set({ loading: true });
     try {
+      // MVP 阶段无注册：本地没 token 就自动登录（后端 mock 接受任意密码）
+      if (!getToken()) {
+        try {
+          const resp = await api.auth.login({ email: '', password: '' });
+          setToken(resp.token);
+        } catch (e) {
+          console.error('auto-login failed', e);
+        }
+      }
+
       const [me, sessions, workspaces, skills] = await Promise.all([
         api.auth.me(),
         api.sessions.list(),
@@ -242,7 +253,11 @@ const useChatStore = create<ChatState>((set, get) => ({
     set({ loggedOut: true });
   },
   async loginAgain() {
-    // mock 模式下直接重启 bootstrap；真实模式应导航到登录页
+    // 清掉过期 token，让 bootstrap 走自动登录流程
+    try {
+      const { clearToken } = await import('@/api');
+      clearToken();
+    } catch { /* ignore */ }
     set({ loggedOut: false });
     await get().bootstrap();
   },
