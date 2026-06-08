@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { Spin } from 'antd';
+import { useEffect, useRef, useState } from 'react';
+import { Alert, Spin } from 'antd';
 import TopBar from './components/TopBar';
 import ChatHistory from './components/Sidebar/ChatHistory';
 import ChatPanel from './components/Chat/ChatPanel';
@@ -7,7 +7,7 @@ import WorkspacePanel from './components/Workspace/WorkspacePanel';
 import SkillCenterModal from './components/SkillCenter/SkillCenterModal';
 import LoginGate from './components/LoginGate';
 import useChatStore from './hooks/useChatStore';
-import { setUnauthorizedHandler } from './api';
+import { BACKEND_MODE, EXTERNAL_API_BASE, setUnauthorizedHandler } from './api';
 
 /**
  * 三栏布局根组件。
@@ -25,13 +25,14 @@ export default function App() {
   const loading = useChatStore((s) => s.loading);
   const bootstrap = useChatStore((s) => s.bootstrap);
   const currentUser = useChatStore((s) => s.currentUser);
+  const [bootError, setBootError] = useState<string | null>(null);
 
   // 应用启动时拉取用户/会话/工作区/技能
   useEffect(() => {
     setUnauthorizedHandler(() => useChatStore.setState({ loggedOut: true }));
     bootstrap().catch((e) => {
-      // bootstrap 失败时也不阻塞渲染，由错误边界 / 登录页接管
       console.error('bootstrap failed', e);
+      setBootError(String((e as Error)?.message ?? e));
     });
   }, [bootstrap]);
 
@@ -62,9 +63,37 @@ export default function App() {
   if (loading && !currentUser) {
     return (
       <div style={{
-        height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        height: '100vh', display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center', gap: 16, padding: 24,
       }}>
-        <Spin size="large" tip="加载中..." />
+        <Spin size="large" />
+        <div style={{ fontSize: 12, color: '#94a3b8' }}>
+          后端模式：<b>{BACKEND_MODE}</b>
+          {BACKEND_MODE === 'external' && <> · base：<code>{EXTERNAL_API_BASE}</code></>}
+        </div>
+        {bootError && (
+          <Alert
+            type="error" showIcon style={{ maxWidth: 520 }}
+            message="启动失败"
+            description={
+              <>
+                <div style={{ fontFamily: 'monospace', fontSize: 12, marginBottom: 8 }}>{bootError}</div>
+                {BACKEND_MODE === 'local' && (
+                  <div style={{ fontSize: 12 }}>
+                    当前是 <code>local</code> 模式但本地 backend 没起。
+                    要么在 <code>.env.local</code> 改 <code>VITE_BACKEND_MODE=external</code>，
+                    要么 <code>cd backend && npm run dev</code> 起本地服务。
+                  </div>
+                )}
+                {BACKEND_MODE === 'external' && (
+                  <div style={{ fontSize: 12 }}>
+                    无法连接同事 OpenClaw 后端。检查 <code>VITE_EXTERNAL_DEV_BACKEND</code> 是否可达。
+                  </div>
+                )}
+              </>
+            }
+          />
+        )}
       </div>
     );
   }
