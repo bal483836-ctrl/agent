@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Avatar, Button, Divider, Popover, Tag, Tooltip, App as AntApp } from 'antd';
+import { Avatar, Button, Divider, Dropdown, Popover, Tag, Tooltip, App as AntApp } from 'antd';
 import {
   UserOutlined, MailOutlined, IdcardOutlined, CalendarOutlined,
-  TeamOutlined, LogoutOutlined,
+  TeamOutlined, LogoutOutlined, SwapOutlined,
 } from '@ant-design/icons';
 import useChatStore from '@/hooks/useChatStore';
-import { BACKEND_MODE } from '@/api/env';
+import { BACKEND_MODE, setBackendModeAndReload } from '@/api/env';
 
 /**
  * 顶部品牌栏。
@@ -122,14 +122,38 @@ export default function TopBar() {
 
       <div style={{ flex: 1 }} />
 
-      <Tooltip title={`后端模式：${BACKEND_MODE}`}>
-        <Tag
-          color={BACKEND_MODE === 'external' ? 'purple' : BACKEND_MODE === 'local' ? 'blue' : 'default'}
-          style={{ marginInlineEnd: 8, fontWeight: 500 }}
-        >
-          {BACKEND_MODE === 'external' ? '🌐 OpenClaw' : BACKEND_MODE === 'local' ? '🏠 本地' : '📦 Mock'}
-        </Tag>
-      </Tooltip>
+      <Dropdown
+        trigger={['click']}
+        menu={{
+          items: [
+            {
+              key: 'external', icon: <span>🌐</span>,
+              label: <span>OpenClaw 后端 <Tag color="purple">默认</Tag></span>,
+              onClick: () => setBackendModeAndReload('external'),
+            },
+            {
+              key: 'local', icon: <span>🏠</span>,
+              label: '本地 backend（localhost:8080）',
+              onClick: () => setBackendModeAndReload('local'),
+            },
+            {
+              key: 'mock', icon: <span>📦</span>,
+              label: 'Mock（纯前端演示）',
+              onClick: () => setBackendModeAndReload('mock'),
+            },
+          ],
+        }}
+      >
+        <Tooltip title="点击切换后端模式（会刷新页面）">
+          <Tag
+            color={BACKEND_MODE === 'external' ? 'purple' : BACKEND_MODE === 'local' ? 'blue' : 'default'}
+            style={{ marginInlineEnd: 8, fontWeight: 500, cursor: 'pointer' }}
+            icon={<SwapOutlined />}
+          >
+            {BACKEND_MODE === 'external' ? 'OpenClaw' : BACKEND_MODE === 'local' ? '本地' : 'Mock'}
+          </Tag>
+        </Tooltip>
+      </Dropdown>
 
       <Popover
         open={open}
