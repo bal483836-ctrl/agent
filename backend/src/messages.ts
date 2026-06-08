@@ -74,7 +74,8 @@ export async function registerMessages(app: FastifyInstance) {
             write('tool-call', { skillId: e.skillId, reason: e.reason, params: e.params });
           } else if (e.type === 'usage') {
             usage = e.usage;
-            write('usage', { ...e.usage });
+            // 前端 MessageStreamEvent 期望 { usage: {...} } 嵌套结构
+            write('usage', { usage: e.usage });
           } else if (e.type === 'done') {
             write('done', { messageId: assistantId });
           } else if (e.type === 'error') {
