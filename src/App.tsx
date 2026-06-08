@@ -40,7 +40,9 @@ export default function App() {
     const onMove = (e: MouseEvent) => {
       if (!resizing.current) return;
       const newW = window.innerWidth - e.clientX;
-      setRightWidth(Math.max(240, Math.min(700, newW)));
+      // 上限：不超过窗口 60%，避免压缩中间对话区
+      const maxRight = Math.floor(window.innerWidth * 0.6);
+      setRightWidth(Math.max(280, Math.min(maxRight, newW)));
     };
     const onUp = () => {
       if (resizing.current) {

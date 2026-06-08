@@ -289,12 +289,16 @@ export default function WorkspacePanel() {
           padding: '10px 14px', background: '#eff6ff', borderBottom: '1px solid #dbeafe',
           fontSize: 12, color: '#1d4ed8',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          gap: 8, minWidth: 0,
         }}
       >
-        <span>
-          已选择 <b style={{ color: '#2563eb' }}>{selectedContext.length}</b> 项文件进行操作
+        <span style={{
+          minWidth: 0, flex: '1 1 auto', whiteSpace: 'nowrap',
+          overflow: 'hidden', textOverflow: 'ellipsis',
+        }}>
+          已选 <b style={{ color: '#2563eb' }}>{selectedContext.length}</b> 项
         </span>
-        <a onClick={() => setSelectedContext([])} style={{ fontSize: 11 }}>
+        <a onClick={() => setSelectedContext([])} style={{ fontSize: 11, flexShrink: 0 }}>
           <CloseCircleOutlined /> 清空
         </a>
       </div>
