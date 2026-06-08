@@ -6,7 +6,7 @@ import { mockWorkspaces } from '@/mock/data';
 export type PreviewResult =
   | { kind: 'image'; name: string; mime: string; totalBytes: number }
   | { kind: 'binary'; name: string; mime: string; totalBytes: number }
-  | { kind: string; name: string; text: string; totalBytes: number; truncated: boolean };
+  | { kind: string; name: string; text: string; html?: string; totalBytes: number; truncated: boolean };
 
 export interface WorkspacesApi {
   list(): Promise<Workspace[]>;

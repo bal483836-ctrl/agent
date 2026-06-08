@@ -14,7 +14,8 @@ import { safeResolve, tempRoot } from './tenant.js';
 import { audit } from './audit.js';
 import { parseFile } from './parsers.js';
 
-const PREVIEW_MAX_BYTES = 64 * 1024;
+const PREVIEW_MAX_BYTES = 2 * 1024 * 1024;       // 文本预览 2MB
+const PREVIEW_HTML_BYTES = 8 * 1024 * 1024;      // HTML 预览（含 base64 图片）8MB
 
 const IMAGE_EXT_MIME: Record<string, string> = {
   '.png': 'image/png',
@@ -129,13 +130,18 @@ export async function registerFiles(app: FastifyInstance) {
         return { kind: 'image', name: node.name, mime: IMAGE_EXT_MIME[ext], totalBytes: size };
       }
 
-      // 文本类（含 PDF/Word/Excel）：调 parseFile
-      const parsed = await parseFile(fsPath, node.name, PREVIEW_MAX_BYTES);
-      if (parsed && parsed.text) {
+      // 文本类（含 PDF/Word/Excel）：调 parseFile，docx/xlsx 同时生成 html
+      const wantHtml = ext === '.docx' || ext === '.xlsx' || ext === '.xls';
+      const parsed = await parseFile(fsPath, node.name, {
+        maxBytes: wantHtml ? PREVIEW_HTML_BYTES : PREVIEW_MAX_BYTES,
+        html: wantHtml,
+      });
+      if (parsed && (parsed.text || parsed.html)) {
         return {
           kind: parsed.kind,
           name: node.name,
           text: parsed.text,
+          html: parsed.html,
           totalBytes: parsed.totalBytes,
           truncated: parsed.truncated,
         };

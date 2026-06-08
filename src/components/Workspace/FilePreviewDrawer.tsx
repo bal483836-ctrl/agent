@@ -97,8 +97,9 @@ function renderContent(data: PreviewResult, downloadUrl: string) {
       />
     );
   }
-  // 文本类
+  // 文本类（可能附带 html）
   const text = (data as any).text as string;
+  const html = (data as any).html as string | undefined;
   const truncated = (data as any).truncated;
 
   return (
@@ -106,21 +107,36 @@ function renderContent(data: PreviewResult, downloadUrl: string) {
       {truncated && (
         <Alert
           type="warning" style={{ marginBottom: 12 }} showIcon
-          message="内容过大，仅展示前 64KB"
+          message="内容过大，仅展示部分"
         />
       )}
-      <pre
-        style={{
-          margin: 0, padding: 14, background: '#f8fafc',
-          border: '1px solid #e2e8f0', borderRadius: 8,
-          fontSize: 12, lineHeight: 1.6,
-          fontFamily: 'ui-monospace, "JetBrains Mono", "Cascadia Code", monospace',
-          whiteSpace: 'pre-wrap', wordBreak: 'break-word',
-          maxHeight: 'calc(100vh - 200px)', overflowY: 'auto',
-        }}
-      >
-        {text}
-      </pre>
+
+      {html ? (
+        <div
+          className="qc-doc-preview"
+          style={{
+            padding: 16, background: '#fff',
+            border: '1px solid #e2e8f0', borderRadius: 8,
+            fontSize: 14, lineHeight: 1.7, color: '#1f2937',
+            maxHeight: 'calc(100vh - 200px)', overflowY: 'auto',
+          }}
+          // 内容来自 backend 解析的用户自有文件
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      ) : (
+        <pre
+          style={{
+            margin: 0, padding: 14, background: '#f8fafc',
+            border: '1px solid #e2e8f0', borderRadius: 8,
+            fontSize: 12, lineHeight: 1.6,
+            fontFamily: 'ui-monospace, "JetBrains Mono", "Cascadia Code", monospace',
+            whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+            maxHeight: 'calc(100vh - 200px)', overflowY: 'auto',
+          }}
+        >
+          {text}
+        </pre>
+      )}
     </>
   );
 }

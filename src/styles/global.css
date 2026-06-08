@@ -94,6 +94,33 @@ body {
 /* 异常行高亮 */
 .qc-warn-row > td { background: #fef2f2 !important; color: #b91c1c; }
 
+/* Word/Excel 富文本预览样式 */
+.qc-doc-preview img {
+  max-width: 100%; height: auto; display: block;
+  margin: 12px auto; border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.qc-doc-preview p { margin: 8px 0; }
+.qc-doc-preview h1, .qc-doc-preview h2, .qc-doc-preview h3,
+.qc-doc-preview h4, .qc-doc-preview h5, .qc-doc-preview h6 {
+  margin: 16px 0 8px; color: #111827; font-weight: 600;
+}
+.qc-doc-preview h1 { font-size: 22px; }
+.qc-doc-preview h2 { font-size: 18px; }
+.qc-doc-preview h3 { font-size: 16px; }
+.qc-doc-preview table {
+  border-collapse: collapse; margin: 12px 0;
+  font-size: 13px; max-width: 100%;
+}
+.qc-doc-preview td, .qc-doc-preview th {
+  border: 1px solid #e2e8f0; padding: 6px 10px;
+}
+.qc-doc-preview th { background: #f8fafc; font-weight: 600; }
+.qc-doc-preview tr:nth-child(even) td { background: #fafbfc; }
+.qc-doc-preview ul, .qc-doc-preview ol { margin: 8px 0 8px 24px; }
+.qc-doc-preview li { margin: 4px 0; }
+.qc-doc-preview a { color: #2563eb; text-decoration: underline; }
+
 /* token 用量 */
 .qc-token-usage {
   display: flex; align-items: center; gap: 6px;

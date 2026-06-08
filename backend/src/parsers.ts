@@ -21,12 +21,21 @@ const TEXT_EXT = new Set([
 export interface ParseResult {
   /** 提取出来的纯文本（截断后） */
   text: string;
+  /** 可选：富文本 HTML（docx/xlsx 在 html=true 时返回，含图片 base64） */
+  html?: string;
   /** 类型简述，写到提示词里方便模型理解 */
   kind: string;
   /** 是否被截断 */
   truncated: boolean;
   /** 原始大小（字节） */
   totalBytes: number;
+}
+
+export interface ParseOptions {
+  /** 文本片段的字节预算（默认 8KB） */
+  maxBytes?: number;
+  /** 是否生成 HTML 富文本预览（默认 false，仅 UI 预览时开启） */
+  html?: boolean;
 }
 
 /**
@@ -39,14 +48,19 @@ export interface ParseResult {
 export async function parseFile(
   fsPath: string,
   name: string,
-  maxBytes = 8 * 1024,
+  maxBytesOrOpts: number | ParseOptions = 8 * 1024,
 ): Promise<ParseResult | null> {
+  const opts: ParseOptions = typeof maxBytesOrOpts === 'number'
+    ? { maxBytes: maxBytesOrOpts }
+    : maxBytesOrOpts;
+  const maxBytes = opts.maxBytes ?? 8 * 1024;
+  const html = opts.html ?? false;
   const ext = path.extname(name).toLowerCase();
   try {
     if (TEXT_EXT.has(ext)) return await parseText(fsPath, ext, maxBytes);
     if (ext === '.pdf') return await parsePdf(fsPath, maxBytes);
-    if (ext === '.docx') return await parseDocx(fsPath, maxBytes);
-    if (ext === '.xlsx' || ext === '.xls') return await parseSpreadsheet(fsPath, ext, maxBytes);
+    if (ext === '.docx') return await parseDocx(fsPath, maxBytes, html);
+    if (ext === '.xlsx' || ext === '.xls') return await parseSpreadsheet(fsPath, ext, maxBytes, html);
     // 其他：仅返回元信息
     const stat = await fs.stat(fsPath);
     return {
@@ -101,46 +115,64 @@ async function parsePdf(fsPath: string, maxBytes: number): Promise<ParseResult> 
 }
 
 /* ===== Word (.docx) ===== */
-async function parseDocx(fsPath: string, maxBytes: number): Promise<ParseResult> {
+async function parseDocx(fsPath: string, maxBytes: number, withHtml: boolean): Promise<ParseResult> {
   const mammoth = await import('mammoth');
-  const result = await mammoth.extractRawText({ path: fsPath });
-  const truncated = result.value.length > maxBytes;
-  const text = truncated ? result.value.slice(0, maxBytes) + '\n... [truncated]' : result.value;
+  const rawResult = await mammoth.extractRawText({ path: fsPath });
+  const truncated = rawResult.value.length > maxBytes;
+  const text = truncated ? rawResult.value.slice(0, maxBytes) + '\n... [truncated]' : rawResult.value;
   const stat = await fs.stat(fsPath);
-  return {
-    text,
-    kind: 'docx',
-    truncated,
-    totalBytes: stat.size,
-  };
+
+  let html: string | undefined;
+  if (withHtml) {
+    // 把内嵌图片转为 base64 data:URL，前端 dangerouslySetInnerHTML 渲染
+    const htmlResult = await mammoth.convertToHtml({ path: fsPath });
+    html = htmlResult.value;
+  }
+
+  return { text, html, kind: 'docx', truncated, totalBytes: stat.size };
 }
 
 /* ===== Excel ===== */
-async function parseSpreadsheet(fsPath: string, ext: string, maxBytes: number): Promise<ParseResult> {
+async function parseSpreadsheet(
+  fsPath: string, ext: string, maxBytes: number, withHtml: boolean,
+): Promise<ParseResult> {
   const XLSX = await import('xlsx');
   const wb = XLSX.readFile(fsPath, { cellDates: true });
   const lines: string[] = [];
+  const htmlParts: string[] = [];
   for (const sheetName of wb.SheetNames) {
     lines.push(`# Sheet: ${sheetName}`);
     const sheet = wb.Sheets[sheetName];
     const rows = XLSX.utils.sheet_to_json<any[]>(sheet, { header: 1, raw: false, defval: '' });
-    // 最多导出前 50 行 + 列头
     for (let i = 0; i < Math.min(rows.length, 50); i++) {
       lines.push(rows[i].map((c: any) => String(c)).join('\t'));
     }
     if (rows.length > 50) lines.push(`... (剩余 ${rows.length - 50} 行省略)`);
     lines.push('');
+
+    if (withHtml) {
+      htmlParts.push(`<h3 style="margin:16px 0 8px;font-size:14px;color:#1f2937">${escapeHtml(sheetName)}</h3>`);
+      htmlParts.push(XLSX.utils.sheet_to_html(sheet, { editable: false }));
+    }
   }
   const full = lines.join('\n');
   const truncated = full.length > maxBytes;
   const text = truncated ? full.slice(0, maxBytes) + '\n... [truncated]' : full;
   const stat = await fs.stat(fsPath);
+
   return {
     text,
+    html: withHtml ? htmlParts.join('\n') : undefined,
     kind: ext === '.xlsx' ? 'xlsx' : 'xls',
     truncated,
     totalBytes: stat.size,
   };
+}
+
+function escapeHtml(s: string): string {
+  return s.replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[c]!));
 }
 
 function kindForExt(ext: string): string {
