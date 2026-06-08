@@ -3,6 +3,11 @@ import { request } from './http';
 import type { Workspace, WsNode } from '@/types';
 import { mockWorkspaces } from '@/mock/data';
 
+export type PreviewResult =
+  | { kind: 'image'; name: string; mime: string; totalBytes: number }
+  | { kind: 'binary'; name: string; mime: string; totalBytes: number }
+  | { kind: string; name: string; text: string; totalBytes: number; truncated: boolean };
+
 export interface WorkspacesApi {
   list(): Promise<Workspace[]>;
   tree(id: string): Promise<WsNode[]>;
@@ -12,6 +17,8 @@ export interface WorkspacesApi {
   move(id: string, dragKey: string, dropKey: string, dropToGap: boolean): Promise<void>;
   getFolderDescription(id: string, key: string): Promise<string>;
   setFolderDescription(id: string, key: string, content: string): Promise<void>;
+  /** 文件内容预览 */
+  previewFile(id: string, key: string): Promise<PreviewResult>;
 }
 
 const realApi: WorkspacesApi = {
@@ -35,6 +42,8 @@ const realApi: WorkspacesApi = {
     request<void>(`/workspaces/${id}/folders/${key}/description`, {
       method: 'PUT', body: { content },
     }),
+  previewFile: (id, key) =>
+    request<PreviewResult>(`/workspaces/${id}/files/${key}/preview`),
 };
 
 /* ---------- mock ---------- */
@@ -50,6 +59,9 @@ const mockApi: WorkspacesApi = {
   async move() { /* no-op */ },
   async getFolderDescription(id, key) { return mockDescs.get(`${id}:${key}`) ?? ''; },
   async setFolderDescription(id, key, content) { mockDescs.set(`${id}:${key}`, content); },
+  async previewFile(_id, _key) {
+    return { kind: 'text', name: 'mock', text: '（mock 模式下无文件内容）', totalBytes: 0, truncated: false };
+  },
 };
 
 export const workspacesApi: WorkspacesApi = USE_MOCK ? mockApi : realApi;

@@ -14,6 +14,7 @@ import {
 import useChatStore from '@/hooks/useChatStore';
 import { api } from '@/api';
 import type { WsNode } from '@/types';
+import FilePreviewDrawer from './FilePreviewDrawer';
 
 /** 把字节数格式化为可读字符串 */
 function fmtSize(bytes: number): string {
@@ -102,6 +103,9 @@ export default function WorkspacePanel() {
   /* —— 搜索 —— */
   const [showSearch, setShowSearch] = useState(false);
   const [search, setSearch] = useState('');
+
+  /* —— 预览 —— */
+  const [preview, setPreview] = useState<{ key: string; name: string } | null>(null);
 
   const matchedKeys = useMemo(() => {
     if (!search.trim()) return new Set<string>();
@@ -359,6 +363,7 @@ export default function WorkspacePanel() {
                 defaultExpandAll
                 treeData={treeData}
                 checkedKeys={checkedKeys}
+                selectedKeys={[]}
                 onCheck={(checked) => {
                   const keys = Array.isArray(checked) ? checked : checked.checked;
                   const set = new Set(keys as string[]);
@@ -368,6 +373,13 @@ export default function WorkspacePanel() {
                       .map((n) => ({ key: n.key, name: n.name, type: n.type })),
                   );
                 }}
+                onSelect={(_keys, info) => {
+                  // 点文件名 → 打开预览（点文件夹无操作，文件夹有 onExpand 切换）
+                  const node = findNode(tree, String(info.node.key));
+                  if (node?.type === 'file') {
+                    setPreview({ key: node.key, name: node.name });
+                  }
+                }}
                 onDrop={onDrop}
                 /* 搜索时把命中节点路径展开 */
                 expandedKeys={search.trim() ? Array.from(matchedKeys) : undefined}
@@ -376,6 +388,13 @@ export default function WorkspacePanel() {
           </Dropdown>
         )}
       </div>
+
+      <FilePreviewDrawer
+        workspaceId={workspaceId}
+        fileKey={preview?.key ?? null}
+        fileName={preview?.name}
+        onClose={() => setPreview(null)}
+      />
     </>
   );
 }

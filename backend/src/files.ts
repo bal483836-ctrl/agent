@@ -12,6 +12,19 @@ import {
 } from './store.js';
 import { safeResolve, tempRoot } from './tenant.js';
 import { audit } from './audit.js';
+import { parseFile } from './parsers.js';
+
+const PREVIEW_MAX_BYTES = 64 * 1024;
+
+const IMAGE_EXT_MIME: Record<string, string> = {
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.gif': 'image/gif',
+  '.webp': 'image/webp',
+  '.bmp': 'image/bmp',
+  '.svg': 'image/svg+xml',
+};
 
 export async function registerFiles(app: FastifyInstance) {
   // 工作区上传（支持单批多文件，强制业务约束）
@@ -84,6 +97,58 @@ export async function registerFiles(app: FastifyInstance) {
     }
     reply.code(400).send({ message: 'no file' });
   });
+
+  /** 工作区文件内容预览
+   *  返回值结构：
+   *    text   类: { kind:'text'|'pdf'|'docx'|'xlsx'|'csv'|'json'|'markdown', text:string, totalBytes, truncated }
+   *    image  类: { kind:'image', mime, totalBytes }
+   *    binary 类: { kind:'binary', mime, totalBytes }
+   */
+  app.get<{ Params: { id: string; key: string } }>(
+    '/api/workspaces/:id/files/:key/preview',
+    async (req, reply) => {
+      const tenant = (req as any).tenant;
+      const wsId = req.params.id;
+      const key = req.params.key;
+
+      // 查 tree 拿文件名（用来识别扩展名）
+      const tree = await getWorkspaceTree(tenant, wsId);
+      const node = findNode(tree, key);
+      if (!node || node.type !== 'file') {
+        return reply.code(404).send({ message: 'file not found' });
+      }
+      const fsPath = nodeFsPath(tenant, wsId, key);
+      let size: number;
+      try { size = (await fsp.stat(fsPath)).size; }
+      catch { return reply.code(404).send({ message: 'file missing on disk' }); }
+
+      const ext = path.extname(node.name).toLowerCase();
+
+      // 图片：返回 mime，前端用 download URL 渲染 <img>
+      if (IMAGE_EXT_MIME[ext]) {
+        return { kind: 'image', name: node.name, mime: IMAGE_EXT_MIME[ext], totalBytes: size };
+      }
+
+      // 文本类（含 PDF/Word/Excel）：调 parseFile
+      const parsed = await parseFile(fsPath, node.name, PREVIEW_MAX_BYTES);
+      if (parsed && parsed.text) {
+        return {
+          kind: parsed.kind,
+          name: node.name,
+          text: parsed.text,
+          totalBytes: parsed.totalBytes,
+          truncated: parsed.truncated,
+        };
+      }
+      // 其他二进制
+      return {
+        kind: 'binary',
+        name: node.name,
+        mime: 'application/octet-stream',
+        totalBytes: size,
+      };
+    },
+  );
 
   // 工作区文件下载（按节点 key）
   app.get<{ Params: { id: string; key: string } }>(
@@ -252,6 +317,17 @@ function streamToFile(stream: NodeJS.ReadableStream, target: string): Promise<vo
     ws.on('error', reject);
     stream.on('error', reject);
   });
+}
+
+function findNode(nodes: WsNode[], key: string): WsNode | null {
+  for (const n of nodes) {
+    if (n.key === key) return n;
+    if (n.children) {
+      const r = findNode(n.children, key);
+      if (r) return r;
+    }
+  }
+  return null;
 }
 
 function fmtSize(bytes: number): string {
