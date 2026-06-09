@@ -24,11 +24,12 @@ export default function UploadSkillForm({ onSuccess }: Props) {
   const uploadProps: UploadProps = {
     name: 'file',
     multiple: false,
-    accept: '.zip',
+    accept: '.zip,.md',
     showUploadList: false,
     beforeUpload: async (file) => {
-      if (!file.name.endsWith('.zip')) {
-        message.error('请上传 zip 格式的技能包');
+      const lower = file.name.toLowerCase();
+      if (!lower.endsWith('.zip') && !lower.endsWith('.md')) {
+        message.error('请上传 .zip 技能包或 SKILL.md 文件');
         return Upload.LIST_IGNORE;
       }
       setBusy(true);
@@ -63,9 +64,10 @@ export default function UploadSkillForm({ onSuccess }: Props) {
           <p className="ant-upload-drag-icon">
             <InboxOutlined style={{ color: '#2563eb' }} />
           </p>
-          <p className="ant-upload-text">点击或拖拽上传技能包（.zip）</p>
+          <p className="ant-upload-text">点击或拖拽上传技能包（.zip 或 SKILL.md）</p>
           <p className="ant-upload-hint">
-            技能包须包含 <code>manifest.json</code>、执行脚本，可选 <code>requirements.txt</code>
+            zip 包须含 <code>manifest.json</code> + 执行脚本，
+            或 <code>SKILL.md</code>（Claude Code 风格，附 YAML frontmatter）
           </p>
         </Dragger>
       </Form.Item>

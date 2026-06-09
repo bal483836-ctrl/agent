@@ -47,6 +47,28 @@ export interface LoadedSkill extends SkillManifest {
   dir: string;
   /** 来源：system（内置）/ org（组织内用户上传） */
   source: 'system' | 'org';
+  /** 入口类型：markdown 类技能仅靠 SKILL.md 注入提示词；executable 启动子进程 */
+  kind: 'markdown' | 'executable';
+}
+
+/** 读取 markdown 类技能的 SKILL.md 正文（去除 frontmatter） */
+export async function readSkillInstructions(skill: LoadedSkill): Promise<string> {
+  if (skill.kind !== 'markdown') return '';
+  const p = path.join(skill.dir, skill.entry);
+  try {
+    const raw = await fs.readFile(p, 'utf-8');
+    return stripFrontmatter(raw);
+  } catch {
+    return '';
+  }
+}
+
+function stripFrontmatter(raw: string): string {
+  if (!raw.startsWith('---')) return raw;
+  const end = raw.indexOf('\n---', 3);
+  if (end < 0) return raw;
+  const after = raw.slice(end + 4);
+  return after.replace(/^\r?\n/, '');
 }
 
 const REQUIRED_KEYS: (keyof SkillManifest)[] = ['id', 'name', 'description', 'category', 'entry'];
@@ -72,7 +94,11 @@ async function loadFromDir(root: string, source: 'system' | 'org'): Promise<Load
       if (!ent.isDirectory()) continue;
       const dir = path.join(root, ent.name);
       const skill = await tryLoadManifest(dir);
-      if (skill) result.push({ ...skill, dir, source });
+      if (skill) {
+        const kind: 'markdown' | 'executable' = skill.entry.toLowerCase().endsWith('.md')
+          ? 'markdown' : 'executable';
+        result.push({ ...skill, dir, source, kind });
+      }
     }
     return result;
   } catch (e: any) {
@@ -99,8 +125,9 @@ export function validateManifest(m: any): asserts m is SkillManifest {
     if (!(k in m)) throw new Error(`manifest 缺字段：${k}`);
   }
   if (!/^[a-z0-9_-]+$/i.test(String(m.id))) throw new Error('id 只能是字母/数字/下划线/连字符');
-  if (!m.entry.endsWith('.py') && !m.entry.endsWith('.js')) {
-    throw new Error('entry 必须是 .py 或 .js');
+  const entry = String(m.entry).toLowerCase();
+  if (!entry.endsWith('.py') && !entry.endsWith('.js') && !entry.endsWith('.md')) {
+    throw new Error('entry 必须是 .py、.js 或 .md');
   }
 }
 

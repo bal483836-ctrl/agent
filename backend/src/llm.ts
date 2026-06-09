@@ -27,6 +27,8 @@ export type StreamEvent =
 
 export interface SkillSummary {
   id: string; name: string; description: string;
+  /** markdown 类技能的 SKILL.md 正文，可选。若提供将完整注入到 system prompt。 */
+  instructions?: string;
 }
 
 /** 注入到对话的上下文文件项 */
@@ -40,10 +42,19 @@ export interface CtxFile {
 }
 
 function buildSystemPrompt(skills: SkillSummary[]): string {
-  const skillsBlock = skills.length
-    ? `\n\n[AVAILABLE SKILLS]\n${skills.map((s) => `- ${s.id}: ${s.name} — ${s.description}`).join('\n')}\n[END SKILLS]\n如需调用其中一个 Skill，在回答末尾用一行输出：\n<tool_call>{"skillId":"<id>","reason":"原因","params":{...}}</tool_call>`
+  if (!skills.length) return config.llm.systemPrompt;
+  const listing = skills
+    .map((s) => `- ${s.id}: ${s.name} — ${s.description}`)
+    .join('\n');
+  const callHint = `如需调用其中一个 Skill，在回答末尾用一行输出：\n<tool_call>{"skillId":"<id>","reason":"原因","params":{...}}</tool_call>`;
+  const instructionsBlocks = skills
+    .filter((s) => s.instructions && s.instructions.trim())
+    .map((s) => `<<<SKILL id="${s.id}" name="${s.name}">>>\n${s.instructions!.trim()}\n<<<END SKILL>>>`)
+    .join('\n\n');
+  const instructionsSection = instructionsBlocks
+    ? `\n\n[SKILL INSTRUCTIONS]\n以下技能附带详细操作说明。当用户请求匹配某个技能的触发场景时，请严格按对应说明执行。\n${instructionsBlocks}\n[END SKILL INSTRUCTIONS]`
     : '';
-  return config.llm.systemPrompt + skillsBlock;
+  return `${config.llm.systemPrompt}\n\n[AVAILABLE SKILLS]\n${listing}\n[END SKILLS]\n${callHint}${instructionsSection}`;
 }
 
 function buildUserMessageContent(userText: string, ctxFiles: CtxFile[]): string {

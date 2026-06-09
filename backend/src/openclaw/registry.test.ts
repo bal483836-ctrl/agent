@@ -33,16 +33,15 @@ describe('skill manifest 校验', () => {
     }
   });
 
-  it('entry 必须 .py 或 .js', () => {
+  it('entry 必须 .py、.js 或 .md', () => {
     expect(() => validateManifest({
       id: 'x', name: 'n', description: 'd', category: 'c', entry: 'main.sh',
     })).toThrow(/entry/);
-    expect(() => validateManifest({
-      id: 'x', name: 'n', description: 'd', category: 'c', entry: 'main.py',
-    })).not.toThrow();
-    expect(() => validateManifest({
-      id: 'x', name: 'n', description: 'd', category: 'c', entry: 'index.js',
-    })).not.toThrow();
+    for (const entry of ['main.py', 'index.js', 'SKILL.md']) {
+      expect(() => validateManifest({
+        id: 'x', name: 'n', description: 'd', category: 'c', entry,
+      })).not.toThrow();
+    }
   });
 
   it('非对象抛错', () => {

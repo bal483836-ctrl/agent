@@ -2,14 +2,21 @@
  * Skills REST 路由 —— 暴露 OpenClaw 注册表 + zip 上传 + 删除 + 意图识别。
  */
 import { FastifyInstance } from 'fastify';
-import { loadAllSkills, getSkillByIdForOrg, type LoadedSkill } from './openclaw/registry.js';
-import { uploadSkillZip, deleteSkill } from './openclaw/uploader.js';
+import {
+  loadAllSkills, getSkillByIdForOrg, readSkillInstructions, type LoadedSkill,
+} from './openclaw/registry.js';
+import { uploadSkillZip, uploadSkillMarkdown, deleteSkill } from './openclaw/uploader.js';
 import { audit } from './audit.js';
 
-/** 给 LLM 注入 system 用的摘要 */
+/** 给 LLM 注入 system 用的摘要；markdown 类技能附带完整 SKILL.md 正文。 */
 export async function listSkillSummaries(orgId: string) {
   const all = await loadAllSkills(orgId);
-  return all.map((s) => ({ id: s.id, name: s.name, description: s.description }));
+  return Promise.all(all.map(async (s) => ({
+    id: s.id,
+    name: s.name,
+    description: s.description,
+    instructions: s.kind === 'markdown' ? await readSkillInstructions(s) : '',
+  })));
 }
 
 /** 对外暴露用 */
@@ -52,7 +59,10 @@ export async function registerSkills(app: FastifyInstance) {
     for await (const p of parts) {
       if (p.type === 'file') {
         try {
-          const result = await uploadSkillZip(tenant, p.file);
+          const fname = (p.filename || '').toLowerCase();
+          const result = fname.endsWith('.md')
+            ? await uploadSkillMarkdown(tenant, p.file, p.filename || 'SKILL.md')
+            : await uploadSkillZip(tenant, p.file);
           await audit(tenant, { action: 'skill.upload', skillId: result.id, status: 'success' });
           return result;
         } catch (e) {
