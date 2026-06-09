@@ -8,7 +8,7 @@ import path from 'node:path';
 export default defineConfig(function (_a) {
     var mode = _a.mode;
     var env = loadEnv(mode, process.cwd(), '');
-    var backend = env.VITE_DEV_BACKEND || 'http://localhost:8080';
+    var backend = env.VITE_DEV_BACKEND || 'http://47.116.192.78:8080';
     return {
         plugins: [react()],
         resolve: {

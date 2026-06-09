@@ -3,6 +3,8 @@ import { API_BASE, WS_BASE } from './env';
 /* ===== JWT 存取 ===== */
 
 const TOKEN_KEY = 'qc_jwt';
+const USER_ID_KEY = 'qc_user_id';
+const USER_DEPT_KEY = 'qc_user_dept';
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
@@ -12,7 +14,15 @@ export function setToken(t: string) {
 }
 export function clearToken() {
   localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_ID_KEY);
+  localStorage.removeItem(USER_DEPT_KEY);
 }
+
+/* ===== 身份（gateway 用 userID + dept 替代 JWT 解析） ===== */
+export function getUserID(): string | null { return localStorage.getItem(USER_ID_KEY); }
+export function setUserID(id: string) { localStorage.setItem(USER_ID_KEY, id); }
+export function getUserDept(): string | null { return localStorage.getItem(USER_DEPT_KEY); }
+export function setUserDept(d: string) { localStorage.setItem(USER_DEPT_KEY, d); }
 
 /* ===== 全局 401 处理 ===== */
 
@@ -157,4 +167,33 @@ export async function streamSSE(
     }
   }
   void currentEvent;
+}
+
+/**
+ * GET 方式的 SSE 流（用于 gateway 的 /api/chat/stream）。
+ * EventSource 不支持自定义 header，gateway 也无需鉴权 header，正好可用。
+ * 兼容三种情况：
+ *  - 默认 message 事件
+ *  - 命名事件（先用 onmessage 兜底，再尝试 listen 常见名）
+ *  - 普通文本（不一定是 JSON）
+ */
+export function streamSSEGet(
+  path: string,
+  query: Record<string, string | number | boolean | undefined>,
+  onEvent: (event: { event: string; data: string }) => void,
+  onError?: (err: unknown) => void,
+): { close: () => void } {
+  const url = buildUrl(path, query);
+  const es = new EventSource(url);
+  es.onmessage = (ev) => onEvent({ event: 'message', data: ev.data });
+  // 常见自定义事件名，统一转给同一回调
+  const named = ['delta', 'text-delta', 'chunk', 'token', 'message', 'usage', 'done', 'error', 'tool-call', 'end'];
+  for (const name of named) {
+    es.addEventListener(name, (ev: MessageEvent) => onEvent({ event: name, data: ev.data }));
+  }
+  es.onerror = (e) => {
+    // EventSource 在流自然结束时也会触发 error，统一交由上层判定
+    if (onError) onError(e);
+  };
+  return { close: () => es.close() };
 }

@@ -105,4 +105,6 @@ export const UPLOAD_LIMITS = {
   maxFiles: 200,
 };
 
-export const filesApi: FilesApi = USE_MOCK ? mockApi : realApi;
+// gateway 当前无文件接口 → 统一走 mock 实现
+export const filesApi: FilesApi = USE_MOCK ? mockApi : mockApi;
+void realApi;

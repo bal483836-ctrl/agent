@@ -113,4 +113,6 @@ const mockApi: RunsApi = {
   },
 };
 
-export const runsApi: RunsApi = USE_MOCK ? mockApi : realApi;
+// gateway 当前无技能执行/runs 接口 → 统一走 mock 实现
+export const runsApi: RunsApi = USE_MOCK ? mockApi : mockApi;
+void realApi;

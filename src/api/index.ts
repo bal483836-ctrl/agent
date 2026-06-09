@@ -23,5 +23,9 @@ export const api = {
 
 export { UPLOAD_LIMITS };
 export * from './types';
-export { ApiError, setUnauthorizedHandler, getToken, setToken, clearToken } from './http';
+export {
+  ApiError, setUnauthorizedHandler,
+  getToken, setToken, clearToken,
+  getUserID, setUserID, getUserDept, setUserDept,
+} from './http';
 export { USE_MOCK, API_BASE, WS_BASE } from './env';

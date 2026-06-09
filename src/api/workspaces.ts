@@ -64,4 +64,6 @@ const mockApi: WorkspacesApi = {
   },
 };
 
-export const workspacesApi: WorkspacesApi = USE_MOCK ? mockApi : realApi;
+// gateway 当前无 /workspaces 相关接口 → 统一走 mock 实现，保证 UI 可用
+export const workspacesApi: WorkspacesApi = USE_MOCK ? mockApi : mockApi;
+void realApi;

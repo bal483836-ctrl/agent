@@ -6,7 +6,7 @@ import type {
 } from '@/types';
 import { api } from '@/api';
 import type { Closeable } from '@/api';
-import { getToken, setToken } from '@/api';
+import { getToken, setToken, getUserID } from '@/api';
 
 /**
  * 全局对话状态 + 业务动作。
@@ -105,8 +105,8 @@ const useChatStore = create<ChatState>((set, get) => ({
   async bootstrap() {
     set({ loading: true });
     try {
-      // MVP 阶段无注册：本地没 token 就自动登录（后端 mock 接受任意密码）
-      if (!getToken()) {
+      // MVP 阶段无注册：本地没 token / userID 就自动登录（gateway 用 userID 标识身份）
+      if (!getToken() || !getUserID()) {
         try {
           const resp = await api.auth.login({ email: '', password: '' });
           setToken(resp.token);
