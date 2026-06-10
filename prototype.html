@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>智枢 · SkillHub</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* 背景层 */
+  --bg-app:#f6f4fb;
+  --bg-card:#ffffff;
+  --bg-soft:#faf8fd;
+  --bg-tint:#f1edfa;
+
+  /* 边框 */
+  --border:#ece8f3;
+  --border-strong:#d8d1e6;
+
+  /* 文本 */
+  --t1:#1a1530;
+  --t2:#5b556e;
+  --t3:#9892a8;
+  --t-on-dark:#ffffff;
+
+  /* 主色 / 强调 */
+  --primary:#1a1530;
+  --primary-hover:#2a2348;
+  --accent:#6d5cf5;
+  --accent-2:#a78bfa;
+  --accent-grad:linear-gradient(135deg,#6d5cf5 0%,#a78bfa 100%);
+  --accent-soft:#ede9fe;
+
+  /* 状态色 */
+  --pink:#ec4899;--pink-soft:#fce7f3;
+  --rose:#f43f5e;--rose-soft:#ffe4e6;
+  --mint:#10b981;--mint-soft:#d1fae5;
+  --sky:#3b82f6;--sky-soft:#dbeafe;
+  --amber:#f59e0b;--amber-soft:#fef3c7;
+
+  /* 阴影与圆角 */
+  --r:10px;--r-lg:16px;--r-xl:22px;
+  --sh-sm:0 1px 2px rgba(26,21,48,.04);
+  --sh:0 2px 8px rgba(26,21,48,.06);
+  --sh-md:0 6px 20px rgba(26,21,48,.08);
+  --sh-lg:0 12px 36px rgba(26,21,48,.12);
+}
+body{background:var(--bg-app);color:var(--t1);font-family:'PingFang SC','Noto Sans SC','Microsoft YaHei',system-ui,sans-serif;font-size:13.5px;line-height:1.55;min-height:100vh;overflow:hidden}
+.app{display:flex;height:100vh}
+
+/* ─── SIDEBAR ─────────────────────────────────────── */
+.sidebar{width:232px;flex-shrink:0;background:var(--bg-card);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:18px 14px}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 6px 18px;border-bottom:1px solid var(--border);margin-bottom:14px}
+.brand-mark{width:34px;height:34px;border-radius:10px;background:var(--accent-grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;box-shadow:0 4px 12px rgba(109,92,245,.35)}
+.brand-name{font-size:15px;font-weight:600;color:var(--t1)}
+.brand-sub{font-size:9px;letter-spacing:.16em;color:var(--t3);text-transform:uppercase;margin-top:1px}
+.side-section{margin-bottom:6px}
+.side-label{font-size:10px;font-weight:600;letter-spacing:.1em;color:var(--t3);text-transform:uppercase;padding:8px 10px 6px}
+.nav{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:var(--r);color:var(--t2);cursor:pointer;font-size:13px;transition:all .15s;margin-bottom:2px;position:relative}
+.nav:hover{background:var(--bg-soft);color:var(--t1)}
+.nav.active{background:var(--bg-tint);color:var(--accent);font-weight:600}
+.nav.active::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:var(--accent)}
+.nav-ico{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+.nav-badge{margin-left:auto;font-size:10px;font-weight:700;background:var(--accent-grad);color:#fff;border-radius:99px;padding:2px 7px;min-width:18px;text-align:center}
+.nav-badge.amber{background:linear-gradient(135deg,#f59e0b,#fbbf24)}
+.nav-sub{padding-left:36px;font-size:12px;color:var(--t2);padding-top:6px;padding-bottom:6px;cursor:pointer;border-radius:8px;margin-left:8px;margin-bottom:1px}
+.nav-sub:hover{color:var(--t1);background:var(--bg-soft)}
+.nav-sub.active{color:var(--accent);font-weight:500}
+
+.side-user{margin-top:auto;border-top:1px solid var(--border);padding-top:14px;display:flex;align-items:center;gap:10px;padding-left:6px;padding-right:6px}
+.user-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#fce7f3,#fbcfe8);display:flex;align-items:center;justify-content:center;color:var(--pink);font-weight:700;font-size:13px;border:2px solid #fff;box-shadow:var(--sh-sm)}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:13px;color:var(--t1);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-size:11px;color:var(--t3)}
+.user-more{font-size:14px;color:var(--t3);cursor:pointer;padding:4px}
+
+/* ─── MAIN ────────────────────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{height:62px;display:flex;align-items:center;gap:14px;padding:0 28px;background:var(--bg-app);flex-shrink:0}
+.greeting{flex:1}
+.greet-hi{font-size:18px;font-weight:600;color:var(--t1)}
+.greet-sub{font-size:12px;color:var(--t3);margin-top:1px}
+.search{display:flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:8px 14px;width:280px;transition:all .15s;box-shadow:var(--sh-sm)}
+.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.search-i{color:var(--t3);font-size:13px}
+.search input{flex:1;border:none;outline:none;background:transparent;font-size:13px;color:var(--t1);font-family:inherit}
+.search input::placeholder{color:var(--t3)}
+.topbar-btn{width:38px;height:38px;border-radius:12px;background:var(--bg-card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;color:var(--t2);position:relative;box-shadow:var(--sh-sm);transition:all .15s}
+.topbar-btn:hover{border-color:var(--border-strong);color:var(--t1)}
+.topbar-dot{position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--rose);border:2px solid var(--bg-card)}
+.topbar-cta{background:var(--primary);color:#fff;border:none;border-radius:12px;padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:7px;box-shadow:var(--sh)}
+.topbar-cta:hover{background:var(--primary-hover)}
+
+/* 屏幕容器 */
+.screen{flex:1;overflow-y:auto;padding:8px 28px 28px}
+.screen::-webkit-scrollbar{width:6px}
+.screen::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:99px}
+.screen{display:none}
+.screen.active{display:block;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── STATS ROW (类似截图) ───────────────────────── */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+.stat-card{background:var(--bg-card);border-radius:var(--r-xl);padding:18px 22px;display:flex;align-items:center;gap:16px;box-shadow:var(--sh-sm);position:relative;overflow:hidden}
+.stat-card.pink{background:linear-gradient(135deg,#fef0f3 0%,#fff 70%)}
+.stat-card.lavender{background:linear-gradient(135deg,#f3eefc 0%,#fff 70%)}
+.stat-card.mint{background:linear-gradient(135deg,#ecfdf5 0%,#fff 70%)}
+.stat-ico{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:rgba(255,255,255,.7);box-shadow:var(--sh-sm)}
+.stat-meta{font-size:12px;color:var(--t2);margin-bottom:3px}
+.stat-val{font-size:22px;font-weight:700;color:var(--t1);letter-spacing:-.02em}
+.stat-val .u{font-size:11px;color:var(--t3);font-weight:500;margin-left:6px;letter-spacing:0}
+.stat-trend{margin-left:auto;font-size:11px;color:var(--mint);background:var(--mint-soft);padding:3px 8px;border-radius:99px;font-weight:600}
+
+/* ─── PANEL ─────────────────────────────────────── */
+.panel{background:var(--bg-card);border-radius:var(--r-xl);padding:20px 22px;margin-bottom:14px;box-shadow:var(--sh-sm)}
+.panel-head{display:flex;align-items:center;margin-bottom:14px;gap:12px}
+.panel-title{font-size:15px;font-weight:600;color:var(--t1)}
+.panel-tag{font-size:11px;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:99px;font-weight:600}
+.panel-action{margin-left:auto;font-size:12px;color:var(--t3);cursor:pointer;display:flex;align-items:center;gap:4px}
+.panel-action:hover{color:var(--accent)}
+.panel-pill{background:var(--bg-soft);border:1px solid var(--border);border-radius:8px;padding:5px 11px;font-size:12px;color:var(--t2);cursor:pointer;font-family:inherit}
+.panel-pill:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ─── TWO-COL LAYOUT ─────────────────────────────── */
+.cols{display:grid;grid-template-columns:1fr 360px;gap:14px}
+.col-left{display:flex;flex-direction:column;gap:14px;min-width:0}
+.col-right{display:flex;flex-direction:column;gap:14px}
+
+/* ─── CHART (任务趋势) ───────────────────────────── */
+.chart-wrap{height:200px;position:relative;padding:8px 0 20px}
+.chart-grid{position:absolute;inset:8px 0 20px 30px;display:flex;flex-direction:column;justify-content:space-between}
+.chart-grid-line{border-top:1px dashed var(--border);font-size:10px;color:var(--t3);margin-top:-5px;padding-left:0;position:relative}
+.chart-grid-line span{position:absolute;left:-26px;background:var(--bg-card);padding-right:4px;top:-6px}
+.chart-bars{position:absolute;left:30px;right:0;bottom:20px;top:8px;display:flex;align-items:flex-end;justify-content:space-around;gap:6px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;position:relative}
+.bar{width:64%;border-radius:8px 8px 4px 4px;background:linear-gradient(180deg,#ede9fe 0%,#c4b5fd 100%);transition:all .2s;position:relative}
+.bar-col:hover .bar{background:var(--accent-grad)}
+.bar.hot{background:var(--accent-grad);box-shadow:0 -4px 16px rgba(109,92,245,.35)}
+.bar-bubble{position:absolute;top:-26px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.bar-bubble::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:var(--primary)}
+.bar-day{font-size:11px;color:var(--t3);position:absolute;bottom:-18px}
+.chart-legend{display:flex;gap:14px;align-items:center;font-size:11px;color:var(--t3);margin-top:4px}
+.legend-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
+
+/* ─── TASK TABLE ─────────────────────────────────── */
+.tbl-wrap{overflow-x:auto;border-radius:12px}
+table{width:100%;border-collapse:collapse}
+thead th{font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.05em;text-transform:uppercase;text-align:left;padding:10px 14px;border-bottom:1px solid var(--border);white-space:nowrap}
+tbody td{padding:13px 14px;font-size:13px;color:var(--t2);border-bottom:1px solid var(--border)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr{transition:background .15s}
+tbody tr:hover td{background:var(--bg-soft)}
+.cell-name{display:flex;align-items:center;gap:10px;color:var(--t1);font-weight:500}
+.cell-ico{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.ci-pink{background:var(--pink-soft);color:var(--pink)}
+.ci-lav{background:var(--accent-soft);color:var(--accent)}
+.ci-mint{background:var(--mint-soft);color:var(--mint)}
+.ci-sky{background:var(--sky-soft);color:var(--sky)}
+.ci-amber{background:var(--amber-soft);color:var(--amber)}
+
+.progress-ring{width:30px;height:30px;border-radius:50%;background:conic-gradient(var(--accent) var(--p,60%),var(--bg-tint) 0);display:flex;align-items:center;justify-content:center;font-size:0;position:relative}
+.progress-ring::after{content:'';width:22px;height:22px;background:var(--bg-card);border-radius:50%;position:absolute}
+.progress-ring span{position:relative;z-index:1;font-size:9px;color:var(--accent);font-weight:700}
+
+.status-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:4px 10px;border-radius:99px;font-weight:500;white-space:nowrap}
+.sp-dot{width:5px;height:5px;border-radius:50%}
+.sp-done{background:var(--mint-soft);color:var(--mint)}
+.sp-done .sp-dot{background:var(--mint)}
+.sp-running{background:var(--sky-soft);color:var(--sky)}
+.sp-running .sp-dot{background:var(--sky);animation:blink 1.2s infinite}
+.sp-review{background:var(--amber-soft);color:var(--amber)}
+.sp-review .sp-dot{background:var(--amber)}
+.sp-queue{background:var(--bg-tint);color:var(--t2)}
+.sp-queue .sp-dot{background:var(--t3)}
+.sp-fail{background:var(--rose-soft);color:var(--rose)}
+.sp-fail .sp-dot{background:var(--rose)}
+.sp-draft{background:#f1f5f9;color:#64748b}
+.sp-draft .sp-dot{background:#64748b}
+@keyframes blink{0%,100%{opacity:.4}50%{opacity:1}}
+
+.row-more{background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;padding:4px 6px;border-radius:6px}
+.row-more:hover{background:var(--bg-soft);color:var(--t1)}
+
+/* ─── CARE TEAM / 协作 ───────────────────────────── */
+.care-list{display:flex;flex-direction:column;gap:10px}
+.care-row{display:flex;align-items:center;gap:11px}
+.care-av{width:38px;height:38px;border-radius:50%;background:var(--bg-tint);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--accent);flex-shrink:0;border:2px solid #fff;box-shadow:var(--sh-sm)}
+.care-av.a1{background:linear-gradient(135deg,#fce7f3,#fbcfe8);color:var(--pink)}
+.care-av.a2{background:linear-gradient(135deg,#ede9fe,#ddd6fe);color:var(--accent)}
+.care-av.a3{background:linear-gradient(135deg,#dbeafe,#bfdbfe);color:var(--sky)}
+.care-av.a4{background:linear-gradient(135deg,#d1fae5,#a7f3d0);color:var(--mint)}
+.care-info{flex:1;min-width:0}
+.care-name{font-size:13px;color:var(--t1);font-weight:500}
+.care-mail{font-size:11px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.care-msg{width:30px;height:30px;border-radius:8px;background:var(--bg-soft);display:flex;align-items:center;justify-content:center;color:var(--t3);cursor:pointer;font-size:13px}
+.care-msg:hover{background:var(--accent-soft);color:var(--accent)}
+.care-add{margin-top:6px;width:100%;padding:11px;border:1px dashed var(--border-strong);background:transparent;border-radius:12px;color:var(--t2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit}
+.care-add:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+
+/* ─── SKILL MARKETPLACE ──────────────────────────── */
+.market-filter{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.chip{background:var(--bg-card);border:1px solid var(--border);border-radius:99px;padding:7px 16px;font-size:12px;color:var(--t2);cursor:pointer;font-family:inherit;transition:all .15s}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+.skill-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.skill-card{background:var(--bg-card);border-radius:var(--r-xl);padding:20px;box-shadow:var(--sh-sm);position:relative;transition:all .2s;cursor:pointer;border:1px solid transparent}
+.skill-card:hover{transform:translateY(-2px);box-shadow:var(--sh-md);border-color:var(--accent-soft)}
+.skill-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.skill-ico{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.skill-name{font-size:14px;font-weight:600;color:var(--t1);margin-bottom:3px}
+.skill-cat{font-size:11px;color:var(--t3)}
+.skill-desc{font-size:12px;color:var(--t2);line-height:1.6;min-height:38px;margin-bottom:14px}
+.skill-foot{display:flex;align-items:center;gap:8px}
+.skill-stat{font-size:11px;color:var(--t3);display:flex;align-items:center;gap:3px}
+.skill-btn{margin-left:auto;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
+.skill-btn-use{background:var(--primary);color:#fff}
+.skill-btn-use:hover{background:var(--primary-hover)}
+.skill-btn-apply{background:var(--accent-soft);color:var(--accent)}
+.skill-btn-apply:hover{background:var(--accent);color:#fff}
+.skill-btn-pending{background:var(--amber-soft);color:var(--amber);cursor:default}
+.skill-corner{position:absolute;top:14px;right:14px;width:22px;height:22px;border-radius:50%;background:var(--mint);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;box-shadow:0 2px 6px rgba(16,185,129,.4)}
+
+/* ─── WIZARD (新建任务) ──────────────────────────── */
+.wizard-steps{display:flex;align-items:center;gap:0;margin-bottom:22px;padding:0 4px}
+.ws-step{display:flex;align-items:center;gap:10px;color:var(--t3);font-size:13px;font-weight:500}
+.ws-num{width:28px;height:28px;border-radius:50%;background:var(--bg-tint);color:var(--t3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:2px solid var(--bg-card);flex-shrink:0}
+.ws-step.done .ws-num{background:var(--mint);color:#fff}
+.ws-step.active{color:var(--t1)}
+.ws-step.active .ws-num{background:var(--accent-grad);color:#fff;box-shadow:0 0 0 4px var(--accent-soft)}
+.ws-line{flex:1;height:2px;background:var(--border);margin:0 12px;border-radius:2px;position:relative;overflow:hidden}
+.ws-line.done{background:var(--mint)}
+
+.wiz-pick{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px}
+.wiz-pick-card{background:var(--bg-soft);border:1.5px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;text-align:center;transition:all .15s}
+.wiz-pick-card:hover{border-color:var(--accent);background:var(--accent-soft)}
+.wiz-pick-card.selected{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px var(--accent-soft)}
+.wiz-pick-ico{font-size:24px;margin-bottom:6px}
+.wiz-pick-name{font-size:13px;font-weight:600;color:var(--t1)}
+
+/* 上传区 */
+.upload{border:1.5px dashed var(--border-strong);border-radius:14px;padding:28px;text-align:center;background:var(--bg-soft);cursor:pointer;transition:all .15s}
+.upload:hover{border-color:var(--accent);background:var(--accent-soft)}
+.upload-ico{font-size:32px;color:var(--accent);margin-bottom:8px}
+.upload-t{font-size:13px;color:var(--t1);font-weight:500;margin-bottom:3px}
+.upload-s{font-size:11px;color:var(--t3)}
+.upload-file{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-top:8px}
+.uf-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--mint-soft);color:var(--mint);font-size:12px;font-weight:700}
+.uf-info{flex:1;min-width:0}
+.uf-n{font-size:13px;color:var(--t1);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.uf-m{font-size:11px;color:var(--t3)}
+.uf-x{color:var(--t3);font-size:14px;cursor:pointer;padding:4px}
+.uf-x:hover{color:var(--rose)}
+
+/* 自然语言指令对话框 */
+.nl-box{background:var(--bg-soft);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px}
+.nl-msg{display:flex;gap:10px;margin-bottom:12px;align-items:flex-start}
+.nl-av{width:28px;height:28px;border-radius:8px;background:var(--accent-grad);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.nl-av.you{background:linear-gradient(135deg,#fce7f3,#fbcfe8);color:var(--pink)}
+.nl-text{flex:1;font-size:13px;color:var(--t1);line-height:1.6;background:#fff;border-radius:10px;padding:10px 12px;border:1px solid var(--border)}
+.nl-input-row{display:flex;gap:8px;align-items:flex-end;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:10px 12px;transition:all .15s}
+.nl-input-row:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.nl-input{flex:1;border:none;outline:none;font-size:13px;color:var(--t1);font-family:inherit;background:transparent;resize:none;min-height:20px;max-height:80px}
+.nl-send{width:32px;height:32px;border-radius:8px;background:var(--accent-grad);border:none;color:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+.wiz-foot{display:flex;justify-content:space-between;margin-top:18px;gap:10px}
+.btn{padding:10px 22px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;border:none;transition:all .15s}
+.btn-ghost{background:transparent;color:var(--t2);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--border-strong);color:var(--t1)}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-hover)}
+.btn-accent{background:var(--accent-grad);color:#fff;box-shadow:0 4px 12px rgba(109,92,245,.3)}
+
+/* ─── 执行详情 (含侧栏对话/文件) ─────────────────── */
+.exec-layout{display:grid;grid-template-columns:1fr 340px;gap:14px;height:calc(100vh - 110px)}
+.exec-layout.collapsed{grid-template-columns:1fr 0}
+.exec-main{overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+.exec-side{background:var(--bg-card);border-radius:var(--r-xl);box-shadow:var(--sh-sm);display:flex;flex-direction:column;overflow:hidden;transition:all .25s}
+.exec-side-tabs{display:flex;border-bottom:1px solid var(--border);padding:6px 8px 0;align-items:center;gap:4px}
+.es-tab{padding:10px 14px;font-size:12px;color:var(--t2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:6px;font-weight:500}
+.es-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.es-collapse{margin-left:auto;width:28px;height:28px;border-radius:8px;background:var(--bg-soft);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t3);font-size:12px;margin-bottom:6px}
+.es-body{flex:1;overflow-y:auto;padding:14px}
+
+.chat-msg{margin-bottom:12px}
+.chat-meta{font-size:10px;color:var(--t3);font-weight:600;margin-bottom:3px;letter-spacing:.05em;text-transform:uppercase}
+.chat-bubble{font-size:12.5px;line-height:1.6;padding:10px 12px;border-radius:12px;max-width:92%}
+.chat-bubble.ai{background:var(--bg-tint);color:var(--t1);border:1px solid var(--border);border-bottom-left-radius:3px}
+.chat-bubble.user{background:var(--accent-grad);color:#fff;margin-left:auto;border-bottom-right-radius:3px}
+.chat-row.user{display:flex;justify-content:flex-end}
+
+.es-files{display:flex;flex-direction:column;gap:8px}
+.es-file{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-soft);border-radius:10px;cursor:pointer;transition:all .15s}
+.es-file:hover{background:var(--accent-soft)}
+.es-file-group{font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin:8px 4px 4px}
+
+/* 进度卡片 */
+.progress-card{background:var(--bg-card);border-radius:var(--r-xl);padding:20px 22px;box-shadow:var(--sh-sm)}
+.pc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.pc-name{font-size:15px;font-weight:600;color:var(--t1);display:flex;align-items:center;gap:10px}
+.pc-name .cell-ico{width:38px;height:38px}
+.pc-pct{font-size:22px;font-weight:700;color:var(--accent);letter-spacing:-.02em}
+.pc-bar{height:8px;background:var(--bg-tint);border-radius:99px;overflow:hidden;margin-bottom:18px;position:relative}
+.pc-bar-fill{height:100%;border-radius:99px;background:var(--accent-grad);position:relative;overflow:hidden}
+.pc-bar-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);animation:shimmer 2s infinite}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.pc-step{display:flex;align-items:center;gap:12px;padding:8px 0;font-size:13px}
+.pc-step-ic{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.pc-step-ic.done{background:var(--mint);color:#fff}
+.pc-step-ic.active{background:var(--accent-grad);color:#fff;box-shadow:0 0 0 4px var(--accent-soft)}
+.pc-step-ic.pending{background:var(--bg-tint);color:var(--t3)}
+.pc-step-t{flex:1;color:var(--t1)}
+.pc-step.pending .pc-step-t{color:var(--t3)}
+.pc-step-time{font-size:11px;color:var(--t3)}
+
+/* 审核 toolbar / 表格 */
+.review-toolbar{background:var(--bg-card);border-radius:var(--r-xl);padding:12px 18px;display:flex;align-items:center;gap:10px;box-shadow:var(--sh-sm)}
+.flag-icon{width:18px;height:18px;border-radius:6px;background:var(--amber-soft);color:var(--amber);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:1px solid #fde68a}
+.confirm-btn{font-size:11px;padding:5px 12px;border-radius:8px;cursor:pointer;background:var(--bg-card);border:1px solid var(--border);color:var(--t2);font-family:inherit}
+.confirm-btn:hover{border-color:var(--mint);color:var(--mint);background:var(--mint-soft)}
+.confirm-btn.done{background:var(--mint-soft);border-color:var(--mint);color:var(--mint);font-weight:600}
+
+/* 文件管理 */
+.file-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.fb-crumb{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--t2)}
+.fb-crumb b{color:var(--t1);font-weight:600}
+.fb-crumb .sep{color:var(--t3)}
+.file-table .cell-ico{font-size:13px}
+.fi-tag{font-size:10px;padding:2px 6px;border-radius:4px;background:var(--bg-tint);color:var(--t2);margin-left:6px;font-weight:500}
+
+/* 通知 */
+.notif-list{display:flex;flex-direction:column;gap:8px}
+.notif{background:var(--bg-card);border-radius:14px;padding:14px 18px;display:flex;gap:14px;box-shadow:var(--sh-sm);transition:all .15s;cursor:pointer;border-left:3px solid transparent}
+.notif:hover{box-shadow:var(--sh-md)}
+.notif.unread{border-left-color:var(--accent);background:linear-gradient(90deg,var(--accent-soft) 0%,#fff 8%)}
+.notif-ic{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.notif-body{flex:1;min-width:0}
+.notif-t{font-size:13px;color:var(--t1);font-weight:500;margin-bottom:3px}
+.notif-d{font-size:12px;color:var(--t2);line-height:1.5}
+.notif-time{font-size:11px;color:var(--t3);white-space:nowrap}
+
+/* 组织管理 子导航 */
+.subtabs{display:flex;gap:4px;background:var(--bg-card);border-radius:14px;padding:5px;margin-bottom:14px;box-shadow:var(--sh-sm);max-width:fit-content}
+.subtab{padding:8px 18px;border-radius:10px;font-size:13px;color:var(--t2);cursor:pointer;font-weight:500;transition:all .15s}
+.subtab.active{background:var(--primary);color:#fff}
+.subtab:hover:not(.active){background:var(--bg-soft);color:var(--t1)}
+
+/* 登录 */
+.login{display:flex;align-items:center;justify-content:center;height:100vh;background:radial-gradient(circle at 20% 30%,#ede9fe 0%,transparent 50%),radial-gradient(circle at 80% 70%,#fce7f3 0%,transparent 50%),var(--bg-app)}
+.login-card{background:var(--bg-card);border-radius:24px;padding:42px 48px;width:420px;box-shadow:var(--sh-lg);text-align:center}
+.login-brand{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:22px}
+.login-brand .brand-mark{width:44px;height:44px;font-size:18px;border-radius:13px}
+.login-name-l{font-size:20px;font-weight:700;color:var(--t1)}
+.login-sub-l{font-size:11px;letter-spacing:.18em;color:var(--t3);text-transform:uppercase;margin-top:2px}
+.login-title{font-size:18px;font-weight:600;color:var(--t1);margin-bottom:8px;margin-top:18px}
+.login-desc{font-size:13px;color:var(--t2);margin-bottom:28px}
+.qr-box{width:200px;height:200px;margin:0 auto 18px;background:linear-gradient(135deg,#f9f7fd,#fff);border:1px solid var(--border);border-radius:18px;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:var(--sh-sm)}
+.qr-pattern{width:160px;height:160px;background:
+  linear-gradient(45deg,#1a1530 25%,transparent 25%) -10px 0,
+  linear-gradient(-45deg,#1a1530 25%,transparent 25%) -10px 0,
+  linear-gradient(45deg,transparent 75%,#1a1530 75%),
+  linear-gradient(-45deg,transparent 75%,#1a1530 75%);
+  background-size:20px 20px;background-color:#fff;border-radius:8px;opacity:.9;position:relative}
+.qr-logo{position:absolute;width:42px;height:42px;background:var(--accent-grad);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;border:3px solid #fff;box-shadow:var(--sh-md)}
+.login-tip{font-size:12px;color:var(--t3);display:flex;align-items:center;justify-content:center;gap:6px}
+.wechat-tag{display:inline-flex;align-items:center;gap:6px;background:#07c160;color:#fff;font-size:11px;padding:4px 10px;border-radius:99px;margin-bottom:12px}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--primary);color:#fff;border-radius:12px;padding:12px 18px;font-size:13px;z-index:200;display:flex;align-items:center;gap:8px;box-shadow:var(--sh-lg);animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(26,21,48,.4);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;animation:fade .2s ease}
+.modal-bg.show{display:flex}
+.modal{background:#fff;border-radius:18px;padding:26px;width:440px;box-shadow:var(--sh-lg)}
+.modal-t{font-size:16px;font-weight:600;margin-bottom:6px}
+.modal-d{font-size:13px;color:var(--t2);margin-bottom:18px}
+.modal-input{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-size:13px;font-family:inherit;outline:none;resize:none;min-height:90px;background:var(--bg-soft)}
+.modal-input:focus{border-color:var(--accent)}
+.modal-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- ═════ LOGIN SCREEN ═════ -->
+<div id="loginScreen" class="login">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="brand-mark">智</div>
+      <div style="text-align:left">
+        <div class="login-name-l">智枢 · SkillHub</div>
+        <div class="login-sub-l">Intelligent Skill Platform</div>
+      </div>
+    </div>
+    <div class="login-title">欢迎使用 智枢</div>
+    <div class="login-desc">企业级 AI 技能协作平台</div>
+    <div class="wechat-tag">● 企业微信扫码登录</div>
+    <div class="qr-box">
+      <div class="qr-pattern"></div>
+      <div class="qr-logo">智</div>
+    </div>
+    <div class="login-tip">🔒 请使用企业微信扫描二维码 · 仅限受邀成员</div>
+    <button class="btn btn-accent" style="margin-top:22px;width:100%" onclick="enterApp()">模拟扫码登录（演示）</button>
+  </div>
+</div>
+
+<!-- ═════ APP ═════ -->
+<div id="app" class="app hidden">
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">智</div>
+      <div>
+        <div class="brand-name">智枢</div>
+        <div class="brand-sub">SkillHub</div>
+      </div>
+    </div>
+
+    <div class="side-section">
+      <div class="side-label">工作台</div>
+      <div class="nav active" data-screen="dashboard"><span class="nav-ico">▦</span>仪表盘</div>
+      <div class="nav" data-screen="tasks"><span class="nav-ico">◷</span>任务中心<span class="nav-badge">4</span></div>
+      <div class="nav" data-screen="market"><span class="nav-ico">◈</span>技能市场</div>
+      <div class="nav" data-screen="files"><span class="nav-ico">▤</span>工作区文件</div>
+    </div>
+
+    <div class="side-section">
+      <div class="side-label">流程</div>
+      <div class="nav" data-screen="wizard"><span class="nav-ico">＋</span>新建任务</div>
+      <div class="nav" data-screen="exec"><span class="nav-ico">⟳</span>执行详情</div>
+      <div class="nav" data-screen="review"><span class="nav-ico">⚠</span>结果审核<span class="nav-badge amber">3</span></div>
+    </div>
+
+    <div class="side-section">
+      <div class="side-label">系统</div>
+      <div class="nav" data-screen="notif"><span class="nav-ico">🔔</span>通知中心</div>
+      <div class="nav" data-screen="admin"><span class="nav-ico">⚙</span>组织管理</div>
+    </div>
+
+    <div class="side-user">
+      <div class="user-av">王</div>
+      <div class="user-info">
+        <div class="user-name">王思远</div>
+        <div class="user-role">管理员 · 临床医学部</div>
+      </div>
+      <div class="user-more" onclick="toast('个人设置')">⋯</div>
+    </div>
+  </aside>
+
+  <!-- ─── MAIN ─── -->
+  <main class="main">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="greeting">
+        <div class="greet-hi">您好，王思远 👋</div>
+        <div class="greet-sub" id="greetSub">今天有 3 项任务待审核，2 项正在执行中</div>
+      </div>
+      <div class="search">
+        <span class="search-i">⌕</span>
+        <input placeholder="搜索任务、技能、文件..."/>
+      </div>
+      <div class="topbar-btn" onclick="go('notif')">🔔<div class="topbar-dot"></div></div>
+      <div class="topbar-btn" onclick="toast('企业微信已绑定')">📱</div>
+      <button class="topbar-cta" onclick="go('wizard')">＋ 新建任务</button>
+    </div>
+
+    <!-- ─── SCREEN: DASHBOARD ─── -->
+    <section class="screen active" id="screen-dashboard">
+
+      <div class="stats-row">
+        <div class="stat-card pink">
+          <div class="stat-ico" style="color:var(--pink)">◐</div>
+          <div>
+            <div class="stat-meta">本周完成任务</div>
+            <div class="stat-val">24<span class="u">/ 28 项</span></div>
+          </div>
+          <div class="stat-trend">↑ 12%</div>
+        </div>
+        <div class="stat-card lavender">
+          <div class="stat-ico" style="color:var(--accent)">◇</div>
+          <div>
+            <div class="stat-meta">已授权技能</div>
+            <div class="stat-val">12<span class="u">个技能</span></div>
+          </div>
+          <div class="stat-trend">+ 2 新</div>
+        </div>
+        <div class="stat-card mint">
+          <div class="stat-ico" style="color:var(--mint)">▢</div>
+          <div>
+            <div class="stat-meta">工作区使用</div>
+            <div class="stat-val">18.4<span class="u">/ 50 GB</span></div>
+          </div>
+          <div class="stat-trend">37%</div>
+        </div>
+      </div>
+
+      <div class="cols">
+        <div class="col-left">
+          <!-- Chart -->
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title">任务执行趋势</div>
+              <div class="panel-tag">本周</div>
+              <div style="margin-left:auto;display:flex;align-items:center;gap:14px">
+                <span class="chart-legend"><span class="legend-dot" style="background:var(--accent)"></span>已完成</span>
+                <button class="panel-pill">本周 ▾</button>
+              </div>
+            </div>
+            <div class="chart-wrap">
+              <div class="chart-grid">
+                <div class="chart-grid-line"><span>10</span></div>
+                <div class="chart-grid-line"><span>5</span></div>
+                <div class="chart-grid-line"><span>0</span></div>
+              </div>
+              <div class="chart-bars">
+                <div class="bar-col"><div class="bar" style="height:42%"></div><div class="bar-day">周一</div></div>
+                <div class="bar-col"><div class="bar" style="height:58%"></div><div class="bar-day">周二</div></div>
+                <div class="bar-col"><div class="bar" style="height:70%"></div><div class="bar-day">周三</div></div>
+                <div class="bar-col"><div class="bar hot" style="height:88%"><div class="bar-bubble">9 个</div></div><div class="bar-day">周四</div></div>
+                <div class="bar-col"><div class="bar" style="height:64%"></div><div class="bar-day">周五</div></div>
+                <div class="bar-col"><div class="bar" style="height:34%"></div><div class="bar-day">周六</div></div>
+                <div class="bar-col"><div class="bar" style="height:28%"></div><div class="bar-day">周日</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Task Tracker Table -->
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title">任务追踪</div>
+              <div class="panel-tag">+3 新</div>
+              <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+                <div class="search" style="width:170px;padding:6px 12px"><span class="search-i">⌕</span><input placeholder="搜索..."/></div>
+                <button class="panel-pill">本月 ▾</button>
+              </div>
+            </div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr>
+                  <th>任务名称</th><th>进度</th><th>开始日期</th><th>使用技能</th><th>状态</th><th></th>
+                </tr></thead>
+                <tbody>
+                  <tr onclick="go('exec')">
+                    <td><div class="cell-name"><div class="cell-ico ci-pink">⚠</div>疫苗V-203不良反应汇总</div></td>
+                    <td><div class="progress-ring" style="--p:68%"><span>68%</span></div></td>
+                    <td>2026/06/08</td>
+                    <td>AE/SAE 汇总</td>
+                    <td><span class="status-pill sp-running"><span class="sp-dot"></span>执行中</span></td>
+                    <td><button class="row-more">⋯</button></td>
+                  </tr>
+                  <tr onclick="go('review')">
+                    <td><div class="cell-name"><div class="cell-ico ci-amber">📋</div>中心01 vs 中心02 CRF比对</div></td>
+                    <td><div class="progress-ring" style="--p:100%"><span>100%</span></div></td>
+                    <td>2026/06/08</td>
+                    <td>CRF 数据比对</td>
+                    <td><span class="status-pill sp-review"><span class="sp-dot"></span>待审核</span></td>
+                    <td><button class="row-more">⋯</button></td>
+                  </tr>
+                  <tr>
+                    <td><div class="cell-name"><div class="cell-ico ci-mint">📊</div>SAE 周报草稿 · 第14周</div></td>
+                    <td><div class="progress-ring" style="--p:100%"><span>✓</span></div></td>
+                    <td>2026/06/07</td>
+                    <td>SAE 周报生成</td>
+                    <td><span class="status-pill sp-done"><span class="sp-dot"></span>已完成</span></td>
+                    <td><button class="row-more">⋯</button></td>
+                  </tr>
+                  <tr>
+                    <td><div class="cell-name"><div class="cell-ico ci-sky">🔬</div>实验室异常复核 W12</div></td>
+                    <td><div class="progress-ring" style="--p:100%"><span>✓</span></div></td>
+                    <td>2026/06/06</td>
+                    <td>实验室异常</td>
+                    <td><span class="status-pill sp-done"><span class="sp-dot"></span>已完成</span></td>
+                    <td><button class="row-more">⋯</button></td>
+                  </tr>
+                  <tr>
+                    <td><div class="cell-name"><div class="cell-ico ci-lav">🛡</div>DSMB 月度安全报告</div></td>
+                    <td><div class="progress-ring" style="--p:35%"><span>35%</span></div></td>
+                    <td>2026/06/05</td>
+                    <td>安全监查</td>
+                    <td><span class="status-pill sp-queue"><span class="sp-dot"></span>排队中</span></td>
+                    <td><button class="row-more">⋯</button></td>
+                  </tr>
+                  <tr>
+                    <td><div class="cell-name"><div class="cell-ico ci-pink">📑</div>知情同意文件审查</div></td>
+                    <td><div class="progress-ring" style="--p:0%"><span>—</span></div></td>
+                    <td>—</td>
+                    <td>文档审查</td>
+                    <td><span class="status-pill sp-draft"><span class="sp-dot"></span>草稿</span></td>
+                    <td><button class="row-more">⋯</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-right">
+          <!-- Care team / 协作者 -->
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title">协作团队</div>
+              <div class="panel-action" onclick="toast('查看全部')">查看全部 →</div>
+            </div>
+            <div class="care-list">
+              <div class="care-row">
+                <div class="care-av a1">林</div>
+                <div class="care-info"><div class="care-name">林雅琪</div><div class="care-mail">linyaqi@hospital.cn</div></div>
+                <div class="care-msg">✉</div>
+              </div>
+              <div class="care-row">
+                <div class="care-av a2">陈</div>
+                <div class="care-info"><div class="care-name">陈泽明</div><div class="care-mail">chenzeming@hospital.cn</div></div>
+                <div class="care-msg">✉</div>
+              </div>
+              <div class="care-row">
+                <div class="care-av a3">徐</div>
+                <div class="care-info"><div class="care-name">徐子涵</div><div class="care-mail">xuzihan@hospital.cn</div></div>
+                <div class="care-msg">✉</div>
+              </div>
+              <div class="care-row">
+                <div class="care-av a4">马</div>
+                <div class="care-info"><div class="care-name">马思源</div><div class="care-mail">masiyuan@hospital.cn</div></div>
+                <div class="care-msg">✉</div>
+              </div>
+              <button class="care-add">＋ 添加成员</button>
+            </div>
+          </div>
+
+          <!-- 快速入口 -->
+          <div class="panel">
+            <div class="panel-head"><div class="panel-title">推荐技能</div><div class="panel-action" onclick="go('market')">技能市场 →</div></div>
+            <div class="care-list">
+              <div class="care-row" style="cursor:pointer" onclick="go('wizard')">
+                <div class="cell-ico ci-lav" style="width:38px;height:38px">📋</div>
+                <div class="care-info"><div class="care-name">CRF 数据比对</div><div class="care-mail">已授权 · 已使用 12 次</div></div>
+                <button class="skill-btn skill-btn-use">使用</button>
+              </div>
+              <div class="care-row" style="cursor:pointer" onclick="go('wizard')">
+                <div class="cell-ico ci-mint" style="width:38px;height:38px">📊</div>
+                <div class="care-info"><div class="care-name">SAE 周报生成</div><div class="care-mail">已授权 · 已使用 8 次</div></div>
+                <button class="skill-btn skill-btn-use">使用</button>
+              </div>
+              <div class="care-row" style="cursor:pointer">
+                <div class="cell-ico ci-amber" style="width:38px;height:38px">🔬</div>
+                <div class="care-info"><div class="care-name">实验室异常复核</div><div class="care-mail">未授权 · 点击申请</div></div>
+                <button class="skill-btn skill-btn-apply" onclick="showApply(event)">申请</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── SCREEN: TASKS ─── -->
+    <section class="screen" id="screen-tasks">
+      <div class="market-filter">
+        <button class="chip active">全部 24</button>
+        <button class="chip">执行中 2</button>
+        <button class="chip">待审核 3</button>
+        <button class="chip">已完成 18</button>
+        <button class="chip">草稿 1</button>
+        <button class="chip">失败 0</button>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">我的任务</div>
+          <div class="panel-action" style="margin-left:auto">最近 30 天 ▾</div>
+        </div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>任务名称</th><th>使用技能</th><th>状态</th><th>进度</th><th>创建时间</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr><td><div class="cell-name"><div class="cell-ico ci-pink">⚠</div>疫苗V-203不良反应汇总</div></td><td>AE/SAE 汇总</td><td><span class="status-pill sp-running"><span class="sp-dot"></span>执行中</span></td><td><div class="progress-ring" style="--p:68%"><span>68%</span></div></td><td>2小时前</td><td><button class="confirm-btn" onclick="go('exec')">查看</button></td></tr>
+            <tr><td><div class="cell-name"><div class="cell-ico ci-amber">📋</div>中心01 vs 中心02 CRF比对</div></td><td>CRF 数据比对</td><td><span class="status-pill sp-review"><span class="sp-dot"></span>待审核</span></td><td><div class="progress-ring" style="--p:100%"><span>✓</span></div></td><td>今天</td><td><button class="confirm-btn" onclick="go('review')">审核</button></td></tr>
+            <tr><td><div class="cell-name"><div class="cell-ico ci-mint">📊</div>SAE周报草稿 · 第14周</div></td><td>SAE 周报生成</td><td><span class="status-pill sp-done"><span class="sp-dot"></span>已完成</span></td><td><div class="progress-ring" style="--p:100%"><span>✓</span></div></td><td>昨天</td><td><button class="confirm-btn">下载</button></td></tr>
+            <tr><td><div class="cell-name"><div class="cell-ico ci-sky">🔬</div>实验室异常复核 W12</div></td><td>实验室异常</td><td><span class="status-pill sp-done"><span class="sp-dot"></span>已完成</span></td><td><div class="progress-ring" style="--p:100%"><span>✓</span></div></td><td>3天前</td><td><button class="confirm-btn">下载</button></td></tr>
+            <tr><td><div class="cell-name"><div class="cell-ico ci-lav">🛡</div>DSMB 月度安全报告</div></td><td>安全监查</td><td><span class="status-pill sp-queue"><span class="sp-dot"></span>排队中</span></td><td><div class="progress-ring" style="--p:0%"><span>—</span></div></td><td>5分钟前</td><td><button class="confirm-btn">取消</button></td></tr>
+            <tr><td><div class="cell-name"><div class="cell-ico ci-pink">📑</div>知情同意文件审查</div></td><td>文档审查</td><td><span class="status-pill sp-draft"><span class="sp-dot"></span>草稿</span></td><td><div class="progress-ring" style="--p:0%"><span>—</span></div></td><td>—</td><td><button class="confirm-btn" onclick="go('wizard')">继续</button></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ─── SCREEN: SKILL MARKET ─── -->
+    <section class="screen" id="screen-market">
+      <div class="market-filter">
+        <button class="chip active">全部</button>
+        <button class="chip">已授权 12</button>
+        <button class="chip">未授权 6</button>
+        <button class="chip">审批中 2</button>
+        <span style="margin-left:auto;display:flex;gap:6px">
+          <button class="chip">数据核查</button>
+          <button class="chip">报告生成</button>
+          <button class="chip">安全监查</button>
+          <button class="chip">文档审查</button>
+        </span>
+      </div>
+
+      <div class="skill-grid">
+        <div class="skill-card">
+          <div class="skill-corner">✓</div>
+          <div class="skill-head">
+            <div class="skill-ico" style="background:var(--accent-soft);color:var(--accent)">📋</div>
+            <div><div class="skill-name">CRF 数据比对</div><div class="skill-cat">数据核查 · v2.3</div></div>
+          </div>
+          <div class="skill-desc">比对多中心病例报告表数据，自动标注差异字段并生成核查报告。</div>
+          <div class="skill-foot">
+            <span class="skill-stat">⚡ 1.2k 次</span>
+            <span class="skill-stat">⭐ 4.8</span>
+            <button class="skill-btn skill-btn-use" onclick="go('wizard')">使用</button>
+          </div>
+        </div>
+
+        <div class="skill-card">
+          <div class="skill-corner">✓</div>
+          <div class="skill-head">
+            <div class="skill-ico" style="background:var(--mint-soft);color:var(--mint)">📊</div>
+            <div><div class="skill-name">SAE 周报生成</div><div class="skill-cat">报告生成 · v1.8</div></div>
+          </div>
+          <div class="skill-desc">基于不良事件记录自动生成符合 CIOMS 标准的周报文档。</div>
+          <div class="skill-foot">
+            <span class="skill-stat">⚡ 840 次</span>
+            <span class="skill-stat">⭐ 4.9</span>
+            <button class="skill-btn skill-btn-use" onclick="go('wizard')">使用</button>
+          </div>
+        </div>
+
+        <div class="skill-card">
+          <div class="skill-corner">✓</div>
+          <div class="skill-head">
+            <div class="skill-ico" style="background:var(--pink-soft);color:var(--pink)">⚠</div>
+            <div><div class="skill-name">不良反应汇总</div><div class="skill-cat">安全监查 · v2.0</div></div>
+          </div>
+          <div class="skill-desc">汇总分类 AE/SAE 记录，按 MedDRA 标准生成频率分布表。</div>
+          <div class="skill-foot">
+            <span class="skill-stat">⚡ 620 次</span>
+            <span class="skill-stat">⭐ 4.7</span>
+            <button class="skill-btn skill-btn-use" onclick="go('wizard')">使用</button>
+          </div>
+        </div>
+
+        <div class="skill-card">
+          <div class="skill-head">
+            <div class="skill-ico" style="background:var(--sky-soft);color:var(--sky)">🔬</div>
+            <div><div class="skill-name">实验室异常复核</div><div class="skill-cat">数据核查 · v1.5</div></div>
+          </div>
+          <div class="skill-desc">识别超出参考范围的实验室检查值，自动标注异常等级。</div>
+          <div class="skill-foot">
+            <span class="skill-stat">⚡ 410 次</span>
+            <span class="skill-stat">⭐ 4.6</span>
+            <button class="skill-btn skill-btn-apply" onclick="showApply(event)">申请使用</button>
+          </div>
+        </div>
+
+        <div class="skill-card">
+          <div class="skill-head">
+            <div class="skill-ico" style="background:var(--amber-soft);color:var(--amber)">🛡</div>
+            <div><div class="skill-name">DSMB 安全报告</div><div class="skill-cat">安全监查 · v1.2</div></div>
+          </div>
+          <div class="skill-desc">生成数据安全监查委员会月度报告，自动汇总安全性数据。</div>
+          <div class="skill-foot">
+            <span class="skill-stat">⚡ 180 次</span>
+            <span class="skill-stat">⭐ 4.8</span>
+            <button class="skill-btn skill-btn-pending">审批中…</button>
+          </div>
+        </div>
+
+        <div class="skill-card">
+          <div class="skill-head">
+            <div class="skill-ico" style="background:#fdf4ff;color:#a855f7">📑</div>
+            <div><div class="skill-name">知情同意审查</div><div class="skill-cat">文档审查 · v1.0</div></div>
+          </div>
+          <div class="skill-desc">自动审查知情同意书完整性、签字与日期合规性。</div>
+          <div class="skill-foot">
+            <span class="skill-stat">⚡ 95 次</span>
+            <span class="skill-stat">⭐ 4.5</span>
+            <button class="skill-btn skill-btn-apply" onclick="showApply(event)">申请使用</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── SCREEN: WIZARD (新建任务) ─── -->
+    <section class="screen" id="screen-wizard">
+      <div class="panel">
+        <div class="wizard-steps">
+          <div class="ws-step done"><div class="ws-num">✓</div>选择技能</div>
+          <div class="ws-line done"></div>
+          <div class="ws-step active"><div class="ws-num">2</div>选择输入文件</div>
+          <div class="ws-line"></div>
+          <div class="ws-step"><div class="ws-num">3</div>补充指令</div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:14px;background:var(--bg-soft);padding:14px 18px;border-radius:14px;margin-bottom:18px">
+          <div class="cell-ico ci-lav" style="width:42px;height:42px;font-size:18px">📋</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--t1)">CRF 数据比对</div>
+            <div style="font-size:12px;color:var(--t3)">数据核查 · v2.3 · 比对多中心病例报告表</div>
+          </div>
+          <button class="btn btn-ghost" style="margin-left:auto;padding:7px 14px">更换技能</button>
+        </div>
+
+        <div class="panel-head"><div class="panel-title">输入文件</div><div class="panel-tag">2 个文件</div></div>
+        <div class="upload">
+          <div class="upload-ico">↑</div>
+          <div class="upload-t">点击上传或拖拽文件至此</div>
+          <div class="upload-s">支持 PDF / Word / Excel / CSV / 图片 / 压缩包 · 单文件最大 500 MB</div>
+        </div>
+        <div class="upload-file">
+          <div class="uf-ico">XLS</div>
+          <div class="uf-info"><div class="uf-n">中心01_CRF_V203_W14.xlsx</div><div class="uf-m">2.4 MB · 248 行</div></div>
+          <span class="status-pill sp-done" style="margin-right:6px"><span class="sp-dot"></span>已上传</span>
+          <div class="uf-x">✕</div>
+        </div>
+        <div class="upload-file">
+          <div class="uf-ico" style="background:var(--sky-soft);color:var(--sky)">XLS</div>
+          <div class="uf-info"><div class="uf-n">中心02_CRF_V203_W14.xlsx</div><div class="uf-m">2.1 MB · 231 行</div></div>
+          <span class="status-pill sp-done" style="margin-right:6px"><span class="sp-dot"></span>已上传</span>
+          <div class="uf-x">✕</div>
+        </div>
+
+        <div class="panel-head" style="margin-top:22px"><div class="panel-title">补充指令</div><div class="panel-tag">自然语言对话</div></div>
+        <div class="nl-box">
+          <div class="nl-msg">
+            <div class="nl-av">智</div>
+            <div class="nl-text">我已识别到两份多中心 CRF 表。请告诉我您的具体要求，比如：哪些字段需要重点核对？空值如何处理？输出格式偏好？</div>
+          </div>
+          <div class="nl-msg">
+            <div class="nl-av you">您</div>
+            <div class="nl-text">请重点比对知情同意日期、不良事件记录与生命体征三类字段。空值视为差异并标红，输出 Excel 报告，按受试者编号排序。</div>
+          </div>
+          <div class="nl-msg">
+            <div class="nl-av">智</div>
+            <div class="nl-text">已理解。我会：① 锁定上述三类共 18 个字段进行比对；② 空值标红并归入"缺失值"差异类型；③ 输出按受试者编号升序排列的 Excel。准备开始？</div>
+          </div>
+          <div class="nl-input-row">
+            <textarea class="nl-input" placeholder="继续补充指令... 比如：只比对第14周以后的数据"></textarea>
+            <button class="nl-send">↑</button>
+          </div>
+        </div>
+
+        <div class="wiz-foot">
+          <button class="btn btn-ghost">← 上一步</button>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-ghost">保存为草稿</button>
+            <button class="btn btn-accent" onclick="go('exec')">开始执行 →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── SCREEN: EXEC (执行详情) ─── -->
+    <section class="screen" id="screen-exec">
+      <div class="exec-layout">
+        <div class="exec-main">
+          <div class="panel" style="margin-bottom:0">
+            <div style="display:flex;align-items:center;gap:14px">
+              <div class="cell-ico ci-pink" style="width:48px;height:48px;font-size:20px">⚠</div>
+              <div style="flex:1">
+                <div style="font-size:16px;font-weight:600;color:var(--t1)">疫苗V-203不良反应汇总</div>
+                <div style="font-size:12px;color:var(--t3);margin-top:2px">使用技能：AE/SAE 汇总 · 输入 3 个文件 · 启动于 14:23</div>
+              </div>
+              <span class="status-pill sp-running"><span class="sp-dot"></span>执行中</span>
+              <button class="btn btn-ghost" style="padding:7px 14px">取消任务</button>
+            </div>
+          </div>
+
+          <div class="progress-card">
+            <div class="pc-head">
+              <div class="pc-name">⚡ 实时执行进度</div>
+              <div class="pc-pct">68%</div>
+            </div>
+            <div class="pc-bar"><div class="pc-bar-fill" style="width:68%"></div></div>
+            <div class="pc-step">
+              <div class="pc-step-ic done">✓</div>
+              <div class="pc-step-t">解析输入文件（3 份）</div>
+              <div class="pc-step-time">14:23 · 4 秒</div>
+            </div>
+            <div class="pc-step">
+              <div class="pc-step-ic done">✓</div>
+              <div class="pc-step-t">提取不良反应记录（共 892 条）</div>
+              <div class="pc-step-time">14:24 · 38 秒</div>
+            </div>
+            <div class="pc-step">
+              <div class="pc-step-ic done">✓</div>
+              <div class="pc-step-t">按 MedDRA v26 标准分类</div>
+              <div class="pc-step-time">14:25 · 1 分 12 秒</div>
+            </div>
+            <div class="pc-step">
+              <div class="pc-step-ic active">⟳</div>
+              <div class="pc-step-t" style="color:var(--t1);font-weight:500">生成频率分布表与可视化</div>
+              <div class="pc-step-time" style="color:var(--accent)">进行中…</div>
+            </div>
+            <div class="pc-step pending">
+              <div class="pc-step-ic pending">4</div>
+              <div class="pc-step-t">导出报告与归档</div>
+              <div class="pc-step-time">等待</div>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-bottom:0">
+            <div class="panel-head"><div class="panel-title">最近活动</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px;font-size:12.5px;color:var(--t2)">
+              <div>· 14:26:18 — 检测到 V203-001-089 缺失合并用药字段，已标记</div>
+              <div>· 14:26:02 — 完成中心03 数据合并，共 312 条记录</div>
+              <div>· 14:25:47 — MedDRA 编码完成，识别到 12 个 PT 术语</div>
+              <div>· 14:25:12 — 开始按系统器官分类（SOC）汇总</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右侧面板：对话 / 文件 -->
+        <aside class="exec-side" id="execSide">
+          <div class="exec-side-tabs">
+            <div class="es-tab active" onclick="switchSide(this,'chat')">💬 对话</div>
+            <div class="es-tab" onclick="switchSide(this,'files')">📁 文件</div>
+            <div class="es-collapse" onclick="toggleSide()">⇥</div>
+          </div>
+          <div class="es-body" id="esBodyChat">
+            <div class="chat-msg">
+              <div class="chat-meta">智枢 · AI</div>
+              <div class="chat-bubble ai">已完成 3/5 步骤。当前正在按 MedDRA 标准对 892 条不良反应记录进行编码归类。</div>
+            </div>
+            <div class="chat-row user">
+              <div class="chat-msg">
+                <div class="chat-meta" style="text-align:right">您</div>
+                <div class="chat-bubble user">注射部位反应也要单独统计吗？</div>
+              </div>
+            </div>
+            <div class="chat-msg">
+              <div class="chat-meta">智枢 · AI</div>
+              <div class="chat-bubble ai">是的，根据 SOC 分类规则，"局部注射反应"会作为独立 SOC 单独统计。当前已识别 47 条相关记录，将在频率分布表第 3 节展示。</div>
+            </div>
+            <div class="chat-row user">
+              <div class="chat-msg">
+                <div class="chat-meta" style="text-align:right">您</div>
+                <div class="chat-bubble user">把严重不良反应单独导出一份</div>
+              </div>
+            </div>
+            <div class="chat-msg">
+              <div class="chat-meta">智枢 · AI</div>
+              <div class="chat-bubble ai">好的，已加入任务清单。完成主报告后会生成 "SAE_单独清单.xlsx" 并保存至 任务输出 文件夹。</div>
+            </div>
+          </div>
+          <div class="es-body hidden" id="esBodyFiles">
+            <div class="es-file-group">输入文件 (3)</div>
+            <div class="es-file"><div class="uf-ico" style="width:28px;height:28px;font-size:10px">XLS</div><div style="flex:1"><div style="font-size:12px;color:var(--t1)">中心01_AE数据.xlsx</div><div style="font-size:10px;color:var(--t3)">2.4 MB</div></div><span style="font-size:13px;color:var(--t3)">⇣</span></div>
+            <div class="es-file"><div class="uf-ico" style="width:28px;height:28px;font-size:10px;background:var(--sky-soft);color:var(--sky)">XLS</div><div style="flex:1"><div style="font-size:12px;color:var(--t1)">中心02_AE数据.xlsx</div><div style="font-size:10px;color:var(--t3)">2.1 MB</div></div><span style="font-size:13px;color:var(--t3)">⇣</span></div>
+            <div class="es-file"><div class="uf-ico" style="width:28px;height:28px;font-size:10px;background:var(--amber-soft);color:var(--amber)">XLS</div><div style="flex:1"><div style="font-size:12px;color:var(--t1)">中心03_AE数据.xlsx</div><div style="font-size:10px;color:var(--t3)">1.8 MB</div></div><span style="font-size:13px;color:var(--t3)">⇣</span></div>
+            <div class="es-file-group">输出文件 (生成中)</div>
+            <div class="es-file" style="opacity:.6"><div class="uf-ico" style="width:28px;height:28px;font-size:10px;background:var(--bg-tint);color:var(--t3)">…</div><div style="flex:1"><div style="font-size:12px;color:var(--t1)">AE_频率分布表.xlsx</div><div style="font-size:10px;color:var(--accent)">生成中 68%</div></div></div>
+          </div>
+          <div style="padding:10px;border-top:1px solid var(--border)" id="esInput">
+            <div class="nl-input-row" style="padding:8px 10px">
+              <input class="nl-input" placeholder="向 AI 提问..." style="min-height:18px"/>
+              <button class="nl-send" style="width:28px;height:28px;font-size:12px">↑</button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ─── SCREEN: REVIEW (审核) ─── -->
+    <section class="screen" id="screen-review">
+      <div class="panel" style="margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="cell-ico ci-amber" style="width:48px;height:48px;font-size:20px">📋</div>
+          <div style="flex:1">
+            <div style="font-size:16px;font-weight:600;color:var(--t1)">CRF 数据比对结果</div>
+            <div style="font-size:12px;color:var(--t3);margin-top:2px">中心01 vs 中心02 · V-203 第14周 · 共比对 231 行，发现 12 处差异</div>
+          </div>
+          <span class="status-pill sp-review"><span class="sp-dot"></span>待审核</span>
+        </div>
+      </div>
+
+      <div class="review-toolbar" style="margin-bottom:14px">
+        <span style="font-size:13px;color:var(--t2)">需要确认</span>
+        <span style="font-size:12px;font-weight:600;color:var(--amber);background:var(--amber-soft);padding:3px 10px;border-radius:99px">3 项</span>
+        <div style="width:1px;height:18px;background:var(--border);margin:0 4px"></div>
+        <button class="confirm-btn">仅显示待确认</button>
+        <button class="confirm-btn">📥 导出报告</button>
+        <button class="btn btn-accent" style="margin-left:auto;padding:8px 18px;font-size:12px" onclick="toast('全部已确认 · 报告已归档')">✓ 全部确认并导出</button>
+      </div>
+
+      <div class="panel" style="padding:0;overflow:hidden">
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>受试者编号</th><th>字段</th><th>中心01</th><th>中心02</th><th>差异类型</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr><td style="color:var(--t1);font-weight:500">V203-001-023</td><td>访视日期</td><td>2026-03-12</td><td>2026-03-14</td><td><span class="status-pill sp-queue"><span class="sp-dot"></span>已标注</span></td><td style="font-size:12px;color:var(--t3)">系统处理</td></tr>
+            <tr style="background:#fffbeb"><td style="color:var(--t1);font-weight:500">V203-001-047</td><td><span style="display:inline-flex;align-items:center;gap:6px"><span class="flag-icon">!</span>体重 (kg)</span></td><td style="color:var(--amber);font-weight:500">68.5</td><td style="color:var(--rose)">—</td><td><span class="status-pill sp-fail"><span class="sp-dot"></span>缺失值</span></td><td><button class="confirm-btn" onclick="this.classList.add('done');this.textContent='✓ 已确认'">确认</button></td></tr>
+            <tr><td style="color:var(--t1);font-weight:500">V203-001-052</td><td>收缩压</td><td>118</td><td>120</td><td><span class="status-pill sp-queue"><span class="sp-dot"></span>已标注</span></td><td style="font-size:12px;color:var(--t3)">系统处理</td></tr>
+            <tr style="background:#fffbeb"><td style="color:var(--t1);font-weight:500">V203-001-061</td><td><span style="display:inline-flex;align-items:center;gap:6px"><span class="flag-icon">!</span>知情同意日期</span></td><td style="color:var(--amber);font-weight:500">2026-01-08</td><td style="color:var(--amber);font-weight:500">2026-01-15</td><td><span class="status-pill sp-review"><span class="sp-dot"></span>日期差异</span></td><td><button class="confirm-btn" onclick="this.classList.add('done');this.textContent='✓ 已确认'">确认</button></td></tr>
+            <tr><td style="color:var(--t1);font-weight:500">V203-001-074</td><td>AE是否发生</td><td>否</td><td>否</td><td><span class="status-pill sp-done"><span class="sp-dot"></span>一致</span></td><td style="font-size:12px;color:var(--t3)">无需处理</td></tr>
+            <tr style="background:#fffbeb"><td style="color:var(--t1);font-weight:500">V203-001-089</td><td><span style="display:inline-flex;align-items:center;gap:6px"><span class="flag-icon">!</span>合并用药</span></td><td style="color:var(--amber);font-weight:500">布洛芬 200mg</td><td style="color:var(--rose)">—</td><td><span class="status-pill sp-fail"><span class="sp-dot"></span>缺失值</span></td><td><button class="confirm-btn" onclick="this.classList.add('done');this.textContent='✓ 已确认'">确认</button></td></tr>
+            <tr><td style="color:var(--t1);font-weight:500">V203-001-103</td><td>实验室编号</td><td>LAB-0231</td><td>LAB-0231</td><td><span class="status-pill sp-done"><span class="sp-dot"></span>一致</span></td><td style="font-size:12px;color:var(--t3)">无需处理</td></tr>
+            <tr><td style="color:var(--t1);font-weight:500">V203-001-112</td><td>舒张压</td><td>78</td><td>76</td><td><span class="status-pill sp-queue"><span class="sp-dot"></span>已标注</span></td><td style="font-size:12px;color:var(--t3)">系统处理</td></tr>
+            <tr><td style="color:var(--t1);font-weight:500">V203-001-118</td><td>体温 (°C)</td><td>36.7</td><td>36.5</td><td><span class="status-pill sp-done"><span class="sp-dot"></span>一致</span></td><td style="font-size:12px;color:var(--t3)">无需处理</td></tr>
+            <tr><td style="color:var(--t1);font-weight:500">V203-001-134</td><td>血红蛋白</td><td>132 g/L</td><td>135 g/L</td><td><span class="status-pill sp-queue"><span class="sp-dot"></span>已标注</span></td><td style="font-size:12px;color:var(--t3)">系统处理</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ─── SCREEN: FILES (工作区) ─── -->
+    <section class="screen" id="screen-files">
+      <div class="file-toolbar">
+        <div class="fb-crumb"><b>工作区</b><span class="sep">/</span><span>01_原始数据</span></div>
+        <div style="margin-left:auto;display:flex;gap:8px">
+          <div class="search" style="width:240px"><span class="search-i">⌕</span><input placeholder="搜索文件..."/></div>
+          <button class="btn btn-ghost" style="padding:8px 14px">＋ 新建文件夹</button>
+          <button class="btn btn-primary" style="padding:8px 14px">↑ 上传</button>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card lavender" style="cursor:pointer">
+          <div class="stat-ico" style="color:var(--accent)">📁</div>
+          <div><div class="stat-meta">我的上传</div><div class="stat-val">48<span class="u">文件</span></div></div>
+        </div>
+        <div class="stat-card pink" style="cursor:pointer">
+          <div class="stat-ico" style="color:var(--pink)">📁</div>
+          <div><div class="stat-meta">任务输入</div><div class="stat-val">22<span class="u">文件</span></div></div>
+        </div>
+        <div class="stat-card mint" style="cursor:pointer">
+          <div class="stat-ico" style="color:var(--mint)">📁</div>
+          <div><div class="stat-meta">任务输出</div><div class="stat-val">36<span class="u">文件</span></div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">所有文件</div>
+          <div class="panel-tag">106 个</div>
+          <div style="margin-left:auto;display:flex;gap:6px">
+            <button class="panel-pill">↻ 共享</button>
+            <button class="panel-pill">🗑 回收站 (12)</button>
+            <button class="panel-pill">视图 ▾</button>
+          </div>
+        </div>
+        <div class="tbl-wrap file-table"><table>
+          <thead><tr><th><input type="checkbox"/></th><th>文件名</th><th>大小</th><th>修改时间</th><th>来源</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="cell-ico ci-mint">XLS</div>中心01_CRF_V203_W14.xlsx</div></td><td>2.4 MB</td><td>今天 14:23</td><td><span class="fi-tag">手动上传</span></td><td><button class="row-more">⋯</button></td></tr>
+            <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="cell-ico ci-sky">XLS</div>中心02_CRF_V203_W14.xlsx</div></td><td>2.1 MB</td><td>今天 14:23</td><td><span class="fi-tag">手动上传</span></td><td><button class="row-more">⋯</button></td></tr>
+            <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="cell-ico ci-amber">PDF</div>临床试验方案_V203_v3.1.pdf</div></td><td>8.4 MB</td><td>昨天</td><td><span class="fi-tag">企微导入</span></td><td><button class="row-more">⋯</button></td></tr>
+            <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="cell-ico ci-mint">XLS</div>不良反应_频率分布表.xlsx</div></td><td>1.6 MB</td><td>2小时前</td><td><span class="fi-tag" style="background:var(--mint-soft);color:var(--mint)">任务输出</span></td><td><button class="row-more">⋯</button></td></tr>
+            <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="cell-ico ci-pink">DOC</div>SAE周报_第14周_草稿.docx</div></td><td>0.8 MB</td><td>昨天</td><td><span class="fi-tag" style="background:var(--mint-soft);color:var(--mint)">任务输出</span></td><td><button class="row-more">⋯</button></td></tr>
+            <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="cell-ico ci-lav">PDF</div>DSMB安全报告_2026年5月.pdf</div></td><td>2.1 MB</td><td>上周</td><td><span class="fi-tag" style="background:var(--mint-soft);color:var(--mint)">任务输出</span></td><td><button class="row-more">⋯</button></td></tr>
+            <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="cell-ico ci-sky">CSV</div>受试者入组记录.csv</div></td><td>0.8 MB</td><td>3天前</td><td><span class="fi-tag">手动上传</span></td><td><button class="row-more">⋯</button></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ─── SCREEN: NOTIFICATION ─── -->
+    <section class="screen" id="screen-notif">
+      <div class="market-filter">
+        <button class="chip active">全部 12</button>
+        <button class="chip">未读 4</button>
+        <button class="chip">任务</button>
+        <button class="chip">授权</button>
+        <button class="chip">分享</button>
+        <button class="chip">系统</button>
+        <button class="chip" style="margin-left:auto">全部标记为已读</button>
+      </div>
+      <div class="notif-list">
+        <div class="notif unread">
+          <div class="notif-ic" style="background:var(--mint-soft);color:var(--mint)">✓</div>
+          <div class="notif-body">
+            <div class="notif-t">任务已完成 · 进入待审核</div>
+            <div class="notif-d">"中心01 vs 中心02 CRF比对" 已完成，共发现 12 处差异，其中 3 项需要您人工确认。</div>
+          </div>
+          <div class="notif-time">5 分钟前</div>
+        </div>
+        <div class="notif unread">
+          <div class="notif-ic" style="background:var(--accent-soft);color:var(--accent)">◈</div>
+          <div class="notif-body">
+            <div class="notif-t">技能授权申请已批准</div>
+            <div class="notif-d">您申请使用 "实验室异常复核" 技能的申请已被管理员李主任批准，有效期 90 天。</div>
+          </div>
+          <div class="notif-time">25 分钟前</div>
+        </div>
+        <div class="notif unread">
+          <div class="notif-ic" style="background:var(--pink-soft);color:var(--pink)">📎</div>
+          <div class="notif-body">
+            <div class="notif-t">收到文件分享</div>
+            <div class="notif-d">陈泽明 通过企业微信向您分享了 "受试者基线数据_V203.xlsx"。</div>
+          </div>
+          <div class="notif-time">1 小时前</div>
+        </div>
+        <div class="notif unread">
+          <div class="notif-ic" style="background:var(--amber-soft);color:var(--amber)">⚠</div>
+          <div class="notif-body">
+            <div class="notif-t">工作区使用提醒</div>
+            <div class="notif-d">您的工作区使用已达 92%（46.2 GB / 50 GB），请及时清理或联系管理员扩容。</div>
+          </div>
+          <div class="notif-time">今天 09:12</div>
+        </div>
+        <div class="notif">
+          <div class="notif-ic" style="background:var(--mint-soft);color:var(--mint)">✓</div>
+          <div class="notif-body">
+            <div class="notif-t">SAE周报已完成</div>
+            <div class="notif-d">"SAE周报草稿 · 第14周" 已生成，共 12 页 · 已自动保存至 任务输出 文件夹。</div>
+          </div>
+          <div class="notif-time">昨天 16:48</div>
+        </div>
+        <div class="notif">
+          <div class="notif-ic" style="background:var(--sky-soft);color:var(--sky)">📱</div>
+          <div class="notif-body">
+            <div class="notif-t">系统维护公告</div>
+            <div class="notif-d">本平台将于本周六 02:00 - 04:00 进行例行维护升级，期间任务执行可能受影响。</div>
+          </div>
+          <div class="notif-time">2 天前</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── SCREEN: ADMIN (组织管理) ─── -->
+    <section class="screen" id="screen-admin">
+      <div class="subtabs">
+        <div class="subtab active">概览</div>
+        <div class="subtab">成员管理</div>
+        <div class="subtab">技能管理</div>
+        <div class="subtab">授权审批 <span style="background:var(--rose);color:#fff;font-size:10px;padding:1px 6px;border-radius:99px;margin-left:4px">5</span></div>
+        <div class="subtab">组织设置</div>
+        <div class="subtab">审计日志</div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card lavender">
+          <div class="stat-ico" style="color:var(--accent)">👥</div>
+          <div><div class="stat-meta">组织成员</div><div class="stat-val">42<span class="u">人</span></div></div>
+          <div class="stat-trend">+ 3 本周</div>
+        </div>
+        <div class="stat-card pink">
+          <div class="stat-ico" style="color:var(--pink)">◈</div>
+          <div><div class="stat-meta">已上架技能</div><div class="stat-val">18<span class="u">个</span></div></div>
+          <div class="stat-trend">+ 1 本周</div>
+        </div>
+        <div class="stat-card mint">
+          <div class="stat-ico" style="color:var(--mint)">⟳</div>
+          <div><div class="stat-meta">本周任务</div><div class="stat-val">186<span class="u">次执行</span></div></div>
+          <div class="stat-trend">↑ 22%</div>
+        </div>
+      </div>
+
+      <div class="cols">
+        <div class="col-left">
+          <div class="panel">
+            <div class="panel-head">
+              <div class="panel-title">待处理事项</div>
+              <div class="panel-tag" style="background:var(--rose-soft);color:var(--rose)">5 项</div>
+            </div>
+            <div class="care-list">
+              <div class="care-row">
+                <div class="cell-ico ci-amber" style="width:38px;height:38px">◈</div>
+                <div class="care-info">
+                  <div class="care-name">张瑞 申请使用 "实验室异常复核"</div>
+                  <div class="care-mail">理由：W12 实验室数据复核 · 提交于 2 小时前</div>
+                </div>
+                <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px">拒绝</button>
+                <button class="btn btn-primary" style="padding:6px 12px;font-size:12px">批准</button>
+              </div>
+              <div class="care-row">
+                <div class="cell-ico ci-amber" style="width:38px;height:38px">◈</div>
+                <div class="care-info">
+                  <div class="care-name">刘宇航 申请使用 "DSMB 安全报告"</div>
+                  <div class="care-mail">理由：3 月度 DSMB 报告 · 提交于 4 小时前</div>
+                </div>
+                <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px">拒绝</button>
+                <button class="btn btn-primary" style="padding:6px 12px;font-size:12px">批准</button>
+              </div>
+              <div class="care-row">
+                <div class="cell-ico ci-pink" style="width:38px;height:38px">👤</div>
+                <div class="care-info">
+                  <div class="care-name">新成员邀请待发送</div>
+                  <div class="care-mail">3 位通讯录成员待邀请</div>
+                </div>
+                <button class="btn btn-primary" style="padding:6px 12px;font-size:12px">查看</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><div class="panel-title">技能使用频率</div><div class="panel-tag">最近 30 天</div></div>
+            <div class="care-list">
+              <div class="care-row"><div class="cell-ico ci-lav" style="width:36px;height:36px">📋</div><div class="care-info"><div class="care-name">CRF 数据比对</div><div class="care-mail">62 次执行 · 8 位用户</div></div><div style="width:120px;height:6px;background:var(--bg-tint);border-radius:99px;overflow:hidden"><div style="width:88%;height:100%;background:var(--accent-grad)"></div></div></div>
+              <div class="care-row"><div class="cell-ico ci-mint" style="width:36px;height:36px">📊</div><div class="care-info"><div class="care-name">SAE 周报生成</div><div class="care-mail">48 次执行 · 6 位用户</div></div><div style="width:120px;height:6px;background:var(--bg-tint);border-radius:99px;overflow:hidden"><div style="width:68%;height:100%;background:var(--accent-grad)"></div></div></div>
+              <div class="care-row"><div class="cell-ico ci-pink" style="width:36px;height:36px">⚠</div><div class="care-info"><div class="care-name">不良反应汇总</div><div class="care-mail">32 次执行 · 5 位用户</div></div><div style="width:120px;height:6px;background:var(--bg-tint);border-radius:99px;overflow:hidden"><div style="width:46%;height:100%;background:var(--accent-grad)"></div></div></div>
+              <div class="care-row"><div class="cell-ico ci-sky" style="width:36px;height:36px">🔬</div><div class="care-info"><div class="care-name">实验室异常复核</div><div class="care-mail">22 次执行 · 4 位用户</div></div><div style="width:120px;height:6px;background:var(--bg-tint);border-radius:99px;overflow:hidden"><div style="width:32%;height:100%;background:var(--accent-grad)"></div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-right">
+          <div class="panel">
+            <div class="panel-head"><div class="panel-title">企业微信状态</div></div>
+            <div style="display:flex;align-items:center;gap:14px;padding:8px 0">
+              <div style="width:48px;height:48px;border-radius:14px;background:#07c160;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px">✓</div>
+              <div>
+                <div style="font-size:14px;color:var(--t1);font-weight:600">已绑定</div>
+                <div style="font-size:11px;color:var(--t3)">应用 ID: ww1234···7890</div>
+              </div>
+              <button class="btn btn-ghost" style="margin-left:auto;padding:7px 14px">管理</button>
+            </div>
+            <div style="border-top:1px solid var(--border);margin-top:12px;padding-top:12px;display:flex;justify-content:space-between;font-size:12px;color:var(--t2)">
+              <span>同步成员</span><span style="color:var(--t1);font-weight:500">42 / 42</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);padding-top:8px">
+              <span>最后同步</span><span style="color:var(--t1);font-weight:500">10 分钟前</span>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><div class="panel-title">最近审计日志</div><div class="panel-action" onclick="toast('日志详情')">查看全部 →</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px;font-size:12px">
+              <div style="display:flex;gap:8px"><span style="color:var(--t3);min-width:64px">14:26</span><span style="color:var(--t1)"><b>王思远</b> 批准技能授权</span></div>
+              <div style="display:flex;gap:8px"><span style="color:var(--t3);min-width:64px">14:12</span><span style="color:var(--t1)"><b>陈泽明</b> 创建任务</span></div>
+              <div style="display:flex;gap:8px"><span style="color:var(--t3);min-width:64px">13:48</span><span style="color:var(--t1)"><b>系统</b> 完成 AE 汇总</span></div>
+              <div style="display:flex;gap:8px"><span style="color:var(--t3);min-width:64px">12:34</span><span style="color:var(--t1)"><b>李主任</b> 上传新技能 v1.8</span></div>
+              <div style="display:flex;gap:8px"><span style="color:var(--t3);min-width:64px">11:02</span><span style="color:var(--t1)"><b>徐子涵</b> 分享文件</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ─── MODAL: 申请技能 ─── -->
+<div class="modal-bg" id="applyModal">
+  <div class="modal">
+    <div class="modal-t">申请使用 · 实验室异常复核</div>
+    <div class="modal-d">提交申请后，管理员会审批授权。请简要说明用途，有助于加快审批。</div>
+    <textarea class="modal-input" placeholder="例：用于本期临床试验 W12 实验室数据异常值复核..."></textarea>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="document.getElementById('applyModal').classList.remove('show')">取消</button>
+      <button class="btn btn-accent" onclick="document.getElementById('applyModal').classList.remove('show');toast('✓ 申请已提交，等待管理员审批')">提交申请</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function enterApp(){
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+}
+function go(screen){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+screen)?.classList.add('active');
+  document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));
+  document.querySelector('.nav[data-screen="'+screen+'"]')?.classList.add('active');
+  const titles={dashboard:'今天有 3 项任务待审核，2 项正在执行中',tasks:'任务中心 · 共 24 项任务',market:'技能市场 · 共 18 个技能可用',files:'工作区文件 · 共 106 个文件',wizard:'新建任务 · 跟随向导逐步完成',exec:'执行详情 · AI 正在为您处理任务',review:'结果审核 · 请逐项确认 AI 产出',notif:'通知中心 · 4 条未读',admin:'组织管理 · 5 项待处理'};
+  document.getElementById('greetSub').textContent=titles[screen]||'';
+}
+document.querySelectorAll('.nav[data-screen]').forEach(el=>{
+  el.onclick=()=>go(el.dataset.screen);
+});
+function switchSide(el,which){
+  el.parentElement.querySelectorAll('.es-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('esBodyChat').classList.toggle('hidden',which!=='chat');
+  document.getElementById('esBodyFiles').classList.toggle('hidden',which!=='files');
+  document.getElementById('esInput').style.display = which==='chat'?'block':'none';
+}
+function toggleSide(){
+  const side=document.getElementById('execSide');
+  side.parentElement.classList.toggle('collapsed');
+  side.style.display=side.style.display==='none'?'flex':'none';
+  setTimeout(()=>{side.style.display='flex'},250);
+}
+function showApply(ev){
+  ev.stopPropagation();
+  document.getElementById('applyModal').classList.add('show');
+}
+function toast(msg){
+  const t=document.createElement('div');
+  t.className='toast';t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2400);
+}
+</script>
+</body>
+</html>
