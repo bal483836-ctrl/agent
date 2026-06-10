@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>量子链 · 4 版设计方案</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'PingFang SC','Inter','Helvetica Neue',system-ui,sans-serif;background:#f7f8fa;color:#0b1e36;min-height:100vh;-webkit-font-smoothing:antialiased;letter-spacing:.005em}
+.wrap{max-width:1280px;margin:0 auto;padding:56px 32px 80px}
+
+.hdr{margin-bottom:48px;display:flex;align-items:flex-end;justify-content:space-between;gap:30px;flex-wrap:wrap}
+.hdr-l{flex:1;min-width:300px}
+.eye{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#6d5cf5;font-weight:700;margin-bottom:10px;display:inline-flex;align-items:center;gap:8px}
+.eye::before{content:'';width:24px;height:1px;background:#6d5cf5}
+.title{font-size:42px;font-weight:700;letter-spacing:-.025em;color:#0b1e36;line-height:1.1;margin-bottom:14px}
+.title span{background:linear-gradient(135deg,#1488e8,#6d5cf5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{font-size:15px;color:#48607d;line-height:1.6;max-width:640px}
+
+.meta{display:flex;flex-direction:column;align-items:flex-end;gap:6px;text-align:right;font-size:12px;color:#8a9bb1;font-variant-numeric:tabular-nums}
+.meta b{color:#0b1e36;font-weight:600}
+
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+
+.card{background:#fff;border:1px solid #e8eef3;border-radius:24px;padding:0;overflow:hidden;cursor:pointer;transition:all .35s cubic-bezier(.4,0,.2,1);position:relative;box-shadow:0 1px 3px rgba(11,30,45,.04)}
+.card:hover{transform:translateY(-6px);box-shadow:0 24px 60px rgba(11,30,45,.12),0 8px 20px rgba(11,30,45,.06);border-color:#cbd9e8}
+
+.preview{height:240px;position:relative;overflow:hidden;border-bottom:1px solid #e8eef3}
+
+/* V1 preview - clean cyan */
+.preview.v1{background:linear-gradient(135deg,#ecfeff 0%,#fff 70%)}
+.preview.v1::before{content:'';position:absolute;top:30px;left:30px;width:280px;height:30px;background:linear-gradient(90deg,#cffafe,transparent);border-radius:8px}
+.preview.v1::after{content:'';position:absolute;top:74px;left:30px;width:200px;height:14px;background:#e8eef3;border-radius:4px}
+.preview.v1 .demo{position:absolute;bottom:24px;left:30px;right:30px;display:flex;gap:10px}
+.preview.v1 .demo-card{flex:1;background:#fff;border:1px solid #e8eef3;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(11,30,45,.04)}
+.preview.v1 .demo-h{font-size:9px;color:#8a9bb1;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.preview.v1 .demo-v{font-size:18px;font-weight:700;color:#0b1e36;letter-spacing:-.015em}
+.preview.v1 .demo-bar{height:3px;background:#f1f6fa;border-radius:99px;margin-top:6px;overflow:hidden}
+.preview.v1 .demo-bar::after{content:'';display:block;width:65%;height:100%;background:linear-gradient(90deg,#06b6d4,#0e7490);border-radius:99px}
+
+/* V2 preview - aurora glass */
+.preview.v2{background:#f5f7fc;overflow:hidden}
+.preview.v2::before{content:'';position:absolute;top:-50px;left:-50px;width:300px;height:300px;background:radial-gradient(circle,#a5b4fc,transparent 70%);border-radius:50%;opacity:.5}
+.preview.v2::after{content:'';position:absolute;bottom:-80px;right:-30px;width:280px;height:280px;background:radial-gradient(circle,#67e8f9,transparent 70%);border-radius:50%;opacity:.5}
+.preview.v2 .glass{position:absolute;background:rgba(255,255,255,.7);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.85);border-radius:16px;padding:14px;box-shadow:0 6px 20px rgba(99,102,241,.08)}
+.preview.v2 .glass-1{top:40px;left:30px;width:280px}
+.preview.v2 .glass-1 .h{font-size:10px;color:#8b89ac;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.preview.v2 .glass-1 .v{font-size:22px;font-weight:700;background:linear-gradient(135deg,#1e1b4b,#4f46e5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-.02em}
+.preview.v2 .glass-2{bottom:30px;right:30px;width:170px;display:flex;align-items:center;gap:10px}
+.preview.v2 .glass-2 .ring{width:36px;height:36px;border-radius:50%;background:conic-gradient(#6366f1 68%,#e0e7ff 0);display:flex;align-items:center;justify-content:center;position:relative}
+.preview.v2 .glass-2 .ring::after{content:'';width:24px;height:24px;background:#fff;border-radius:50%;position:absolute}
+.preview.v2 .glass-2 .ring span{position:relative;z-index:1;font-size:9px;font-weight:700;color:#4338ca}
+.preview.v2 .glass-2 .info .h{font-size:10px;color:#8b89ac}
+.preview.v2 .glass-2 .info .n{font-size:12px;color:#1e1b4b;font-weight:600}
+
+/* V3 preview - editorial */
+.preview.v3{background:#fcfbf8}
+.preview.v3 .ed-top{padding:24px 30px 12px;border-bottom:2px solid #1a1a2e}
+.preview.v3 .ed-eye{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:#c2410c;font-weight:700;margin-bottom:6px;font-family:'JetBrains Mono',monospace}
+.preview.v3 .ed-t{font-family:'Source Serif Pro','Songti SC',Georgia,serif;font-size:24px;font-weight:700;color:#1a1a2e;letter-spacing:-.015em;line-height:1.1}
+.preview.v3 .ed-cols{display:grid;grid-template-columns:repeat(3,1fr);padding:20px 30px;gap:0;background:#fff;border-top:1px solid #e8e3d8;margin:14px 0}
+.preview.v3 .ed-col{padding:0 16px;border-right:1px solid #e8e3d8;position:relative}
+.preview.v3 .ed-col:last-child{border-right:none}
+.preview.v3 .ed-col:first-child{padding-left:0}
+.preview.v3 .ed-col .n{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:#c2410c;font-weight:700;letter-spacing:.06em}
+.preview.v3 .ed-col .l{font-size:8.5px;color:#8a8aa3;font-weight:700;letter-spacing:.16em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;margin:6px 0 8px}
+.preview.v3 .ed-col .v{font-family:'Source Serif Pro','Songti SC',serif;font-size:22px;font-weight:700;color:#1a1a2e;letter-spacing:-.02em;line-height:1}
+.preview.v3 .ed-tag{position:absolute;bottom:24px;right:30px;font-family:'JetBrains Mono',monospace;font-size:8.5px;color:#8a8aa3;letter-spacing:.06em;text-transform:uppercase}
+
+/* V4 preview - soft bloom */
+.preview.v4{background:#f7f9f7}
+.preview.v4 .bloom-bg{position:absolute;inset:0;background:linear-gradient(135deg,#fce7f3 0%,#ccfbf1 100%);opacity:.4}
+.preview.v4 .bloom-bg::before{content:'';position:absolute;top:-30%;right:-10%;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(20,184,166,.25),transparent 70%)}
+.preview.v4 .bloom-pill{position:absolute;background:rgba(255,255,255,.85);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.9);border-radius:99px;padding:10px 18px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 12px rgba(15,41,34,.08)}
+.preview.v4 .bloom-pill .ic{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#14b8a6,#16a34a);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.6)}
+.preview.v4 .bloom-pill .info .v{font-size:17px;font-weight:700;color:#0f2922;letter-spacing:-.015em;line-height:1}
+.preview.v4 .bloom-pill .info .l{font-size:10px;color:#788b82;font-weight:600;margin-top:2px}
+.preview.v4 .p1{top:32px;left:30px}
+.preview.v4 .p2{top:32px;left:200px}
+.preview.v4 .ring-big{position:absolute;bottom:24px;right:30px;width:90px;height:90px}
+.preview.v4 .ring-big svg{width:100%;height:100%;transform:rotate(-90deg)}
+.preview.v4 .ring-bg{fill:none;stroke:#ccfbf1;stroke-width:8}
+.preview.v4 .ring-fg{fill:none;stroke:url(#mintGrad);stroke-width:8;stroke-linecap:round}
+.preview.v4 .ring-l{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.preview.v4 .ring-l .v{font-size:20px;font-weight:700;color:#0f2922;letter-spacing:-.025em}
+.preview.v4 .ring-l .lab{font-size:8px;color:#788b82;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+
+.body{padding:24px 28px}
+.tag-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.tag{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:99px;font-family:'JetBrains Mono','SF Mono',monospace}
+.tag.v1{background:#ecfeff;color:#0e7490}
+.tag.v2{background:#eef2ff;color:#4338ca}
+.tag.v3{background:#ffedd5;color:#c2410c}
+.tag.v4{background:#ccfbf1;color:#0f766e}
+.num{font-size:10.5px;color:#8a9bb1;font-family:'JetBrains Mono','SF Mono',monospace;font-weight:700;letter-spacing:.06em;margin-left:auto}
+.name{font-size:24px;font-weight:700;color:#0b1e36;letter-spacing:-.015em;margin-bottom:6px}
+.name-en{font-size:11px;color:#8a9bb1;font-weight:500;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px}
+.desc{font-size:13.5px;color:#48607d;line-height:1.65;margin-bottom:18px}
+
+.feats{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.feat{display:flex;align-items:center;gap:10px;font-size:12.5px;color:#48607d}
+.feat-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.v1 .feat-dot{background:#0891b2}
+.v2 .feat-dot{background:#6366f1}
+.v3 .feat-dot{background:#c2410c}
+.v4 .feat-dot{background:#14b8a6}
+
+.foot{display:flex;align-items:center;gap:12px;padding-top:18px;border-top:1px solid #e8eef3}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:99px;font-size:12.5px;font-weight:600;font-family:inherit;border:none;cursor:pointer;transition:all .2s;text-decoration:none}
+.btn-primary{background:#0b1e36;color:#fff}
+.btn-primary:hover{background:#1a334a;transform:translateY(-1px);box-shadow:0 6px 18px rgba(11,30,45,.18)}
+.btn-ghost{background:#f7f8fa;color:#48607d;border:1px solid #e8eef3}
+.btn-ghost:hover{border-color:#cbd9e8;color:#0b1e36}
+.foot .meta-info{margin-left:auto;font-size:11px;color:#8a9bb1;font-family:'JetBrains Mono',monospace;letter-spacing:.04em}
+
+.ftr{margin-top:64px;padding-top:32px;border-top:1px solid #e8eef3;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#8a9bb1}
+.ftr-l{display:flex;align-items:center;gap:14px}
+.ftr-mark{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#1488e8,#6d5cf5);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;letter-spacing:-.02em;font-family:'Source Serif Pro','Songti SC',serif}
+.ftr b{color:#0b1e36;font-weight:600}
+
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="mintGrad" x1="0" x2="1"><stop offset="0%" stop-color="#14b8a6"/><stop offset="100%" stop-color="#16a34a"/></linearGradient>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header class="hdr">
+    <div class="hdr-l">
+      <div class="eye">设计方案 · 4 个独立方向</div>
+      <div class="title">量子链 · <span>四版高级原型</span></div>
+      <div class="sub">为医学场景定制的四种独立设计语言。每版完整包含仪表盘、新建任务（工作区多选）、执行详情、审核、技能详情、工作区文件、组织管理与通知中心。</div>
+    </div>
+    <div class="meta">
+      <div>2026 · Q2 · Quantum Chain</div>
+      <div><b>4</b> 方案 · <b>32+</b> 屏幕 · <b>纯净浅色</b></div>
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <!-- V1 Crystal -->
+    <div class="card" onclick="location.href='v1-crystal.html'">
+      <div class="preview v1">
+        <div class="demo">
+          <div class="demo-card"><div class="demo-h">本周完成</div><div class="demo-v">24<span style="font-size:11px;color:#8a9bb1;font-weight:500;margin-left:4px">/ 28</span></div><div class="demo-bar"></div></div>
+          <div class="demo-card"><div class="demo-h">已授权技能</div><div class="demo-v">12</div><div class="demo-bar" style="--p:60%"></div></div>
+          <div class="demo-card"><div class="demo-h">平均时长</div><div class="demo-v">3.4<span style="font-size:11px;color:#8a9bb1;font-weight:500;margin-left:4px">min</span></div><div class="demo-bar"></div></div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="tag-row">
+          <span class="tag v1">V1 · Crystal Clear</span>
+          <span class="num">№ 01</span>
+        </div>
+        <div class="name">临床清新 · 海洋青</div>
+        <div class="name-en">Pure white · Cyan-teal · Apple Health</div>
+        <div class="desc">纯净白底 + 海洋青/薄荷点缀。柔和阴影、慷慨呼吸感、Apple Health 风格。临床场景最安全可靠的选择。</div>
+        <div class="feats">
+          <div class="feat"><span class="feat-dot"></span>主色 <code style="font-family:monospace;color:#0e7490;font-weight:600">#0E7490</code> 海洋青渐变</div>
+          <div class="feat"><span class="feat-dot"></span>大圆角 (16-28px) + 柔和阴影</div>
+          <div class="feat"><span class="feat-dot"></span>状态进度环 + 任务点指示器</div>
+          <div class="feat"><span class="feat-dot"></span>动态柱状图 + 浮动 tooltip</div>
+        </div>
+        <div class="foot">
+          <a class="btn btn-primary" href="v1-crystal.html">打开方案 →</a>
+          <span class="meta-info">CYAN · TEAL · CLEAN</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- V2 Aurora -->
+    <div class="card" onclick="location.href='v2-aurora.html'">
+      <div class="preview v2">
+        <div class="glass glass-1">
+          <div class="h">本周完成任务</div>
+          <div class="v">24 / 28</div>
+        </div>
+        <div class="glass glass-2">
+          <div class="ring"><span>68%</span></div>
+          <div class="info"><div class="h">实时进度</div><div class="n">疫苗V-203...</div></div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="tag-row">
+          <span class="tag v2">V2 · Aurora Light</span>
+          <span class="num">№ 02</span>
+        </div>
+        <div class="name">光感渐变 · 极光玻璃</div>
+        <div class="name-en">Light glass · Iris gradient · Floating</div>
+        <div class="desc">浅色玻璃拟态 + 极光渐变背景。靛蓝-青色 SaaS 高级感。卡片如悬浮玻璃，渐变光晕装饰，最具未来感。</div>
+        <div class="feats">
+          <div class="feat"><span class="feat-dot"></span>主色 <code style="font-family:monospace;color:#4338ca;font-weight:600">#6366F1 → #38BDF8</code> 极光渐变</div>
+          <div class="feat"><span class="feat-dot"></span>backdrop-filter 玻璃模糊</div>
+          <div class="feat"><span class="feat-dot"></span>SVG 面积折线图 + 渐变文字</div>
+          <div class="feat"><span class="feat-dot"></span>动态背景光斑 (CSS 动画)</div>
+        </div>
+        <div class="foot">
+          <a class="btn btn-primary" href="v2-aurora.html">打开方案 →</a>
+          <span class="meta-info">IRIS · GLASS · PREMIUM</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- V3 Editorial -->
+    <div class="card" onclick="location.href='v3-editorial.html'">
+      <div class="preview v3">
+        <div class="ed-top">
+          <div class="ed-eye">Volume 24 · Issue 06</div>
+          <div class="ed-t">每日临床简报</div>
+        </div>
+        <div class="ed-cols">
+          <div class="ed-col"><span class="n">01</span><div class="l">本周完成</div><div class="v">24/28</div></div>
+          <div class="ed-col"><span class="n">02</span><div class="l">已授权技能</div><div class="v">12</div></div>
+          <div class="ed-col"><span class="n">03</span><div class="l">平均时长</div><div class="v">3.4 min</div></div>
+        </div>
+        <div class="ed-tag">QUANTUM CHAIN · 2026/06/10</div>
+      </div>
+      <div class="body">
+        <div class="tag-row">
+          <span class="tag v3">V3 · Editorial</span>
+          <span class="num">№ 03</span>
+        </div>
+        <div class="name">期刊纸感 · 学术编辑</div>
+        <div class="name-en">Serif · Indigo + Orange · Magazine</div>
+        <div class="desc">暖白纸感 + 深靛蓝 + 暖橙强调。衬线标题 + 等宽数字。最具严肃学术质感，适合科研严谨气质。</div>
+        <div class="feats">
+          <div class="feat"><span class="feat-dot"></span>主色 <code style="font-family:monospace;color:#1e3a8a;font-weight:600">#1E3A8A · #EA580C</code> 靛蓝+橙</div>
+          <div class="feat"><span class="feat-dot"></span>Source Serif + JetBrains Mono</div>
+          <div class="feat"><span class="feat-dot"></span>编号 § 章节 + 网格分隔线</div>
+          <div class="feat"><span class="feat-dot"></span>极简阴影，强排版层级</div>
+        </div>
+        <div class="foot">
+          <a class="btn btn-primary" href="v3-editorial.html">打开方案 →</a>
+          <span class="meta-info">SERIF · INDIGO · GRAVITAS</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- V4 Bloom -->
+    <div class="card" onclick="location.href='v4-bloom.html'">
+      <div class="preview v4">
+        <div class="bloom-bg"></div>
+        <div class="bloom-pill p1">
+          <div class="ic">24</div>
+          <div class="info"><div class="v">24</div><div class="l">已完成</div></div>
+        </div>
+        <div class="bloom-pill p2">
+          <div class="ic" style="background:linear-gradient(135deg,#fbbf24,#d97706)">!</div>
+          <div class="info"><div class="v">3</div><div class="l">待审核</div></div>
+        </div>
+        <div class="ring-big">
+          <svg viewBox="0 0 100 100">
+            <circle class="ring-bg" cx="50" cy="50" r="42"/>
+            <circle class="ring-fg" cx="50" cy="50" r="42" stroke-dasharray="264" stroke-dashoffset="85"/>
+          </svg>
+          <div class="ring-l"><div class="v">68%</div><div class="lab">进度</div></div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="tag-row">
+          <span class="tag v4">V4 · Soft Bloom</span>
+          <span class="num">№ 04</span>
+        </div>
+        <div class="name">薄荷柔和 · 健康关怀</div>
+        <div class="name-en">Mint + Rose · Rounded · Caring</div>
+        <div class="desc">薄荷绿 + 玫瑰渐变。圆润 pill 元素、Apple Watch 风格圆环、内阴影柔光。最具亲和力与关怀感。</div>
+        <div class="feats">
+          <div class="feat"><span class="feat-dot"></span>主色 <code style="font-family:monospace;color:#0f766e;font-weight:600">#14B8A6</code> 薄荷渐变</div>
+          <div class="feat"><span class="feat-dot"></span>大圆角 (18-32px) + Pill 标签</div>
+          <div class="feat"><span class="feat-dot"></span>三层活动圆环 (Apple 风格)</div>
+          <div class="feat"><span class="feat-dot"></span>欢迎横幅 + 渐变光晕装饰</div>
+        </div>
+        <div class="foot">
+          <a class="btn btn-primary" href="v4-bloom.html">打开方案 →</a>
+          <span class="meta-info">MINT · ROUNDED · WARM</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="ftr">
+    <div class="ftr-l">
+      <div class="ftr-mark">量</div>
+      <div>
+        <div><b>量子链 · Quantum Chain</b></div>
+        <div>医学智能协作平台 · 设计方案画廊</div>
+      </div>
+    </div>
+    <div>每版均含完整 8 个屏幕 / 100% 浅色 / 任务驱动型导航</div>
+  </footer>
+</div>
+
+</body>
+</html>
