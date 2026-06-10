@@ -3,407 +3,521 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>智枢 · SkillHub</title>
+<title>量子链 · Quantum Chain</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  /* 背景层 */
-  --bg-app:#f6f4fb;
+  /* 医学蓝渐变体系 */
+  --bg-app:#f4f8fc;
   --bg-card:#ffffff;
-  --bg-soft:#faf8fd;
-  --bg-tint:#f1edfa;
+  --bg-soft:#f7fafd;
+  --bg-tint:#eaf3fb;
 
-  /* 边框 */
-  --border:#ece8f3;
-  --border-strong:#d8d1e6;
+  --border:#e3ecf5;
+  --border-strong:#cbd9e8;
 
-  /* 文本 */
-  --t1:#1a1530;
-  --t2:#5b556e;
-  --t3:#9892a8;
-  --t-on-dark:#ffffff;
+  --t1:#0b1e36;
+  --t2:#48607d;
+  --t3:#8a9bb1;
+  --t-light:#a8b8cc;
 
-  /* 主色 / 强调 */
-  --primary:#1a1530;
-  --primary-hover:#2a2348;
-  --accent:#6d5cf5;
-  --accent-2:#a78bfa;
-  --accent-grad:linear-gradient(135deg,#6d5cf5 0%,#a78bfa 100%);
-  --accent-soft:#ede9fe;
+  /* 主色系（医学蓝） */
+  --c50:#eff8ff;
+  --c100:#dbeefe;
+  --c200:#b6dcfd;
+  --c300:#7ec3fb;
+  --c400:#3aa3f5;
+  --c500:#1488e8;
+  --c600:#0a6dcf;
+  --c700:#0a58a8;
+  --c800:#0c4886;
+  --c900:#0d3a6e;
+  --c950:#0a2547;
 
-  /* 状态色 */
-  --pink:#ec4899;--pink-soft:#fce7f3;
-  --rose:#f43f5e;--rose-soft:#ffe4e6;
-  --mint:#10b981;--mint-soft:#d1fae5;
-  --sky:#3b82f6;--sky-soft:#dbeafe;
-  --amber:#f59e0b;--amber-soft:#fef3c7;
+  --primary:#0a58a8;
+  --accent:#1488e8;
+  --grad:linear-gradient(135deg,#1488e8 0%,#0a58a8 100%);
+  --grad-soft:linear-gradient(135deg,#dbeefe 0%,#eaf3fb 100%);
 
-  /* 阴影与圆角 */
-  --r:10px;--r-lg:16px;--r-xl:22px;
-  --sh-sm:0 1px 2px rgba(26,21,48,.04);
-  --sh:0 2px 8px rgba(26,21,48,.06);
-  --sh-md:0 6px 20px rgba(26,21,48,.08);
-  --sh-lg:0 12px 36px rgba(26,21,48,.12);
+  /* 状态色（医学语义） */
+  --ok:#0e9f6e;--ok-soft:#defce9;
+  --warn:#d97706;--warn-soft:#fef3c7;
+  --bad:#dc2626;--bad-soft:#fee2e2;
+  --info:#1488e8;--info-soft:#dbeefe;
+  --neut:#64748b;--neut-soft:#f1f5f9;
+
+  /* 圆角 / 阴影 */
+  --r-sm:6px;--r:10px;--r-lg:14px;--r-xl:20px;
+  --sh-1:0 1px 2px rgba(10,88,168,.05);
+  --sh-2:0 2px 8px rgba(10,88,168,.07);
+  --sh-3:0 8px 24px rgba(10,88,168,.10);
+  --sh-4:0 16px 40px rgba(10,88,168,.14);
 }
-body{background:var(--bg-app);color:var(--t1);font-family:'PingFang SC','Noto Sans SC','Microsoft YaHei',system-ui,sans-serif;font-size:13.5px;line-height:1.55;min-height:100vh;overflow:hidden}
+html,body{height:100%}
+body{background:var(--bg-app);color:var(--t1);font-family:'PingFang SC','Helvetica Neue','Noto Sans SC','Microsoft YaHei',system-ui,sans-serif;font-size:13.5px;line-height:1.55;overflow:hidden;-webkit-font-smoothing:antialiased}
+
+/* ─── SVG ICONS ────────────────────────────────── */
+.ic{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle}
+.ic-sm{width:14px;height:14px}
+.ic-lg{width:22px;height:22px}
+.ic-xl{width:28px;height:28px}
+
 .app{display:flex;height:100vh}
 
-/* ─── SIDEBAR ─────────────────────────────────────── */
-.sidebar{width:232px;flex-shrink:0;background:var(--bg-card);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:18px 14px}
-.brand{display:flex;align-items:center;gap:10px;padding:6px 6px 18px;border-bottom:1px solid var(--border);margin-bottom:14px}
-.brand-mark{width:34px;height:34px;border-radius:10px;background:var(--accent-grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;box-shadow:0 4px 12px rgba(109,92,245,.35)}
-.brand-name{font-size:15px;font-weight:600;color:var(--t1)}
-.brand-sub{font-size:9px;letter-spacing:.16em;color:var(--t3);text-transform:uppercase;margin-top:1px}
-.side-section{margin-bottom:6px}
-.side-label{font-size:10px;font-weight:600;letter-spacing:.1em;color:var(--t3);text-transform:uppercase;padding:8px 10px 6px}
-.nav{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:var(--r);color:var(--t2);cursor:pointer;font-size:13px;transition:all .15s;margin-bottom:2px;position:relative}
-.nav:hover{background:var(--bg-soft);color:var(--t1)}
-.nav.active{background:var(--bg-tint);color:var(--accent);font-weight:600}
-.nav.active::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:var(--accent)}
-.nav-ico{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
-.nav-badge{margin-left:auto;font-size:10px;font-weight:700;background:var(--accent-grad);color:#fff;border-radius:99px;padding:2px 7px;min-width:18px;text-align:center}
-.nav-badge.amber{background:linear-gradient(135deg,#f59e0b,#fbbf24)}
-.nav-sub{padding-left:36px;font-size:12px;color:var(--t2);padding-top:6px;padding-bottom:6px;cursor:pointer;border-radius:8px;margin-left:8px;margin-bottom:1px}
-.nav-sub:hover{color:var(--t1);background:var(--bg-soft)}
-.nav-sub.active{color:var(--accent);font-weight:500}
+/* ─── SIDEBAR ────────────────────────────────── */
+.sidebar{width:236px;flex-shrink:0;background:var(--bg-card);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:20px 14px}
+.brand{display:flex;align-items:center;gap:12px;padding:4px 8px 20px;margin-bottom:14px;border-bottom:1px solid var(--border)}
+.brand-mark{width:38px;height:38px;border-radius:11px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 4px 12px rgba(20,136,232,.35);position:relative;overflow:hidden}
+.brand-mark::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.35),transparent 60%)}
+.brand-mark svg{width:22px;height:22px;position:relative;z-index:1}
+.brand-name{font-size:16px;font-weight:600;color:var(--t1);letter-spacing:.02em}
+.brand-sub{font-size:9.5px;letter-spacing:.22em;color:var(--t3);text-transform:uppercase;margin-top:2px}
 
-.side-user{margin-top:auto;border-top:1px solid var(--border);padding-top:14px;display:flex;align-items:center;gap:10px;padding-left:6px;padding-right:6px}
-.user-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#fce7f3,#fbcfe8);display:flex;align-items:center;justify-content:center;color:var(--pink);font-weight:700;font-size:13px;border:2px solid #fff;box-shadow:var(--sh-sm)}
+.side-section{margin-bottom:4px}
+.side-label{font-size:10px;font-weight:600;letter-spacing:.12em;color:var(--t3);text-transform:uppercase;padding:10px 12px 6px}
+.nav{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--r);color:var(--t2);cursor:pointer;font-size:13px;transition:all .15s;margin-bottom:2px;position:relative;user-select:none}
+.nav:hover{background:var(--bg-soft);color:var(--t1)}
+.nav.active{background:var(--c50);color:var(--primary);font-weight:600}
+.nav.active::before{content:'';position:absolute;left:-14px;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:var(--grad)}
+.nav .ic{width:17px;height:17px}
+.nav-badge{margin-left:auto;font-size:10px;font-weight:700;background:var(--grad);color:#fff;border-radius:99px;padding:2px 8px;min-width:20px;text-align:center;letter-spacing:.02em}
+.nav-badge.warn{background:linear-gradient(135deg,#f59e0b,#d97706)}
+
+.side-user{margin-top:auto;border-top:1px solid var(--border);padding-top:16px;display:flex;align-items:center;gap:10px;padding-left:6px;padding-right:6px}
+.user-av{width:38px;height:38px;border-radius:50%;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;border:2px solid #fff;box-shadow:var(--sh-2);letter-spacing:.02em}
 .user-info{flex:1;min-width:0}
 .user-name{font-size:13px;color:var(--t1);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .user-role{font-size:11px;color:var(--t3)}
-.user-more{font-size:14px;color:var(--t3);cursor:pointer;padding:4px}
+.user-more{color:var(--t3);cursor:pointer;padding:4px;border-radius:6px}
+.user-more:hover{background:var(--bg-soft);color:var(--t1)}
 
-/* ─── MAIN ────────────────────────────────────────── */
+/* ─── MAIN ────────────────────────────────── */
 .main{flex:1;display:flex;flex-direction:column;min-width:0}
-.topbar{height:62px;display:flex;align-items:center;gap:14px;padding:0 28px;background:var(--bg-app);flex-shrink:0}
-.greeting{flex:1}
-.greet-hi{font-size:18px;font-weight:600;color:var(--t1)}
-.greet-sub{font-size:12px;color:var(--t3);margin-top:1px}
-.search{display:flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:8px 14px;width:280px;transition:all .15s;box-shadow:var(--sh-sm)}
-.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-.search-i{color:var(--t3);font-size:13px}
+.topbar{height:68px;display:flex;align-items:center;gap:14px;padding:0 30px;background:var(--bg-app);flex-shrink:0}
+.greet{flex:1;min-width:0}
+.greet-hi{font-size:19px;font-weight:600;color:var(--t1);letter-spacing:-.01em}
+.greet-sub{font-size:12.5px;color:var(--t3);margin-top:2px}
+.search{display:flex;align-items:center;gap:10px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:9px 14px;width:300px;transition:all .15s;box-shadow:var(--sh-1)}
+.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--c100)}
+.search .ic{color:var(--t-light);width:15px;height:15px}
 .search input{flex:1;border:none;outline:none;background:transparent;font-size:13px;color:var(--t1);font-family:inherit}
-.search input::placeholder{color:var(--t3)}
-.topbar-btn{width:38px;height:38px;border-radius:12px;background:var(--bg-card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;color:var(--t2);position:relative;box-shadow:var(--sh-sm);transition:all .15s}
-.topbar-btn:hover{border-color:var(--border-strong);color:var(--t1)}
-.topbar-dot{position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--rose);border:2px solid var(--bg-card)}
-.topbar-cta{background:var(--primary);color:#fff;border:none;border-radius:12px;padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:7px;box-shadow:var(--sh)}
-.topbar-cta:hover{background:var(--primary-hover)}
+.search input::placeholder{color:var(--t-light)}
+.icon-btn{width:40px;height:40px;border-radius:12px;background:var(--bg-card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);position:relative;box-shadow:var(--sh-1);transition:all .15s}
+.icon-btn:hover{border-color:var(--border-strong);color:var(--t1)}
+.icon-dot{position:absolute;top:9px;right:9px;width:7px;height:7px;border-radius:50%;background:var(--bad);border:2px solid var(--bg-card)}
+.cta{background:var(--grad);color:#fff;border:none;border-radius:12px;padding:10px 18px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:7px;box-shadow:0 4px 12px rgba(20,136,232,.32)}
+.cta:hover{filter:brightness(1.05)}
 
-/* 屏幕容器 */
-.screen{flex:1;overflow-y:auto;padding:8px 28px 28px}
+.screen{flex:1;overflow-y:auto;padding:6px 30px 28px;display:none}
+.screen.active{display:block;animation:fadeUp .3s ease}
 .screen::-webkit-scrollbar{width:6px}
 .screen::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:99px}
-.screen{display:none}
-.screen.active{display:block;animation:fadeUp .3s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
-/* ─── STATS ROW (类似截图) ───────────────────────── */
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
-.stat-card{background:var(--bg-card);border-radius:var(--r-xl);padding:18px 22px;display:flex;align-items:center;gap:16px;box-shadow:var(--sh-sm);position:relative;overflow:hidden}
-.stat-card.pink{background:linear-gradient(135deg,#fef0f3 0%,#fff 70%)}
-.stat-card.lavender{background:linear-gradient(135deg,#f3eefc 0%,#fff 70%)}
-.stat-card.mint{background:linear-gradient(135deg,#ecfdf5 0%,#fff 70%)}
-.stat-ico{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:rgba(255,255,255,.7);box-shadow:var(--sh-sm)}
-.stat-meta{font-size:12px;color:var(--t2);margin-bottom:3px}
-.stat-val{font-size:22px;font-weight:700;color:var(--t1);letter-spacing:-.02em}
-.stat-val .u{font-size:11px;color:var(--t3);font-weight:500;margin-left:6px;letter-spacing:0}
-.stat-trend{margin-left:auto;font-size:11px;color:var(--mint);background:var(--mint-soft);padding:3px 8px;border-radius:99px;font-weight:600}
+/* ─── STATS ROW ────────────────────────────────── */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+.stat-card{background:var(--bg-card);border-radius:var(--r-xl);padding:20px 22px;display:flex;align-items:center;gap:16px;box-shadow:var(--sh-1);position:relative;overflow:hidden;border:1px solid var(--border)}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad);opacity:.9}
+.stat-card.v2::before{background:linear-gradient(135deg,#3aa3f5,#1488e8)}
+.stat-card.v3::before{background:linear-gradient(135deg,#7ec3fb,#3aa3f5)}
+.stat-ico{width:48px;height:48px;border-radius:14px;background:var(--c50);color:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--c100)}
+.stat-ico .ic{width:22px;height:22px;stroke-width:1.8}
+.stat-meta{font-size:12px;color:var(--t2);margin-bottom:4px;font-weight:500}
+.stat-val{font-size:24px;font-weight:700;color:var(--t1);letter-spacing:-.02em;line-height:1.1}
+.stat-val .u{font-size:12px;color:var(--t3);font-weight:500;margin-left:6px;letter-spacing:0}
+.stat-trend{margin-left:auto;font-size:11px;color:var(--ok);background:var(--ok-soft);padding:4px 9px;border-radius:99px;font-weight:600;display:flex;align-items:center;gap:3px}
 
-/* ─── PANEL ─────────────────────────────────────── */
-.panel{background:var(--bg-card);border-radius:var(--r-xl);padding:20px 22px;margin-bottom:14px;box-shadow:var(--sh-sm)}
-.panel-head{display:flex;align-items:center;margin-bottom:14px;gap:12px}
-.panel-title{font-size:15px;font-weight:600;color:var(--t1)}
-.panel-tag{font-size:11px;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:99px;font-weight:600}
-.panel-action{margin-left:auto;font-size:12px;color:var(--t3);cursor:pointer;display:flex;align-items:center;gap:4px}
-.panel-action:hover{color:var(--accent)}
-.panel-pill{background:var(--bg-soft);border:1px solid var(--border);border-radius:8px;padding:5px 11px;font-size:12px;color:var(--t2);cursor:pointer;font-family:inherit}
+/* ─── PANEL ────────────────────────────────── */
+.panel{background:var(--bg-card);border-radius:var(--r-xl);padding:22px 24px;margin-bottom:14px;box-shadow:var(--sh-1);border:1px solid var(--border)}
+.panel-head{display:flex;align-items:center;margin-bottom:16px;gap:12px}
+.panel-title{font-size:15px;font-weight:600;color:var(--t1);letter-spacing:-.005em}
+.panel-tag{font-size:11px;color:var(--primary);background:var(--c50);padding:3px 9px;border-radius:99px;font-weight:600;border:1px solid var(--c100)}
+.panel-link{margin-left:auto;font-size:12.5px;color:var(--primary);cursor:pointer;display:flex;align-items:center;gap:4px;font-weight:500}
+.panel-link:hover{text-decoration:underline}
+.panel-pill{background:var(--bg-soft);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--t2);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px}
 .panel-pill:hover{border-color:var(--accent);color:var(--accent)}
 
-/* ─── TWO-COL LAYOUT ─────────────────────────────── */
+/* ─── COLS ────────────────────────────────── */
 .cols{display:grid;grid-template-columns:1fr 360px;gap:14px}
 .col-left{display:flex;flex-direction:column;gap:14px;min-width:0}
 .col-right{display:flex;flex-direction:column;gap:14px}
 
-/* ─── CHART (任务趋势) ───────────────────────────── */
-.chart-wrap{height:200px;position:relative;padding:8px 0 20px}
-.chart-grid{position:absolute;inset:8px 0 20px 30px;display:flex;flex-direction:column;justify-content:space-between}
-.chart-grid-line{border-top:1px dashed var(--border);font-size:10px;color:var(--t3);margin-top:-5px;padding-left:0;position:relative}
-.chart-grid-line span{position:absolute;left:-26px;background:var(--bg-card);padding-right:4px;top:-6px}
-.chart-bars{position:absolute;left:30px;right:0;bottom:20px;top:8px;display:flex;align-items:flex-end;justify-content:space-around;gap:6px}
-.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;position:relative}
-.bar{width:64%;border-radius:8px 8px 4px 4px;background:linear-gradient(180deg,#ede9fe 0%,#c4b5fd 100%);transition:all .2s;position:relative}
-.bar-col:hover .bar{background:var(--accent-grad)}
-.bar.hot{background:var(--accent-grad);box-shadow:0 -4px 16px rgba(109,92,245,.35)}
-.bar-bubble{position:absolute;top:-26px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap}
+/* ─── CHART ────────────────────────────────── */
+.chart-wrap{height:200px;position:relative;padding:8px 0 24px 32px}
+.chart-grid{position:absolute;inset:8px 0 24px 32px;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none}
+.chart-grid-line{border-top:1px dashed var(--border);position:relative}
+.chart-grid-line span{position:absolute;left:-28px;top:-6px;font-size:10px;color:var(--t3);background:var(--bg-card);padding-right:4px}
+.chart-bars{position:absolute;left:32px;right:0;bottom:24px;top:8px;display:flex;align-items:flex-end;justify-content:space-around;gap:8px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;cursor:pointer;position:relative;height:100%;justify-content:flex-end}
+.bar{width:60%;border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,#dbeefe 0%,#7ec3fb 100%);transition:all .2s}
+.bar-col:hover .bar{background:var(--grad)}
+.bar.hot{background:var(--grad);box-shadow:0 -6px 18px rgba(20,136,232,.4)}
+.bar-bubble{position:absolute;top:-28px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;white-space:nowrap}
 .bar-bubble::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:var(--primary)}
-.bar-day{font-size:11px;color:var(--t3);position:absolute;bottom:-18px}
-.chart-legend{display:flex;gap:14px;align-items:center;font-size:11px;color:var(--t3);margin-top:4px}
-.legend-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.bar-day{font-size:11px;color:var(--t3);position:absolute;bottom:-20px;left:0;right:0;text-align:center}
 
-/* ─── TASK TABLE ─────────────────────────────────── */
-.tbl-wrap{overflow-x:auto;border-radius:12px}
+/* ─── TABLE ────────────────────────────────── */
+.tbl-wrap{overflow-x:auto;border-radius:12px;margin:0 -4px}
 table{width:100%;border-collapse:collapse}
-thead th{font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.05em;text-transform:uppercase;text-align:left;padding:10px 14px;border-bottom:1px solid var(--border);white-space:nowrap}
-tbody td{padding:13px 14px;font-size:13px;color:var(--t2);border-bottom:1px solid var(--border)}
+thead th{font-size:10.5px;font-weight:600;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;text-align:left;padding:11px 14px;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--bg-soft)}
+thead th:first-child{border-radius:8px 0 0 0}
+thead th:last-child{border-radius:0 8px 0 0}
+tbody td{padding:14px;font-size:13px;color:var(--t2);border-bottom:1px solid var(--border)}
 tbody tr:last-child td{border-bottom:none}
-tbody tr{transition:background .15s}
+tbody tr{transition:background .15s;cursor:pointer}
 tbody tr:hover td{background:var(--bg-soft)}
-.cell-name{display:flex;align-items:center;gap:10px;color:var(--t1);font-weight:500}
-.cell-ico{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.ci-pink{background:var(--pink-soft);color:var(--pink)}
-.ci-lav{background:var(--accent-soft);color:var(--accent)}
-.ci-mint{background:var(--mint-soft);color:var(--mint)}
-.ci-sky{background:var(--sky-soft);color:var(--sky)}
-.ci-amber{background:var(--amber-soft);color:var(--amber)}
+.cell-name{display:flex;align-items:center;gap:11px;color:var(--t1);font-weight:500}
+.cell-ico{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--c50);color:var(--primary);border:1px solid var(--c100)}
+.cell-ico .ic{width:16px;height:16px;stroke-width:1.8}
+.cell-ico.v-warn{background:var(--warn-soft);color:var(--warn);border-color:#fde68a}
+.cell-ico.v-ok{background:var(--ok-soft);color:var(--ok);border-color:#a7f3d0}
+.cell-ico.v-bad{background:var(--bad-soft);color:var(--bad);border-color:#fecaca}
+.cell-ico.v-info{background:var(--c100);color:var(--c600);border-color:var(--c200)}
+.cell-ico.v-neut{background:var(--neut-soft);color:var(--neut);border-color:#e2e8f0}
 
-.progress-ring{width:30px;height:30px;border-radius:50%;background:conic-gradient(var(--accent) var(--p,60%),var(--bg-tint) 0);display:flex;align-items:center;justify-content:center;font-size:0;position:relative}
-.progress-ring::after{content:'';width:22px;height:22px;background:var(--bg-card);border-radius:50%;position:absolute}
-.progress-ring span{position:relative;z-index:1;font-size:9px;color:var(--accent);font-weight:700}
+.progress-ring{width:32px;height:32px;border-radius:50%;background:conic-gradient(var(--accent) var(--p,60%),var(--bg-tint) 0);display:flex;align-items:center;justify-content:center;position:relative}
+.progress-ring::after{content:'';width:24px;height:24px;background:var(--bg-card);border-radius:50%;position:absolute}
+.progress-ring span{position:relative;z-index:1;font-size:9px;color:var(--primary);font-weight:700}
 
-.status-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:4px 10px;border-radius:99px;font-weight:500;white-space:nowrap}
+.status-pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;padding:4px 10px;border-radius:99px;font-weight:500;white-space:nowrap;border:1px solid transparent}
 .sp-dot{width:5px;height:5px;border-radius:50%}
-.sp-done{background:var(--mint-soft);color:var(--mint)}
-.sp-done .sp-dot{background:var(--mint)}
-.sp-running{background:var(--sky-soft);color:var(--sky)}
-.sp-running .sp-dot{background:var(--sky);animation:blink 1.2s infinite}
-.sp-review{background:var(--amber-soft);color:var(--amber)}
-.sp-review .sp-dot{background:var(--amber)}
-.sp-queue{background:var(--bg-tint);color:var(--t2)}
-.sp-queue .sp-dot{background:var(--t3)}
-.sp-fail{background:var(--rose-soft);color:var(--rose)}
-.sp-fail .sp-dot{background:var(--rose)}
-.sp-draft{background:#f1f5f9;color:#64748b}
+.sp-done{background:var(--ok-soft);color:var(--ok);border-color:#a7f3d0}
+.sp-done .sp-dot{background:var(--ok)}
+.sp-running{background:var(--c100);color:var(--c700);border-color:var(--c200)}
+.sp-running .sp-dot{background:var(--accent);animation:pulse 1.4s infinite}
+.sp-review{background:var(--warn-soft);color:var(--warn);border-color:#fde68a}
+.sp-review .sp-dot{background:var(--warn)}
+.sp-queue{background:var(--neut-soft);color:var(--neut);border-color:#e2e8f0}
+.sp-queue .sp-dot{background:var(--neut)}
+.sp-fail{background:var(--bad-soft);color:var(--bad);border-color:#fecaca}
+.sp-fail .sp-dot{background:var(--bad)}
+.sp-draft{background:#f1f5f9;color:#64748b;border-color:#e2e8f0}
 .sp-draft .sp-dot{background:#64748b}
-@keyframes blink{0%,100%{opacity:.4}50%{opacity:1}}
+@keyframes pulse{0%,100%{opacity:.4;transform:scale(.85)}50%{opacity:1;transform:scale(1.1)}}
 
-.row-more{background:none;border:none;color:var(--t3);font-size:16px;cursor:pointer;padding:4px 6px;border-radius:6px}
-.row-more:hover{background:var(--bg-soft);color:var(--t1)}
+.row-btn{background:transparent;border:none;color:var(--t3);cursor:pointer;padding:6px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center}
+.row-btn:hover{background:var(--bg-soft);color:var(--primary)}
 
-/* ─── CARE TEAM / 协作 ───────────────────────────── */
-.care-list{display:flex;flex-direction:column;gap:10px}
-.care-row{display:flex;align-items:center;gap:11px}
-.care-av{width:38px;height:38px;border-radius:50%;background:var(--bg-tint);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--accent);flex-shrink:0;border:2px solid #fff;box-shadow:var(--sh-sm)}
-.care-av.a1{background:linear-gradient(135deg,#fce7f3,#fbcfe8);color:var(--pink)}
-.care-av.a2{background:linear-gradient(135deg,#ede9fe,#ddd6fe);color:var(--accent)}
-.care-av.a3{background:linear-gradient(135deg,#dbeafe,#bfdbfe);color:var(--sky)}
-.care-av.a4{background:linear-gradient(135deg,#d1fae5,#a7f3d0);color:var(--mint)}
+/* ─── CARE TEAM ────────────────────────────────── */
+.care-list{display:flex;flex-direction:column;gap:12px}
+.care-row{display:flex;align-items:center;gap:12px}
+.care-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0;border:2px solid #fff;box-shadow:var(--sh-1);letter-spacing:.02em}
+.care-av.g1{background:linear-gradient(135deg,#3aa3f5,#0a58a8)}
+.care-av.g2{background:linear-gradient(135deg,#7ec3fb,#1488e8)}
+.care-av.g3{background:linear-gradient(135deg,#1488e8,#0c4886)}
+.care-av.g4{background:linear-gradient(135deg,#b6dcfd,#3aa3f5)}
 .care-info{flex:1;min-width:0}
 .care-name{font-size:13px;color:var(--t1);font-weight:500}
 .care-mail{font-size:11px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.care-msg{width:30px;height:30px;border-radius:8px;background:var(--bg-soft);display:flex;align-items:center;justify-content:center;color:var(--t3);cursor:pointer;font-size:13px}
-.care-msg:hover{background:var(--accent-soft);color:var(--accent)}
-.care-add{margin-top:6px;width:100%;padding:11px;border:1px dashed var(--border-strong);background:transparent;border-radius:12px;color:var(--t2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit}
-.care-add:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.care-action{width:32px;height:32px;border-radius:8px;background:var(--bg-soft);display:flex;align-items:center;justify-content:center;color:var(--t3);cursor:pointer}
+.care-action:hover{background:var(--c50);color:var(--primary)}
+.care-add{margin-top:6px;width:100%;padding:11px;border:1px dashed var(--border-strong);background:transparent;border-radius:12px;color:var(--t2);font-size:12.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit}
+.care-add:hover{border-color:var(--accent);color:var(--accent);background:var(--c50)}
 
-/* ─── SKILL MARKETPLACE ──────────────────────────── */
-.market-filter{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
-.chip{background:var(--bg-card);border:1px solid var(--border);border-radius:99px;padding:7px 16px;font-size:12px;color:var(--t2);cursor:pointer;font-family:inherit;transition:all .15s}
+/* ─── MARKET ────────────────────────────────── */
+.market-filter{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.chip{background:var(--bg-card);border:1px solid var(--border);border-radius:99px;padding:7px 16px;font-size:12.5px;color:var(--t2);cursor:pointer;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
 .chip:hover{border-color:var(--accent);color:var(--accent)}
-.chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.chip.active{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 4px 10px rgba(20,136,232,.25)}
 
 .skill-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.skill-card{background:var(--bg-card);border-radius:var(--r-xl);padding:20px;box-shadow:var(--sh-sm);position:relative;transition:all .2s;cursor:pointer;border:1px solid transparent}
-.skill-card:hover{transform:translateY(-2px);box-shadow:var(--sh-md);border-color:var(--accent-soft)}
-.skill-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
-.skill-ico{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.skill-card{background:var(--bg-card);border-radius:var(--r-xl);padding:22px;box-shadow:var(--sh-1);position:relative;transition:all .2s;cursor:pointer;border:1px solid var(--border)}
+.skill-card:hover{transform:translateY(-2px);box-shadow:var(--sh-3);border-color:var(--c200)}
+.skill-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.skill-ico{width:48px;height:48px;border-radius:14px;background:var(--grad-soft);color:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--c100)}
+.skill-ico .ic{width:22px;height:22px}
+.skill-ico.v2{background:linear-gradient(135deg,#dbeefe,#b6dcfd);color:var(--c700)}
+.skill-ico.v3{background:linear-gradient(135deg,#b6dcfd,#7ec3fb);color:var(--c800)}
 .skill-name{font-size:14px;font-weight:600;color:var(--t1);margin-bottom:3px}
 .skill-cat{font-size:11px;color:var(--t3)}
-.skill-desc{font-size:12px;color:var(--t2);line-height:1.6;min-height:38px;margin-bottom:14px}
-.skill-foot{display:flex;align-items:center;gap:8px}
-.skill-stat{font-size:11px;color:var(--t3);display:flex;align-items:center;gap:3px}
-.skill-btn{margin-left:auto;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
+.skill-desc{font-size:12.5px;color:var(--t2);line-height:1.6;min-height:42px;margin-bottom:16px}
+.skill-foot{display:flex;align-items:center;gap:10px}
+.skill-stat{font-size:11px;color:var(--t3);display:inline-flex;align-items:center;gap:4px}
+.skill-btn{margin-left:auto;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
 .skill-btn-use{background:var(--primary);color:#fff}
-.skill-btn-use:hover{background:var(--primary-hover)}
-.skill-btn-apply{background:var(--accent-soft);color:var(--accent)}
-.skill-btn-apply:hover{background:var(--accent);color:#fff}
-.skill-btn-pending{background:var(--amber-soft);color:var(--amber);cursor:default}
-.skill-corner{position:absolute;top:14px;right:14px;width:22px;height:22px;border-radius:50%;background:var(--mint);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;box-shadow:0 2px 6px rgba(16,185,129,.4)}
+.skill-btn-use:hover{background:var(--c800)}
+.skill-btn-apply{background:var(--c50);color:var(--primary);border:1px solid var(--c100)}
+.skill-btn-apply:hover{background:var(--accent);color:#fff;border-color:transparent}
+.skill-btn-pending{background:var(--warn-soft);color:var(--warn);cursor:default;border:1px solid #fde68a}
+.skill-corner{position:absolute;top:14px;right:14px;width:22px;height:22px;border-radius:50%;background:var(--ok);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(14,159,110,.35)}
+.skill-corner .ic{width:12px;height:12px;stroke-width:2.5}
 
-/* ─── WIZARD (新建任务) ──────────────────────────── */
-.wizard-steps{display:flex;align-items:center;gap:0;margin-bottom:22px;padding:0 4px}
+/* ─── WIZARD ────────────────────────────────── */
+.wizard-steps{display:flex;align-items:center;margin-bottom:24px;padding:4px 8px}
 .ws-step{display:flex;align-items:center;gap:10px;color:var(--t3);font-size:13px;font-weight:500}
-.ws-num{width:28px;height:28px;border-radius:50%;background:var(--bg-tint);color:var(--t3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:2px solid var(--bg-card);flex-shrink:0}
-.ws-step.done .ws-num{background:var(--mint);color:#fff}
+.ws-num{width:30px;height:30px;border-radius:50%;background:var(--bg-tint);color:var(--t3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:2px solid var(--bg-card);flex-shrink:0}
+.ws-step.done .ws-num{background:var(--ok);color:#fff}
+.ws-step.done .ws-num .ic{width:14px;height:14px;stroke-width:2.5}
 .ws-step.active{color:var(--t1)}
-.ws-step.active .ws-num{background:var(--accent-grad);color:#fff;box-shadow:0 0 0 4px var(--accent-soft)}
-.ws-line{flex:1;height:2px;background:var(--border);margin:0 12px;border-radius:2px;position:relative;overflow:hidden}
-.ws-line.done{background:var(--mint)}
+.ws-step.active .ws-num{background:var(--grad);color:#fff;box-shadow:0 0 0 4px var(--c100)}
+.ws-line{flex:1;height:2px;background:var(--border);margin:0 14px;border-radius:2px}
+.ws-line.done{background:var(--ok)}
 
-.wiz-pick{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px}
-.wiz-pick-card{background:var(--bg-soft);border:1.5px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;text-align:center;transition:all .15s}
-.wiz-pick-card:hover{border-color:var(--accent);background:var(--accent-soft)}
-.wiz-pick-card.selected{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px var(--accent-soft)}
-.wiz-pick-ico{font-size:24px;margin-bottom:6px}
-.wiz-pick-name{font-size:13px;font-weight:600;color:var(--t1)}
+.selected-skill-bar{display:flex;align-items:center;gap:14px;background:var(--grad-soft);border:1px solid var(--c100);padding:14px 18px;border-radius:14px;margin-bottom:20px}
+.selected-skill-bar .cell-ico{width:42px;height:42px;background:#fff}
+.selected-skill-bar .cell-ico .ic{width:20px;height:20px}
 
-/* 上传区 */
-.upload{border:1.5px dashed var(--border-strong);border-radius:14px;padding:28px;text-align:center;background:var(--bg-soft);cursor:pointer;transition:all .15s}
-.upload:hover{border-color:var(--accent);background:var(--accent-soft)}
-.upload-ico{font-size:32px;color:var(--accent);margin-bottom:8px}
-.upload-t{font-size:13px;color:var(--t1);font-weight:500;margin-bottom:3px}
-.upload-s{font-size:11px;color:var(--t3)}
-.upload-file{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-top:8px}
-.uf-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--mint-soft);color:var(--mint);font-size:12px;font-weight:700}
-.uf-info{flex:1;min-width:0}
-.uf-n{font-size:13px;color:var(--t1);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.uf-m{font-size:11px;color:var(--t3)}
-.uf-x{color:var(--t3);font-size:14px;cursor:pointer;padding:4px}
-.uf-x:hover{color:var(--rose)}
+/* 工作区文件多选 */
+.ws-picker{border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.ws-picker-head{background:var(--bg-soft);padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.ws-tabs{display:flex;gap:4px}
+.ws-tab{padding:6px 14px;border-radius:8px;font-size:12px;color:var(--t2);cursor:pointer;font-weight:500}
+.ws-tab.active{background:#fff;color:var(--primary);box-shadow:var(--sh-1)}
+.ws-search{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:5px 10px;margin-left:auto;width:200px}
+.ws-search input{flex:1;border:none;outline:none;font-size:12px;font-family:inherit;background:transparent}
+.ws-crumb{padding:10px 16px;font-size:12px;color:var(--t3);background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.ws-crumb b{color:var(--t1);font-weight:600}
+.ws-list{max-height:300px;overflow-y:auto;background:#fff}
+.ws-list::-webkit-scrollbar{width:5px}
+.ws-list::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:99px}
+.ws-row{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
+.ws-row:hover{background:var(--bg-soft)}
+.ws-row.checked{background:var(--c50)}
+.ws-row:last-child{border-bottom:none}
+.ws-check{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border-strong);background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s}
+.ws-check.on{background:var(--grad);border-color:transparent}
+.ws-check.on::after{content:'';width:9px;height:5px;border:2px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px);display:block}
+.ws-fic{width:30px;height:30px;border-radius:8px;background:var(--c50);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;letter-spacing:.02em;border:1px solid var(--c100)}
+.ws-fic.t-pdf{background:#fee2e2;color:#dc2626;border-color:#fecaca}
+.ws-fic.t-doc{background:#dbeafe;color:#1d4ed8;border-color:#bfdbfe}
+.ws-fic.t-csv{background:#fef3c7;color:#d97706;border-color:#fde68a}
+.ws-fic.t-folder{background:var(--c50);color:var(--primary);border-color:var(--c100)}
+.ws-fname{flex:1;font-size:13px;color:var(--t1);font-weight:500;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ws-fmeta{font-size:11px;color:var(--t3);white-space:nowrap}
+.ws-fmeta b{font-weight:500;color:var(--t2)}
+.ws-picker-foot{padding:12px 16px;background:var(--bg-soft);border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--t2)}
+.ws-picker-foot b{color:var(--primary);font-weight:600}
+.ws-picker-foot .upload-link{margin-left:auto;color:var(--primary);cursor:pointer;font-weight:500;display:inline-flex;align-items:center;gap:4px}
+.ws-picker-foot .upload-link:hover{text-decoration:underline}
 
-/* 自然语言指令对话框 */
-.nl-box{background:var(--bg-soft);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:12px}
+/* 选中预览条 */
+.selected-files{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+.sf-row{display:flex;align-items:center;gap:10px;background:var(--c50);border:1px solid var(--c100);border-radius:10px;padding:9px 12px}
+.sf-row .ws-fic{width:26px;height:26px;font-size:9px}
+.sf-name{flex:1;font-size:12.5px;color:var(--t1);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sf-meta{font-size:11px;color:var(--t3)}
+.sf-x{color:var(--t3);cursor:pointer;padding:4px;border-radius:6px}
+.sf-x:hover{background:#fff;color:var(--bad)}
+
+/* 自然语言对话 */
+.nl-box{background:var(--bg-soft);border:1px solid var(--border);border-radius:14px;padding:16px;margin-top:14px}
 .nl-msg{display:flex;gap:10px;margin-bottom:12px;align-items:flex-start}
-.nl-av{width:28px;height:28px;border-radius:8px;background:var(--accent-grad);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
-.nl-av.you{background:linear-gradient(135deg,#fce7f3,#fbcfe8);color:var(--pink)}
-.nl-text{flex:1;font-size:13px;color:var(--t1);line-height:1.6;background:#fff;border-radius:10px;padding:10px 12px;border:1px solid var(--border)}
+.nl-av{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
+.nl-av.ai{background:var(--grad)}
+.nl-av.ai .ic{width:16px;height:16px;stroke-width:2}
+.nl-av.you{background:linear-gradient(135deg,#cbd9e8,#8a9bb1);color:#fff}
+.nl-av.you .ic{width:16px;height:16px;stroke-width:2}
+.nl-text{flex:1;font-size:13px;color:var(--t1);line-height:1.65;background:#fff;border-radius:11px;padding:11px 13px;border:1px solid var(--border)}
+.nl-text.you{background:var(--c50);border-color:var(--c100)}
 .nl-input-row{display:flex;gap:8px;align-items:flex-end;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:10px 12px;transition:all .15s}
-.nl-input-row:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-.nl-input{flex:1;border:none;outline:none;font-size:13px;color:var(--t1);font-family:inherit;background:transparent;resize:none;min-height:20px;max-height:80px}
-.nl-send{width:32px;height:32px;border-radius:8px;background:var(--accent-grad);border:none;color:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nl-input-row:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--c100)}
+.nl-input{flex:1;border:none;outline:none;font-size:13px;color:var(--t1);font-family:inherit;background:transparent;resize:none;min-height:22px;max-height:80px}
+.nl-send{width:34px;height:34px;border-radius:9px;background:var(--grad);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 
-.wiz-foot{display:flex;justify-content:space-between;margin-top:18px;gap:10px}
-.btn{padding:10px 22px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;border:none;transition:all .15s}
+.wiz-foot{display:flex;justify-content:space-between;margin-top:22px;gap:10px}
+.btn{padding:10px 22px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
 .btn-ghost{background:transparent;color:var(--t2);border:1px solid var(--border)}
-.btn-ghost:hover{border-color:var(--border-strong);color:var(--t1)}
+.btn-ghost:hover{border-color:var(--border-strong);color:var(--t1);background:var(--bg-soft)}
 .btn-primary{background:var(--primary);color:#fff}
-.btn-primary:hover{background:var(--primary-hover)}
-.btn-accent{background:var(--accent-grad);color:#fff;box-shadow:0 4px 12px rgba(109,92,245,.3)}
+.btn-primary:hover{background:var(--c800)}
+.btn-accent{background:var(--grad);color:#fff;box-shadow:0 4px 12px rgba(20,136,232,.3)}
+.btn-accent:hover{filter:brightness(1.05)}
 
-/* ─── 执行详情 (含侧栏对话/文件) ─────────────────── */
-.exec-layout{display:grid;grid-template-columns:1fr 340px;gap:14px;height:calc(100vh - 110px)}
+/* ─── EXEC ────────────────────────────────── */
+.exec-layout{display:grid;grid-template-columns:1fr 360px;gap:14px;height:calc(100vh - 110px)}
 .exec-layout.collapsed{grid-template-columns:1fr 0}
-.exec-main{overflow-y:auto;display:flex;flex-direction:column;gap:14px}
-.exec-side{background:var(--bg-card);border-radius:var(--r-xl);box-shadow:var(--sh-sm);display:flex;flex-direction:column;overflow:hidden;transition:all .25s}
-.exec-side-tabs{display:flex;border-bottom:1px solid var(--border);padding:6px 8px 0;align-items:center;gap:4px}
-.es-tab{padding:10px 14px;font-size:12px;color:var(--t2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:6px;font-weight:500}
-.es-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
-.es-collapse{margin-left:auto;width:28px;height:28px;border-radius:8px;background:var(--bg-soft);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t3);font-size:12px;margin-bottom:6px}
-.es-body{flex:1;overflow-y:auto;padding:14px}
+.exec-main{overflow-y:auto;display:flex;flex-direction:column;gap:14px;padding-right:2px}
+.exec-side{background:var(--bg-card);border-radius:var(--r-xl);box-shadow:var(--sh-1);border:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:all .25s}
+.exec-side-tabs{display:flex;border-bottom:1px solid var(--border);padding:6px 10px 0;align-items:center;gap:4px}
+.es-tab{padding:11px 14px;font-size:12.5px;color:var(--t2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:7px;font-weight:500}
+.es-tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+.es-collapse{margin-left:auto;width:30px;height:30px;border-radius:8px;background:var(--bg-soft);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t3);margin-bottom:6px}
+.es-collapse:hover{color:var(--primary)}
+.es-body{flex:1;overflow-y:auto;padding:16px}
+.es-body::-webkit-scrollbar{width:5px}
+.es-body::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:99px}
 
-.chat-msg{margin-bottom:12px}
-.chat-meta{font-size:10px;color:var(--t3);font-weight:600;margin-bottom:3px;letter-spacing:.05em;text-transform:uppercase}
-.chat-bubble{font-size:12.5px;line-height:1.6;padding:10px 12px;border-radius:12px;max-width:92%}
-.chat-bubble.ai{background:var(--bg-tint);color:var(--t1);border:1px solid var(--border);border-bottom-left-radius:3px}
-.chat-bubble.user{background:var(--accent-grad);color:#fff;margin-left:auto;border-bottom-right-radius:3px}
-.chat-row.user{display:flex;justify-content:flex-end}
+.chat-msg{margin-bottom:14px}
+.chat-meta{font-size:10px;color:var(--t3);font-weight:600;margin-bottom:4px;letter-spacing:.06em;text-transform:uppercase}
+.chat-bubble{font-size:12.5px;line-height:1.65;padding:11px 13px;border-radius:12px;max-width:92%}
+.chat-bubble.ai{background:var(--bg-tint);color:var(--t1);border:1px solid var(--c100);border-bottom-left-radius:3px}
+.chat-bubble.user{background:var(--grad);color:#fff;border-bottom-right-radius:3px}
+.chat-row.user{display:flex;flex-direction:column;align-items:flex-end}
+.chat-row.user .chat-meta{text-align:right}
 
-.es-files{display:flex;flex-direction:column;gap:8px}
-.es-file{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-soft);border-radius:10px;cursor:pointer;transition:all .15s}
-.es-file:hover{background:var(--accent-soft)}
-.es-file-group{font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin:8px 4px 4px}
+.es-file-group{font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin:10px 4px 6px}
+.es-file{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-soft);border-radius:10px;cursor:pointer;transition:all .15s;margin-bottom:6px;border:1px solid transparent}
+.es-file:hover{background:var(--c50);border-color:var(--c100)}
 
-/* 进度卡片 */
-.progress-card{background:var(--bg-card);border-radius:var(--r-xl);padding:20px 22px;box-shadow:var(--sh-sm)}
+.progress-card{background:var(--bg-card);border-radius:var(--r-xl);padding:22px 24px;box-shadow:var(--sh-1);border:1px solid var(--border)}
 .pc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .pc-name{font-size:15px;font-weight:600;color:var(--t1);display:flex;align-items:center;gap:10px}
-.pc-name .cell-ico{width:38px;height:38px}
-.pc-pct{font-size:22px;font-weight:700;color:var(--accent);letter-spacing:-.02em}
-.pc-bar{height:8px;background:var(--bg-tint);border-radius:99px;overflow:hidden;margin-bottom:18px;position:relative}
-.pc-bar-fill{height:100%;border-radius:99px;background:var(--accent-grad);position:relative;overflow:hidden}
+.pc-pct{font-size:24px;font-weight:700;color:var(--primary);letter-spacing:-.02em}
+.pc-bar{height:8px;background:var(--bg-tint);border-radius:99px;overflow:hidden;margin-bottom:20px;position:relative}
+.pc-bar-fill{height:100%;border-radius:99px;background:var(--grad);position:relative;overflow:hidden}
 .pc-bar-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);animation:shimmer 2s infinite}
 @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
-.pc-step{display:flex;align-items:center;gap:12px;padding:8px 0;font-size:13px}
-.pc-step-ic{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
-.pc-step-ic.done{background:var(--mint);color:#fff}
-.pc-step-ic.active{background:var(--accent-grad);color:#fff;box-shadow:0 0 0 4px var(--accent-soft)}
+.pc-step{display:flex;align-items:center;gap:14px;padding:10px 0;font-size:13px}
+.pc-step-ic{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.pc-step-ic.done{background:var(--ok);color:#fff}
+.pc-step-ic.done .ic{width:13px;height:13px;stroke-width:3}
+.pc-step-ic.active{background:var(--grad);color:#fff;box-shadow:0 0 0 4px var(--c100)}
+.pc-step-ic.active .ic{width:13px;height:13px;animation:spin 1.5s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .pc-step-ic.pending{background:var(--bg-tint);color:var(--t3)}
 .pc-step-t{flex:1;color:var(--t1)}
 .pc-step.pending .pc-step-t{color:var(--t3)}
 .pc-step-time{font-size:11px;color:var(--t3)}
+.pc-step.active .pc-step-time{color:var(--primary);font-weight:500}
 
-/* 审核 toolbar / 表格 */
-.review-toolbar{background:var(--bg-card);border-radius:var(--r-xl);padding:12px 18px;display:flex;align-items:center;gap:10px;box-shadow:var(--sh-sm)}
-.flag-icon{width:18px;height:18px;border-radius:6px;background:var(--amber-soft);color:var(--amber);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:1px solid #fde68a}
-.confirm-btn{font-size:11px;padding:5px 12px;border-radius:8px;cursor:pointer;background:var(--bg-card);border:1px solid var(--border);color:var(--t2);font-family:inherit}
-.confirm-btn:hover{border-color:var(--mint);color:var(--mint);background:var(--mint-soft)}
-.confirm-btn.done{background:var(--mint-soft);border-color:var(--mint);color:var(--mint);font-weight:600}
+/* ─── REVIEW ────────────────────────────────── */
+.review-toolbar{background:var(--bg-card);border-radius:var(--r-xl);padding:12px 18px;display:flex;align-items:center;gap:10px;box-shadow:var(--sh-1);border:1px solid var(--border)}
+.flag-icon{width:18px;height:18px;border-radius:5px;background:var(--warn-soft);color:var(--warn);display:flex;align-items:center;justify-content:center;border:1px solid #fde68a;flex-shrink:0}
+.flag-icon .ic{width:11px;height:11px;stroke-width:2.5}
+.confirm-btn{font-size:11.5px;padding:6px 13px;border-radius:8px;cursor:pointer;background:var(--bg-card);border:1px solid var(--border-strong);color:var(--t2);font-family:inherit;display:inline-flex;align-items:center;gap:4px;transition:all .15s}
+.confirm-btn:hover{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+.confirm-btn.done{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);font-weight:600}
 
-/* 文件管理 */
-.file-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:14px}
-.fb-crumb{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--t2)}
+/* ─── FILES ────────────────────────────────── */
+.file-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.fb-crumb{display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--t2)}
 .fb-crumb b{color:var(--t1);font-weight:600}
-.fb-crumb .sep{color:var(--t3)}
-.file-table .cell-ico{font-size:13px}
-.fi-tag{font-size:10px;padding:2px 6px;border-radius:4px;background:var(--bg-tint);color:var(--t2);margin-left:6px;font-weight:500}
+.fb-crumb .ic{width:14px;height:14px;color:var(--t-light)}
+.fi-tag{font-size:10px;padding:3px 8px;border-radius:5px;background:var(--bg-tint);color:var(--t2);margin-left:6px;font-weight:500;border:1px solid var(--border)}
+.fi-tag.out{background:var(--ok-soft);color:var(--ok);border-color:#a7f3d0}
+.fi-tag.in{background:var(--c50);color:var(--primary);border-color:var(--c100)}
 
-/* 通知 */
-.notif-list{display:flex;flex-direction:column;gap:8px}
-.notif{background:var(--bg-card);border-radius:14px;padding:14px 18px;display:flex;gap:14px;box-shadow:var(--sh-sm);transition:all .15s;cursor:pointer;border-left:3px solid transparent}
-.notif:hover{box-shadow:var(--sh-md)}
-.notif.unread{border-left-color:var(--accent);background:linear-gradient(90deg,var(--accent-soft) 0%,#fff 8%)}
-.notif-ic{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+/* ─── NOTIF ────────────────────────────────── */
+.notif-list{display:flex;flex-direction:column;gap:10px}
+.notif{background:var(--bg-card);border-radius:14px;padding:16px 20px;display:flex;gap:14px;box-shadow:var(--sh-1);border:1px solid var(--border);cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.notif:hover{box-shadow:var(--sh-2)}
+.notif.unread{border-left-color:var(--accent)}
+.notif-ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--c50);color:var(--primary);border:1px solid var(--c100)}
+.notif-ic.ok{background:var(--ok-soft);color:var(--ok);border-color:#a7f3d0}
+.notif-ic.warn{background:var(--warn-soft);color:var(--warn);border-color:#fde68a}
+.notif-ic.bad{background:var(--bad-soft);color:var(--bad);border-color:#fecaca}
 .notif-body{flex:1;min-width:0}
-.notif-t{font-size:13px;color:var(--t1);font-weight:500;margin-bottom:3px}
-.notif-d{font-size:12px;color:var(--t2);line-height:1.5}
+.notif-t{font-size:13.5px;color:var(--t1);font-weight:500;margin-bottom:4px}
+.notif-d{font-size:12.5px;color:var(--t2);line-height:1.55}
 .notif-time{font-size:11px;color:var(--t3);white-space:nowrap}
 
-/* 组织管理 子导航 */
-.subtabs{display:flex;gap:4px;background:var(--bg-card);border-radius:14px;padding:5px;margin-bottom:14px;box-shadow:var(--sh-sm);max-width:fit-content}
-.subtab{padding:8px 18px;border-radius:10px;font-size:13px;color:var(--t2);cursor:pointer;font-weight:500;transition:all .15s}
-.subtab.active{background:var(--primary);color:#fff}
+/* ─── ADMIN ────────────────────────────────── */
+.subtabs{display:flex;gap:4px;background:var(--bg-card);border-radius:14px;padding:5px;margin-bottom:16px;box-shadow:var(--sh-1);max-width:fit-content;border:1px solid var(--border)}
+.subtab{padding:9px 18px;border-radius:10px;font-size:13px;color:var(--t2);cursor:pointer;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.subtab.active{background:var(--grad);color:#fff;box-shadow:0 4px 10px rgba(20,136,232,.25)}
 .subtab:hover:not(.active){background:var(--bg-soft);color:var(--t1)}
 
-/* 登录 */
-.login{display:flex;align-items:center;justify-content:center;height:100vh;background:radial-gradient(circle at 20% 30%,#ede9fe 0%,transparent 50%),radial-gradient(circle at 80% 70%,#fce7f3 0%,transparent 50%),var(--bg-app)}
-.login-card{background:var(--bg-card);border-radius:24px;padding:42px 48px;width:420px;box-shadow:var(--sh-lg);text-align:center}
-.login-brand{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:22px}
-.login-brand .brand-mark{width:44px;height:44px;font-size:18px;border-radius:13px}
-.login-name-l{font-size:20px;font-weight:700;color:var(--t1)}
-.login-sub-l{font-size:11px;letter-spacing:.18em;color:var(--t3);text-transform:uppercase;margin-top:2px}
-.login-title{font-size:18px;font-weight:600;color:var(--t1);margin-bottom:8px;margin-top:18px}
-.login-desc{font-size:13px;color:var(--t2);margin-bottom:28px}
-.qr-box{width:200px;height:200px;margin:0 auto 18px;background:linear-gradient(135deg,#f9f7fd,#fff);border:1px solid var(--border);border-radius:18px;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:var(--sh-sm)}
-.qr-pattern{width:160px;height:160px;background:
-  linear-gradient(45deg,#1a1530 25%,transparent 25%) -10px 0,
-  linear-gradient(-45deg,#1a1530 25%,transparent 25%) -10px 0,
-  linear-gradient(45deg,transparent 75%,#1a1530 75%),
-  linear-gradient(-45deg,transparent 75%,#1a1530 75%);
-  background-size:20px 20px;background-color:#fff;border-radius:8px;opacity:.9;position:relative}
-.qr-logo{position:absolute;width:42px;height:42px;background:var(--accent-grad);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;border:3px solid #fff;box-shadow:var(--sh-md)}
-.login-tip{font-size:12px;color:var(--t3);display:flex;align-items:center;justify-content:center;gap:6px}
-.wechat-tag{display:inline-flex;align-items:center;gap:6px;background:#07c160;color:#fff;font-size:11px;padding:4px 10px;border-radius:99px;margin-bottom:12px}
+.pill-red{background:var(--bad);color:#fff;font-size:10px;padding:1px 7px;border-radius:99px}
 
-/* Toast */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--primary);color:#fff;border-radius:12px;padding:12px 18px;font-size:13px;z-index:200;display:flex;align-items:center;gap:8px;box-shadow:var(--sh-lg);animation:slideUp .3s ease}
+/* ─── LOGIN ────────────────────────────────── */
+.login{display:flex;align-items:center;justify-content:center;height:100vh;background:radial-gradient(circle at 20% 30%,#dbeefe 0%,transparent 55%),radial-gradient(circle at 80% 75%,#b6dcfd 0%,transparent 55%),var(--bg-app)}
+.login-card{background:var(--bg-card);border-radius:24px;padding:46px 50px;width:440px;box-shadow:var(--sh-4);text-align:center;border:1px solid var(--border);position:relative;overflow:hidden}
+.login-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--grad)}
+.login-brand{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px}
+.login-brand .brand-mark{width:48px;height:48px;border-radius:14px}
+.login-brand .brand-mark svg{width:26px;height:26px}
+.login-name{font-size:22px;font-weight:700;color:var(--t1);letter-spacing:.02em}
+.login-sub{font-size:11px;letter-spacing:.22em;color:var(--t3);text-transform:uppercase;margin-top:3px}
+.login-title{font-size:18px;font-weight:600;color:var(--t1);margin-bottom:8px;margin-top:18px}
+.login-desc{font-size:13px;color:var(--t2);margin-bottom:24px}
+.qr-box{width:208px;height:208px;margin:0 auto 20px;background:linear-gradient(135deg,#fafcff,#fff);border:1px solid var(--border);border-radius:18px;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:var(--sh-2);padding:14px}
+.qr-pattern{width:100%;height:100%;background:
+  linear-gradient(45deg,var(--c950) 25%,transparent 25%) -8px 0,
+  linear-gradient(-45deg,var(--c950) 25%,transparent 25%) -8px 0,
+  linear-gradient(45deg,transparent 75%,var(--c950) 75%),
+  linear-gradient(-45deg,transparent 75%,var(--c950) 75%);
+  background-size:16px 16px;background-color:#fff;border-radius:6px;opacity:.92}
+.qr-logo{position:absolute;width:46px;height:46px;background:var(--grad);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;border:4px solid #fff;box-shadow:var(--sh-3)}
+.qr-logo svg{width:22px;height:22px}
+.login-tip{font-size:12px;color:var(--t3);display:flex;align-items:center;justify-content:center;gap:6px}
+.wechat-tag{display:inline-flex;align-items:center;gap:6px;background:#07c160;color:#fff;font-size:11px;padding:5px 12px;border-radius:99px;margin-bottom:14px;font-weight:500}
+
+/* ─── MODAL / TOAST ────────────────────────────────── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--primary);color:#fff;border-radius:12px;padding:13px 20px;font-size:13px;z-index:200;display:flex;align-items:center;gap:8px;box-shadow:var(--sh-4);animation:slideUp .3s ease}
 @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
 
-/* Modal */
-.modal-bg{position:fixed;inset:0;background:rgba(26,21,48,.4);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;animation:fade .2s ease}
+.modal-bg{position:fixed;inset:0;background:rgba(10,30,54,.45);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;animation:fade .2s ease}
 .modal-bg.show{display:flex}
-.modal{background:#fff;border-radius:18px;padding:26px;width:440px;box-shadow:var(--sh-lg)}
-.modal-t{font-size:16px;font-weight:600;margin-bottom:6px}
+.modal{background:#fff;border-radius:18px;padding:28px;width:460px;box-shadow:var(--sh-4)}
+.modal-t{font-size:16px;font-weight:600;margin-bottom:6px;color:var(--t1)}
 .modal-d{font-size:13px;color:var(--t2);margin-bottom:18px}
-.modal-input{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-size:13px;font-family:inherit;outline:none;resize:none;min-height:90px;background:var(--bg-soft)}
-.modal-input:focus{border-color:var(--accent)}
+.modal-input{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;font-size:13px;font-family:inherit;outline:none;resize:none;min-height:90px;background:var(--bg-soft);color:var(--t1)}
+.modal-input:focus{border-color:var(--accent);background:#fff}
 .modal-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 
 .hidden{display:none!important}
+
+/* 进度条小 */
+.mini-bar{flex:1;height:6px;background:var(--bg-tint);border-radius:99px;overflow:hidden;max-width:120px}
+.mini-bar-fill{height:100%;background:var(--grad);border-radius:99px}
 </style>
 </head>
 <body>
 
-<!-- ═════ LOGIN SCREEN ═════ -->
+<!-- ═════ SVG SYMBOLS ═════ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-quantum" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.5"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-cube" viewBox="0 0 24 24"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5"/><path d="M12 12v10"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3.5-7.1"/><polyline points="21 4 21 9 16 9"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.41 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+  <symbol id="i-arrow-left" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></symbol>
+  <symbol id="i-chev-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></symbol>
+  <symbol id="i-clip" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="3" y1="20" x2="21" y2="20"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+  <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 2v6L4 19a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3l-5-11V2"/><line x1="8" y1="2" x2="16" y2="2"/><line x1="7" y1="14" x2="17" y2="14"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+  <symbol id="i-message" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-pulse" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+  <symbol id="i-link-ext" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></symbol>
+</svg>
+
+<!-- ═════ LOGIN ═════ -->
 <div id="loginScreen" class="login">
   <div class="login-card">
     <div class="login-brand">
-      <div class="brand-mark">智</div>
+      <div class="brand-mark"><svg><use href="#i-quantum"/></svg></div>
       <div style="text-align:left">
-        <div class="login-name-l">智枢 · SkillHub</div>
-        <div class="login-sub-l">Intelligent Skill Platform</div>
+        <div class="login-name">量子链</div>
+        <div class="login-sub">Quantum Chain</div>
       </div>
     </div>
-    <div class="login-title">欢迎使用 智枢</div>
-    <div class="login-desc">企业级 AI 技能协作平台</div>
-    <div class="wechat-tag">● 企业微信扫码登录</div>
+    <div class="login-title">医学智能协作平台</div>
+    <div class="login-desc">企业级 AI 技能与任务管理</div>
+    <div class="wechat-tag"><span style="width:6px;height:6px;background:#fff;border-radius:50%"></span>企业微信扫码登录</div>
     <div class="qr-box">
       <div class="qr-pattern"></div>
-      <div class="qr-logo">智</div>
+      <div class="qr-logo"><svg><use href="#i-quantum"/></svg></div>
     </div>
-    <div class="login-tip">🔒 请使用企业微信扫描二维码 · 仅限受邀成员</div>
-    <button class="btn btn-accent" style="margin-top:22px;width:100%" onclick="enterApp()">模拟扫码登录（演示）</button>
+    <div class="login-tip">请使用企业微信扫描二维码 · 仅限受邀成员</div>
+    <button class="btn btn-accent" style="margin-top:22px;width:100%;justify-content:center" onclick="enterApp()">模拟扫码登录（演示）<svg class="ic ic-sm"><use href="#i-arrow-right"/></svg></button>
   </div>
 </div>
 
@@ -413,32 +527,32 @@ tbody tr:hover td{background:var(--bg-soft)}
   <!-- ─── SIDEBAR ─── -->
   <aside class="sidebar">
     <div class="brand">
-      <div class="brand-mark">智</div>
+      <div class="brand-mark"><svg><use href="#i-quantum"/></svg></div>
       <div>
-        <div class="brand-name">智枢</div>
-        <div class="brand-sub">SkillHub</div>
+        <div class="brand-name">量子链</div>
+        <div class="brand-sub">Quantum Chain</div>
       </div>
     </div>
 
     <div class="side-section">
       <div class="side-label">工作台</div>
-      <div class="nav active" data-screen="dashboard"><span class="nav-ico">▦</span>仪表盘</div>
-      <div class="nav" data-screen="tasks"><span class="nav-ico">◷</span>任务中心<span class="nav-badge">4</span></div>
-      <div class="nav" data-screen="market"><span class="nav-ico">◈</span>技能市场</div>
-      <div class="nav" data-screen="files"><span class="nav-ico">▤</span>工作区文件</div>
+      <div class="nav active" data-screen="dashboard"><svg class="ic"><use href="#i-grid"/></svg>仪表盘</div>
+      <div class="nav" data-screen="tasks"><svg class="ic"><use href="#i-list"/></svg>任务中心<span class="nav-badge">4</span></div>
+      <div class="nav" data-screen="market"><svg class="ic"><use href="#i-cube"/></svg>技能市场</div>
+      <div class="nav" data-screen="files"><svg class="ic"><use href="#i-folder"/></svg>工作区文件</div>
     </div>
 
     <div class="side-section">
       <div class="side-label">流程</div>
-      <div class="nav" data-screen="wizard"><span class="nav-ico">＋</span>新建任务</div>
-      <div class="nav" data-screen="exec"><span class="nav-ico">⟳</span>执行详情</div>
-      <div class="nav" data-screen="review"><span class="nav-ico">⚠</span>结果审核<span class="nav-badge amber">3</span></div>
+      <div class="nav" data-screen="wizard"><svg class="ic"><use href="#i-plus"/></svg>新建任务</div>
+      <div class="nav" data-screen="exec"><svg class="ic"><use href="#i-refresh"/></svg>执行详情</div>
+      <div class="nav" data-screen="review"><svg class="ic"><use href="#i-alert"/></svg>结果审核<span class="nav-badge warn">3</span></div>
     </div>
 
     <div class="side-section">
       <div class="side-label">系统</div>
-      <div class="nav" data-screen="notif"><span class="nav-ico">🔔</span>通知中心</div>
-      <div class="nav" data-screen="admin"><span class="nav-ico">⚙</span>组织管理</div>
+      <div class="nav" data-screen="notif"><svg class="ic"><use href="#i-bell"/></svg>通知中心</div>
+      <div class="nav" data-screen="admin"><svg class="ic"><use href="#i-gear"/></svg>组织管理</div>
     </div>
 
     <div class="side-user">
@@ -447,49 +561,48 @@ tbody tr:hover td{background:var(--bg-soft)}
         <div class="user-name">王思远</div>
         <div class="user-role">管理员 · 临床医学部</div>
       </div>
-      <div class="user-more" onclick="toast('个人设置')">⋯</div>
+      <div class="user-more" onclick="toast('个人设置')"><svg class="ic ic-sm"><use href="#i-more"/></svg></div>
     </div>
   </aside>
 
   <!-- ─── MAIN ─── -->
   <main class="main">
-    <!-- Topbar -->
     <div class="topbar">
-      <div class="greeting">
-        <div class="greet-hi">您好，王思远 👋</div>
+      <div class="greet">
+        <div class="greet-hi">您好，王思远</div>
         <div class="greet-sub" id="greetSub">今天有 3 项任务待审核，2 项正在执行中</div>
       </div>
       <div class="search">
-        <span class="search-i">⌕</span>
+        <svg class="ic"><use href="#i-search"/></svg>
         <input placeholder="搜索任务、技能、文件..."/>
       </div>
-      <div class="topbar-btn" onclick="go('notif')">🔔<div class="topbar-dot"></div></div>
-      <div class="topbar-btn" onclick="toast('企业微信已绑定')">📱</div>
-      <button class="topbar-cta" onclick="go('wizard')">＋ 新建任务</button>
+      <div class="icon-btn" onclick="go('notif')"><svg class="ic"><use href="#i-bell"/></svg><div class="icon-dot"></div></div>
+      <div class="icon-btn" onclick="toast('企业微信已绑定')"><svg class="ic"><use href="#i-message"/></svg></div>
+      <button class="cta" onclick="go('wizard')"><svg class="ic ic-sm"><use href="#i-plus"/></svg>新建任务</button>
     </div>
 
-    <!-- ─── SCREEN: DASHBOARD ─── -->
+    <!-- ─── DASHBOARD ─── -->
     <section class="screen active" id="screen-dashboard">
 
       <div class="stats-row">
-        <div class="stat-card pink">
-          <div class="stat-ico" style="color:var(--pink)">◐</div>
+        <div class="stat-card">
+          <div class="stat-ico"><svg class="ic"><use href="#i-pulse"/></svg></div>
           <div>
             <div class="stat-meta">本周完成任务</div>
             <div class="stat-val">24<span class="u">/ 28 项</span></div>
           </div>
-          <div class="stat-trend">↑ 12%</div>
+          <div class="stat-trend"><svg class="ic ic-sm"><use href="#i-up"/></svg>12%</div>
         </div>
-        <div class="stat-card lavender">
-          <div class="stat-ico" style="color:var(--accent)">◇</div>
+        <div class="stat-card v2">
+          <div class="stat-ico"><svg class="ic"><use href="#i-cube"/></svg></div>
           <div>
             <div class="stat-meta">已授权技能</div>
             <div class="stat-val">12<span class="u">个技能</span></div>
           </div>
           <div class="stat-trend">+ 2 新</div>
         </div>
-        <div class="stat-card mint">
-          <div class="stat-ico" style="color:var(--mint)">▢</div>
+        <div class="stat-card v3">
+          <div class="stat-ico"><svg class="ic"><use href="#i-folder"/></svg></div>
           <div>
             <div class="stat-meta">工作区使用</div>
             <div class="stat-val">18.4<span class="u">/ 50 GB</span></div>
@@ -500,15 +613,11 @@ tbody tr:hover td{background:var(--bg-soft)}
 
       <div class="cols">
         <div class="col-left">
-          <!-- Chart -->
           <div class="panel">
             <div class="panel-head">
               <div class="panel-title">任务执行趋势</div>
               <div class="panel-tag">本周</div>
-              <div style="margin-left:auto;display:flex;align-items:center;gap:14px">
-                <span class="chart-legend"><span class="legend-dot" style="background:var(--accent)"></span>已完成</span>
-                <button class="panel-pill">本周 ▾</button>
-              </div>
+              <button class="panel-pill" style="margin-left:auto">本周<svg class="ic ic-sm"><use href="#i-chev-down"/></svg></button>
             </div>
             <div class="chart-wrap">
               <div class="chart-grid">
@@ -528,69 +637,66 @@ tbody tr:hover td{background:var(--bg-soft)}
             </div>
           </div>
 
-          <!-- Task Tracker Table -->
           <div class="panel">
             <div class="panel-head">
               <div class="panel-title">任务追踪</div>
               <div class="panel-tag">+3 新</div>
               <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
-                <div class="search" style="width:170px;padding:6px 12px"><span class="search-i">⌕</span><input placeholder="搜索..."/></div>
-                <button class="panel-pill">本月 ▾</button>
+                <div class="search" style="width:180px;padding:6px 12px"><svg class="ic ic-sm"><use href="#i-search"/></svg><input placeholder="搜索..."/></div>
+                <button class="panel-pill">本月<svg class="ic ic-sm"><use href="#i-chev-down"/></svg></button>
               </div>
             </div>
             <div class="tbl-wrap">
               <table>
-                <thead><tr>
-                  <th>任务名称</th><th>进度</th><th>开始日期</th><th>使用技能</th><th>状态</th><th></th>
-                </tr></thead>
+                <thead><tr><th>任务名称</th><th>进度</th><th>开始日期</th><th>使用技能</th><th>状态</th><th></th></tr></thead>
                 <tbody>
                   <tr onclick="go('exec')">
-                    <td><div class="cell-name"><div class="cell-ico ci-pink">⚠</div>疫苗V-203不良反应汇总</div></td>
+                    <td><div class="cell-name"><div class="cell-ico v-info"><svg class="ic"><use href="#i-alert"/></svg></div>疫苗V-203不良反应汇总</div></td>
                     <td><div class="progress-ring" style="--p:68%"><span>68%</span></div></td>
                     <td>2026/06/08</td>
                     <td>AE/SAE 汇总</td>
                     <td><span class="status-pill sp-running"><span class="sp-dot"></span>执行中</span></td>
-                    <td><button class="row-more">⋯</button></td>
+                    <td><button class="row-btn"><svg class="ic"><use href="#i-more"/></svg></button></td>
                   </tr>
                   <tr onclick="go('review')">
-                    <td><div class="cell-name"><div class="cell-ico ci-amber">📋</div>中心01 vs 中心02 CRF比对</div></td>
+                    <td><div class="cell-name"><div class="cell-ico v-warn"><svg class="ic"><use href="#i-clip"/></svg></div>中心01 vs 中心02 CRF比对</div></td>
                     <td><div class="progress-ring" style="--p:100%"><span>100%</span></div></td>
                     <td>2026/06/08</td>
                     <td>CRF 数据比对</td>
                     <td><span class="status-pill sp-review"><span class="sp-dot"></span>待审核</span></td>
-                    <td><button class="row-more">⋯</button></td>
+                    <td><button class="row-btn"><svg class="ic"><use href="#i-more"/></svg></button></td>
                   </tr>
                   <tr>
-                    <td><div class="cell-name"><div class="cell-ico ci-mint">📊</div>SAE 周报草稿 · 第14周</div></td>
+                    <td><div class="cell-name"><div class="cell-ico v-ok"><svg class="ic"><use href="#i-chart"/></svg></div>SAE 周报草稿 · 第14周</div></td>
                     <td><div class="progress-ring" style="--p:100%"><span>✓</span></div></td>
                     <td>2026/06/07</td>
                     <td>SAE 周报生成</td>
                     <td><span class="status-pill sp-done"><span class="sp-dot"></span>已完成</span></td>
-                    <td><button class="row-more">⋯</button></td>
+                    <td><button class="row-btn"><svg class="ic"><use href="#i-more"/></svg></button></td>
                   </tr>
                   <tr>
-                    <td><div class="cell-name"><div class="cell-ico ci-sky">🔬</div>实验室异常复核 W12</div></td>
+                    <td><div class="cell-name"><div class="cell-ico"><svg class="ic"><use href="#i-flask"/></svg></div>实验室异常复核 W12</div></td>
                     <td><div class="progress-ring" style="--p:100%"><span>✓</span></div></td>
                     <td>2026/06/06</td>
                     <td>实验室异常</td>
                     <td><span class="status-pill sp-done"><span class="sp-dot"></span>已完成</span></td>
-                    <td><button class="row-more">⋯</button></td>
+                    <td><button class="row-btn"><svg class="ic"><use href="#i-more"/></svg></button></td>
                   </tr>
                   <tr>
-                    <td><div class="cell-name"><div class="cell-ico ci-lav">🛡</div>DSMB 月度安全报告</div></td>
+                    <td><div class="cell-name"><div class="cell-ico v-info"><svg class="ic"><use href="#i-shield"/></svg></div>DSMB 月度安全报告</div></td>
                     <td><div class="progress-ring" style="--p:35%"><span>35%</span></div></td>
                     <td>2026/06/05</td>
                     <td>安全监查</td>
                     <td><span class="status-pill sp-queue"><span class="sp-dot"></span>排队中</span></td>
-                    <td><button class="row-more">⋯</button></td>
+                    <td><button class="row-btn"><svg class="ic"><use href="#i-more"/></svg></button></td>
                   </tr>
                   <tr>
-                    <td><div class="cell-name"><div class="cell-ico ci-pink">📑</div>知情同意文件审查</div></td>
+                    <td><div class="cell-name"><div class="cell-ico v-neut"><svg class="ic"><use href="#i-doc"/></svg></div>知情同意文件审查</div></td>
                     <td><div class="progress-ring" style="--p:0%"><span>—</span></div></td>
                     <td>—</td>
                     <td>文档审查</td>
                     <td><span class="status-pill sp-draft"><span class="sp-dot"></span>草稿</span></td>
-                    <td><button class="row-more">⋯</button></td>
+                    <td><button class="row-btn"><svg class="ic"><use href="#i-more"/></svg></button></td>
                   </tr>
                 </tbody>
               </table>
@@ -599,63 +705,33 @@ tbody tr:hover td{background:var(--bg-soft)}
         </div>
 
         <div class="col-right">
-          <!-- Care team / 协作者 -->
           <div class="panel">
             <div class="panel-head">
               <div class="panel-title">协作团队</div>
-              <div class="panel-action" onclick="toast('查看全部')">查看全部 →</div>
+              <div class="panel-link" onclick="toast('查看全部')">查看全部<svg class="ic ic-sm"><use href="#i-arrow-right"/></svg></div>
             </div>
             <div class="care-list">
-              <div class="care-row">
-                <div class="care-av a1">林</div>
-                <div class="care-info"><div class="care-name">林雅琪</div><div class="care-mail">linyaqi@hospital.cn</div></div>
-                <div class="care-msg">✉</div>
-              </div>
-              <div class="care-row">
-                <div class="care-av a2">陈</div>
-                <div class="care-info"><div class="care-name">陈泽明</div><div class="care-mail">chenzeming@hospital.cn</div></div>
-                <div class="care-msg">✉</div>
-              </div>
-              <div class="care-row">
-                <div class="care-av a3">徐</div>
-                <div class="care-info"><div class="care-name">徐子涵</div><div class="care-mail">xuzihan@hospital.cn</div></div>
-                <div class="care-msg">✉</div>
-              </div>
-              <div class="care-row">
-                <div class="care-av a4">马</div>
-                <div class="care-info"><div class="care-name">马思源</div><div class="care-mail">masiyuan@hospital.cn</div></div>
-                <div class="care-msg">✉</div>
-              </div>
-              <button class="care-add">＋ 添加成员</button>
+              <div class="care-row"><div class="care-av g1">林</div><div class="care-info"><div class="care-name">林雅琪</div><div class="care-mail">linyaqi@hospital.cn</div></div><div class="care-action"><svg class="ic ic-sm"><use href="#i-mail"/></svg></div></div>
+              <div class="care-row"><div class="care-av g2">陈</div><div class="care-info"><div class="care-name">陈泽明</div><div class="care-mail">chenzeming@hospital.cn</div></div><div class="care-action"><svg class="ic ic-sm"><use href="#i-mail"/></svg></div></div>
+              <div class="care-row"><div class="care-av g3">徐</div><div class="care-info"><div class="care-name">徐子涵</div><div class="care-mail">xuzihan@hospital.cn</div></div><div class="care-action"><svg class="ic ic-sm"><use href="#i-mail"/></svg></div></div>
+              <div class="care-row"><div class="care-av g4">马</div><div class="care-info"><div class="care-name">马思源</div><div class="care-mail">masiyuan@hospital.cn</div></div><div class="care-action"><svg class="ic ic-sm"><use href="#i-mail"/></svg></div></div>
+              <button class="care-add"><svg class="ic ic-sm"><use href="#i-plus"/></svg>添加成员</button>
             </div>
           </div>
 
-          <!-- 快速入口 -->
           <div class="panel">
-            <div class="panel-head"><div class="panel-title">推荐技能</div><div class="panel-action" onclick="go('market')">技能市场 →</div></div>
+            <div class="panel-head"><div class="panel-title">推荐技能</div><div class="panel-link" onclick="go('market')">技能市场<svg class="ic ic-sm"><use href="#i-arrow-right"/></svg></div></div>
             <div class="care-list">
-              <div class="care-row" style="cursor:pointer" onclick="go('wizard')">
-                <div class="cell-ico ci-lav" style="width:38px;height:38px">📋</div>
-                <div class="care-info"><div class="care-name">CRF 数据比对</div><div class="care-mail">已授权 · 已使用 12 次</div></div>
-                <button class="skill-btn skill-btn-use">使用</button>
-              </div>
-              <div class="care-row" style="cursor:pointer" onclick="go('wizard')">
-                <div class="cell-ico ci-mint" style="width:38px;height:38px">📊</div>
-                <div class="care-info"><div class="care-name">SAE 周报生成</div><div class="care-mail">已授权 · 已使用 8 次</div></div>
-                <button class="skill-btn skill-btn-use">使用</button>
-              </div>
-              <div class="care-row" style="cursor:pointer">
-                <div class="cell-ico ci-amber" style="width:38px;height:38px">🔬</div>
-                <div class="care-info"><div class="care-name">实验室异常复核</div><div class="care-mail">未授权 · 点击申请</div></div>
-                <button class="skill-btn skill-btn-apply" onclick="showApply(event)">申请</button>
-              </div>
+              <div class="care-row" onclick="go('wizard')" style="cursor:pointer"><div class="cell-ico"><svg class="ic"><use href="#i-clip"/></svg></div><div class="care-info"><div class="care-name">CRF 数据比对</div><div class="care-mail">已授权 · 已使用 12 次</div></div><button class="skill-btn skill-btn-use">使用</button></div>
+              <div class="care-row" onclick="go('wizard')" style="cursor:pointer"><div class="cell-ico v-ok"><svg class="ic"><use href="#i-chart"/></svg></div><div class="care-info"><div class="care-name">SAE 周报生成</div><div class="care-mail">已授权 · 已使用 8 次</div></div><button class="skill-btn skill-btn-use">使用</button></div>
+              <div class="care-row" style="cursor:pointer"><div class="cell-ico v-warn"><svg class="ic"><use href="#i-flask"/></svg></div><div class="care-info"><div class="care-name">实验室异常复核</div><div class="care-mail">未授权 · 点击申请</div></div><button class="skill-btn skill-btn-apply" onclick="showApply(event)">申请</button></div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ─── SCREEN: TASKS ─── -->
+    <!-- ─── TASKS ─── -->
     <section class="screen" id="screen-tasks">
       <div class="market-filter">
         <button class="chip active">全部 24</button>
@@ -664,310 +740,335 @@ tbody tr:hover td{background:var(--bg-soft)}
         <button class="chip">已完成 18</button>
         <button class="chip">草稿 1</button>
         <button class="chip">失败 0</button>
+        <button class="chip" style="margin-left:auto"><svg class="ic ic-sm"><use href="#i-filter"/></svg>筛选</button>
       </div>
       <div class="panel">
-        <div class="panel-head">
-          <div class="panel-title">我的任务</div>
-          <div class="panel-action" style="margin-left:auto">最近 30 天 ▾</div>
-        </div>
+        <div class="panel-head"><div class="panel-title">我的任务</div><button class="panel-pill" style="margin-left:auto"><svg class="ic ic-sm"><use href="#i-cal"/></svg>最近 30 天<svg class="ic ic-sm"><use href="#i-chev-down"/></svg></button></div>
         <div class="tbl-wrap"><table>
           <thead><tr><th>任务名称</th><th>使用技能</th><th>状态</th><th>进度</th><th>创建时间</th><th>操作</th></tr></thead>
           <tbody>
-            <tr><td><div class="cell-name"><div class="cell-ico ci-pink">⚠</div>疫苗V-203不良反应汇总</div></td><td>AE/SAE 汇总</td><td><span class="status-pill sp-running"><span class="sp-dot"></span>执行中</span></td><td><div class="progress-ring" style="--p:68%"><span>68%</span></div></td><td>2小时前</td><td><button class="confirm-btn" onclick="go('exec')">查看</button></td></tr>
-            <tr><td><div class="cell-name"><div class="cell-ico ci-amber">📋</div>中心01 vs 中心02 CRF比对</div></td><td>CRF 数据比对</td><td><span class="status-pill sp-review"><span class="sp-dot"></span>待审核</span></td><td><div class="progress-ring" style="--p:100%"><span>✓</span></div></td><td>今天</td><td><button class="confirm-btn" onclick="go('review')">审核</button></td></tr>
-            <tr><td><div class="cell-name"><div class="cell-ico ci-mint">📊</div>SAE周报草稿 · 第14周</div></td><td>SAE 周报生成</td><td><span class="status-pill sp-done"><span class="sp-dot"></span>已完成</span></td><td><div class="progress-ring" style="--p:100%"><span>✓</span></div></td><td>昨天</td><td><button class="confirm-btn">下载</button></td></tr>
-            <tr><td><div class="cell-name"><div class="cell-ico ci-sky">🔬</div>实验室异常复核 W12</div></td><td>实验室异常</td><td><span class="status-pill sp-done"><span class="sp-dot"></span>已完成</span></td><td><div class="progress-ring" style="--p:100%"><span>✓</span></div></td><td>3天前</td><td><button class="confirm-btn">下载</button></td></tr>
-            <tr><td><div class="cell-name"><div class="cell-ico ci-lav">🛡</div>DSMB 月度安全报告</div></td><td>安全监查</td><td><span class="status-pill sp-queue"><span class="sp-dot"></span>排队中</span></td><td><div class="progress-ring" style="--p:0%"><span>—</span></div></td><td>5分钟前</td><td><button class="confirm-btn">取消</button></td></tr>
-            <tr><td><div class="cell-name"><div class="cell-ico ci-pink">📑</div>知情同意文件审查</div></td><td>文档审查</td><td><span class="status-pill sp-draft"><span class="sp-dot"></span>草稿</span></td><td><div class="progress-ring" style="--p:0%"><span>—</span></div></td><td>—</td><td><button class="confirm-btn" onclick="go('wizard')">继续</button></td></tr>
+            <tr><td><div class="cell-name"><div class="cell-ico v-info"><svg class="ic"><use href="#i-alert"/></svg></div>疫苗V-203不良反应汇总</div></td><td>AE/SAE 汇总</td><td><span class="status-pill sp-running"><span class="sp-dot"></span>执行中</span></td><td><div class="progress-ring" style="--p:68%"><span>68%</span></div></td><td>2小时前</td><td><button class="confirm-btn" onclick="go('exec')"><svg class="ic ic-sm"><use href="#i-eye"/></svg>查看</button></td></tr>
+            <tr><td><div class="cell-name"><div class="cell-ico v-warn"><svg class="ic"><use href="#i-clip"/></svg></div>中心01 vs 中心02 CRF比对</div></td><td>CRF 数据比对</td><td><span class="status-pill sp-review"><span class="sp-dot"></span>待审核</span></td><td><div class="progress-ring" style="--p:100%"><span>✓</span></div></td><td>今天</td><td><button class="confirm-btn" onclick="go('review')">审核</button></td></tr>
+            <tr><td><div class="cell-name"><div class="cell-ico v-ok"><svg class="ic"><use href="#i-chart"/></svg></div>SAE周报草稿 · 第14周</div></td><td>SAE 周报生成</td><td><span class="status-pill sp-done"><span class="sp-dot"></span>已完成</span></td><td><div class="progress-ring" style="--p:100%"><span>✓</span></div></td><td>昨天</td><td><button class="confirm-btn"><svg class="ic ic-sm"><use href="#i-download"/></svg>下载</button></td></tr>
+            <tr><td><div class="cell-name"><div class="cell-ico"><svg class="ic"><use href="#i-flask"/></svg></div>实验室异常复核 W12</div></td><td>实验室异常</td><td><span class="status-pill sp-done"><span class="sp-dot"></span>已完成</span></td><td><div class="progress-ring" style="--p:100%"><span>✓</span></div></td><td>3天前</td><td><button class="confirm-btn"><svg class="ic ic-sm"><use href="#i-download"/></svg>下载</button></td></tr>
+            <tr><td><div class="cell-name"><div class="cell-ico v-info"><svg class="ic"><use href="#i-shield"/></svg></div>DSMB 月度安全报告</div></td><td>安全监查</td><td><span class="status-pill sp-queue"><span class="sp-dot"></span>排队中</span></td><td><div class="progress-ring" style="--p:0%"><span>—</span></div></td><td>5分钟前</td><td><button class="confirm-btn">取消</button></td></tr>
+            <tr><td><div class="cell-name"><div class="cell-ico v-neut"><svg class="ic"><use href="#i-doc"/></svg></div>知情同意文件审查</div></td><td>文档审查</td><td><span class="status-pill sp-draft"><span class="sp-dot"></span>草稿</span></td><td><div class="progress-ring" style="--p:0%"><span>—</span></div></td><td>—</td><td><button class="confirm-btn" onclick="go('wizard')">继续</button></td></tr>
           </tbody>
         </table></div>
       </div>
     </section>
 
-    <!-- ─── SCREEN: SKILL MARKET ─── -->
+    <!-- ─── MARKET ─── -->
     <section class="screen" id="screen-market">
       <div class="market-filter">
         <button class="chip active">全部</button>
         <button class="chip">已授权 12</button>
         <button class="chip">未授权 6</button>
         <button class="chip">审批中 2</button>
-        <span style="margin-left:auto;display:flex;gap:6px">
+        <div style="margin-left:auto;display:flex;gap:6px">
           <button class="chip">数据核查</button>
           <button class="chip">报告生成</button>
           <button class="chip">安全监查</button>
           <button class="chip">文档审查</button>
-        </span>
+        </div>
       </div>
 
       <div class="skill-grid">
         <div class="skill-card">
-          <div class="skill-corner">✓</div>
+          <div class="skill-corner"><svg class="ic"><use href="#i-check"/></svg></div>
           <div class="skill-head">
-            <div class="skill-ico" style="background:var(--accent-soft);color:var(--accent)">📋</div>
+            <div class="skill-ico"><svg class="ic"><use href="#i-clip"/></svg></div>
             <div><div class="skill-name">CRF 数据比对</div><div class="skill-cat">数据核查 · v2.3</div></div>
           </div>
           <div class="skill-desc">比对多中心病例报告表数据，自动标注差异字段并生成核查报告。</div>
           <div class="skill-foot">
-            <span class="skill-stat">⚡ 1.2k 次</span>
-            <span class="skill-stat">⭐ 4.8</span>
+            <span class="skill-stat"><svg class="ic ic-sm"><use href="#i-bolt"/></svg>1.2k 次</span>
+            <span class="skill-stat"><svg class="ic ic-sm"><use href="#i-star"/></svg>4.8</span>
             <button class="skill-btn skill-btn-use" onclick="go('wizard')">使用</button>
           </div>
         </div>
 
         <div class="skill-card">
-          <div class="skill-corner">✓</div>
+          <div class="skill-corner"><svg class="ic"><use href="#i-check"/></svg></div>
           <div class="skill-head">
-            <div class="skill-ico" style="background:var(--mint-soft);color:var(--mint)">📊</div>
+            <div class="skill-ico v2"><svg class="ic"><use href="#i-chart"/></svg></div>
             <div><div class="skill-name">SAE 周报生成</div><div class="skill-cat">报告生成 · v1.8</div></div>
           </div>
           <div class="skill-desc">基于不良事件记录自动生成符合 CIOMS 标准的周报文档。</div>
           <div class="skill-foot">
-            <span class="skill-stat">⚡ 840 次</span>
-            <span class="skill-stat">⭐ 4.9</span>
+            <span class="skill-stat"><svg class="ic ic-sm"><use href="#i-bolt"/></svg>840 次</span>
+            <span class="skill-stat"><svg class="ic ic-sm"><use href="#i-star"/></svg>4.9</span>
             <button class="skill-btn skill-btn-use" onclick="go('wizard')">使用</button>
           </div>
         </div>
 
         <div class="skill-card">
-          <div class="skill-corner">✓</div>
+          <div class="skill-corner"><svg class="ic"><use href="#i-check"/></svg></div>
           <div class="skill-head">
-            <div class="skill-ico" style="background:var(--pink-soft);color:var(--pink)">⚠</div>
+            <div class="skill-ico v3"><svg class="ic"><use href="#i-alert"/></svg></div>
             <div><div class="skill-name">不良反应汇总</div><div class="skill-cat">安全监查 · v2.0</div></div>
           </div>
           <div class="skill-desc">汇总分类 AE/SAE 记录，按 MedDRA 标准生成频率分布表。</div>
           <div class="skill-foot">
-            <span class="skill-stat">⚡ 620 次</span>
-            <span class="skill-stat">⭐ 4.7</span>
+            <span class="skill-stat"><svg class="ic ic-sm"><use href="#i-bolt"/></svg>620 次</span>
+            <span class="skill-stat"><svg class="ic ic-sm"><use href="#i-star"/></svg>4.7</span>
             <button class="skill-btn skill-btn-use" onclick="go('wizard')">使用</button>
           </div>
         </div>
 
         <div class="skill-card">
           <div class="skill-head">
-            <div class="skill-ico" style="background:var(--sky-soft);color:var(--sky)">🔬</div>
+            <div class="skill-ico"><svg class="ic"><use href="#i-flask"/></svg></div>
             <div><div class="skill-name">实验室异常复核</div><div class="skill-cat">数据核查 · v1.5</div></div>
           </div>
           <div class="skill-desc">识别超出参考范围的实验室检查值，自动标注异常等级。</div>
           <div class="skill-foot">
-            <span class="skill-stat">⚡ 410 次</span>
-            <span class="skill-stat">⭐ 4.6</span>
+            <span class="skill-stat"><svg class="ic ic-sm"><use href="#i-bolt"/></svg>410 次</span>
+            <span class="skill-stat"><svg class="ic ic-sm"><use href="#i-star"/></svg>4.6</span>
             <button class="skill-btn skill-btn-apply" onclick="showApply(event)">申请使用</button>
           </div>
         </div>
 
         <div class="skill-card">
           <div class="skill-head">
-            <div class="skill-ico" style="background:var(--amber-soft);color:var(--amber)">🛡</div>
+            <div class="skill-ico v2"><svg class="ic"><use href="#i-shield"/></svg></div>
             <div><div class="skill-name">DSMB 安全报告</div><div class="skill-cat">安全监查 · v1.2</div></div>
           </div>
           <div class="skill-desc">生成数据安全监查委员会月度报告，自动汇总安全性数据。</div>
           <div class="skill-foot">
-            <span class="skill-stat">⚡ 180 次</span>
-            <span class="skill-stat">⭐ 4.8</span>
-            <button class="skill-btn skill-btn-pending">审批中…</button>
+            <span class="skill-stat"><svg class="ic ic-sm"><use href="#i-bolt"/></svg>180 次</span>
+            <span class="skill-stat"><svg class="ic ic-sm"><use href="#i-star"/></svg>4.8</span>
+            <button class="skill-btn skill-btn-pending"><svg class="ic ic-sm"><use href="#i-clock"/></svg>审批中</button>
           </div>
         </div>
 
         <div class="skill-card">
           <div class="skill-head">
-            <div class="skill-ico" style="background:#fdf4ff;color:#a855f7">📑</div>
+            <div class="skill-ico v3"><svg class="ic"><use href="#i-doc"/></svg></div>
             <div><div class="skill-name">知情同意审查</div><div class="skill-cat">文档审查 · v1.0</div></div>
           </div>
           <div class="skill-desc">自动审查知情同意书完整性、签字与日期合规性。</div>
           <div class="skill-foot">
-            <span class="skill-stat">⚡ 95 次</span>
-            <span class="skill-stat">⭐ 4.5</span>
+            <span class="skill-stat"><svg class="ic ic-sm"><use href="#i-bolt"/></svg>95 次</span>
+            <span class="skill-stat"><svg class="ic ic-sm"><use href="#i-star"/></svg>4.5</span>
             <button class="skill-btn skill-btn-apply" onclick="showApply(event)">申请使用</button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ─── SCREEN: WIZARD (新建任务) ─── -->
+    <!-- ─── WIZARD ─── -->
     <section class="screen" id="screen-wizard">
       <div class="panel">
         <div class="wizard-steps">
-          <div class="ws-step done"><div class="ws-num">✓</div>选择技能</div>
+          <div class="ws-step done"><div class="ws-num"><svg class="ic"><use href="#i-check"/></svg></div>选择技能</div>
           <div class="ws-line done"></div>
           <div class="ws-step active"><div class="ws-num">2</div>选择输入文件</div>
           <div class="ws-line"></div>
           <div class="ws-step"><div class="ws-num">3</div>补充指令</div>
         </div>
 
-        <div style="display:flex;align-items:center;gap:14px;background:var(--bg-soft);padding:14px 18px;border-radius:14px;margin-bottom:18px">
-          <div class="cell-ico ci-lav" style="width:42px;height:42px;font-size:18px">📋</div>
+        <div class="selected-skill-bar">
+          <div class="cell-ico"><svg class="ic"><use href="#i-clip"/></svg></div>
           <div>
             <div style="font-size:14px;font-weight:600;color:var(--t1)">CRF 数据比对</div>
-            <div style="font-size:12px;color:var(--t3)">数据核查 · v2.3 · 比对多中心病例报告表</div>
+            <div style="font-size:12px;color:var(--t3);margin-top:2px">数据核查 · v2.3 · 比对多中心病例报告表数据</div>
           </div>
-          <button class="btn btn-ghost" style="margin-left:auto;padding:7px 14px">更换技能</button>
+          <button class="btn btn-ghost" style="margin-left:auto;padding:8px 14px">更换技能</button>
         </div>
 
-        <div class="panel-head"><div class="panel-title">输入文件</div><div class="panel-tag">2 个文件</div></div>
-        <div class="upload">
-          <div class="upload-ico">↑</div>
-          <div class="upload-t">点击上传或拖拽文件至此</div>
-          <div class="upload-s">支持 PDF / Word / Excel / CSV / 图片 / 压缩包 · 单文件最大 500 MB</div>
-        </div>
-        <div class="upload-file">
-          <div class="uf-ico">XLS</div>
-          <div class="uf-info"><div class="uf-n">中心01_CRF_V203_W14.xlsx</div><div class="uf-m">2.4 MB · 248 行</div></div>
-          <span class="status-pill sp-done" style="margin-right:6px"><span class="sp-dot"></span>已上传</span>
-          <div class="uf-x">✕</div>
-        </div>
-        <div class="upload-file">
-          <div class="uf-ico" style="background:var(--sky-soft);color:var(--sky)">XLS</div>
-          <div class="uf-info"><div class="uf-n">中心02_CRF_V203_W14.xlsx</div><div class="uf-m">2.1 MB · 231 行</div></div>
-          <span class="status-pill sp-done" style="margin-right:6px"><span class="sp-dot"></span>已上传</span>
-          <div class="uf-x">✕</div>
+        <div class="panel-head">
+          <div class="panel-title">从工作区选择输入文件</div>
+          <div class="panel-tag" id="selCount">已选 2 个</div>
         </div>
 
-        <div class="panel-head" style="margin-top:22px"><div class="panel-title">补充指令</div><div class="panel-tag">自然语言对话</div></div>
+        <!-- 工作区文件多选 -->
+        <div class="ws-picker">
+          <div class="ws-picker-head">
+            <div class="ws-tabs">
+              <div class="ws-tab active" onclick="switchWsTab(this,0)">我的上传</div>
+              <div class="ws-tab" onclick="switchWsTab(this,1)">任务输入</div>
+              <div class="ws-tab" onclick="switchWsTab(this,2)">任务输出</div>
+              <div class="ws-tab" onclick="switchWsTab(this,3)">全部文件</div>
+            </div>
+            <div class="ws-search"><svg class="ic ic-sm"><use href="#i-search"/></svg><input placeholder="搜索文件名..."/></div>
+          </div>
+          <div class="ws-crumb">
+            <svg class="ic ic-sm"><use href="#i-folder"/></svg>
+            <b>工作区</b><span>/</span><span>我的上传</span><span>/</span><b>01_原始数据</b>
+          </div>
+          <div class="ws-list" id="wsList">
+            <div class="ws-row checked" onclick="togglePick(this,'中心01_CRF_V203_W14.xlsx',2.4)">
+              <div class="ws-check on"></div>
+              <div class="ws-fic">XLS</div>
+              <div class="ws-fname">中心01_CRF_V203_W14.xlsx</div>
+              <div class="ws-fmeta"><b>248 行</b> · 2.4 MB · 今天 14:23</div>
+            </div>
+            <div class="ws-row checked" onclick="togglePick(this,'中心02_CRF_V203_W14.xlsx',2.1)">
+              <div class="ws-check on"></div>
+              <div class="ws-fic">XLS</div>
+              <div class="ws-fname">中心02_CRF_V203_W14.xlsx</div>
+              <div class="ws-fmeta"><b>231 行</b> · 2.1 MB · 今天 14:23</div>
+            </div>
+            <div class="ws-row" onclick="togglePick(this,'中心03_CRF_V203_W14.xlsx',1.9)">
+              <div class="ws-check"></div>
+              <div class="ws-fic">XLS</div>
+              <div class="ws-fname">中心03_CRF_V203_W14.xlsx</div>
+              <div class="ws-fmeta"><b>198 行</b> · 1.9 MB · 昨天</div>
+            </div>
+            <div class="ws-row" onclick="togglePick(this,'受试者基线数据_V203.xlsx',1.8)">
+              <div class="ws-check"></div>
+              <div class="ws-fic">XLS</div>
+              <div class="ws-fname">受试者基线数据_V203.xlsx</div>
+              <div class="ws-fmeta"><b>124 行</b> · 1.8 MB · 3 天前</div>
+            </div>
+            <div class="ws-row" onclick="togglePick(this,'临床试验方案_V203_v3.1.pdf',8.4)">
+              <div class="ws-check"></div>
+              <div class="ws-fic t-pdf">PDF</div>
+              <div class="ws-fname">临床试验方案_V203_v3.1.pdf</div>
+              <div class="ws-fmeta"><b>128 页</b> · 8.4 MB · 上周</div>
+            </div>
+            <div class="ws-row" onclick="togglePick(this,'CRF字段定义_v2.3.xlsx',1.2)">
+              <div class="ws-check"></div>
+              <div class="ws-fic">XLS</div>
+              <div class="ws-fname">CRF字段定义_v2.3.xlsx</div>
+              <div class="ws-fmeta"><b>312 行</b> · 1.2 MB · 2 月前</div>
+            </div>
+            <div class="ws-row" onclick="togglePick(this,'编码手册_V203_v1.0.pdf',2.3)">
+              <div class="ws-check"></div>
+              <div class="ws-fic t-pdf">PDF</div>
+              <div class="ws-fname">编码手册_V203_v1.0.pdf</div>
+              <div class="ws-fmeta"><b>45 页</b> · 2.3 MB · 2 月前</div>
+            </div>
+          </div>
+          <div class="ws-picker-foot">
+            <span>已选 <b id="selCount2">2</b> 个文件，共 <b id="selSize">4.5</b> MB</span>
+            <span class="upload-link" onclick="toast('上传新文件至工作区')"><svg class="ic ic-sm"><use href="#i-up"/></svg>上传新文件到工作区</span>
+          </div>
+        </div>
+
+        <!-- 已选文件预览 -->
+        <div class="selected-files" id="selPreview">
+          <div class="sf-row">
+            <div class="ws-fic">XLS</div>
+            <div class="sf-name">中心01_CRF_V203_W14.xlsx</div>
+            <div class="sf-meta">2.4 MB · 248 行</div>
+            <div class="sf-x"><svg class="ic ic-sm"><use href="#i-x"/></svg></div>
+          </div>
+          <div class="sf-row">
+            <div class="ws-fic">XLS</div>
+            <div class="sf-name">中心02_CRF_V203_W14.xlsx</div>
+            <div class="sf-meta">2.1 MB · 231 行</div>
+            <div class="sf-x"><svg class="ic ic-sm"><use href="#i-x"/></svg></div>
+          </div>
+        </div>
+
+        <div class="panel-head" style="margin-top:24px"><div class="panel-title">补充指令</div><div class="panel-tag">自然语言对话</div></div>
         <div class="nl-box">
           <div class="nl-msg">
-            <div class="nl-av">智</div>
-            <div class="nl-text">我已识别到两份多中心 CRF 表。请告诉我您的具体要求，比如：哪些字段需要重点核对？空值如何处理？输出格式偏好？</div>
+            <div class="nl-av ai"><svg class="ic"><use href="#i-quantum"/></svg></div>
+            <div class="nl-text">已识别到 2 份多中心 CRF 数据表。请告诉我您的具体要求，例如：哪些字段需要重点核对？空值如何处理？输出格式偏好？</div>
+          </div>
+          <div class="nl-msg" style="flex-direction:row-reverse">
+            <div class="nl-av you"><svg class="ic"><use href="#i-user"/></svg></div>
+            <div class="nl-text you">请重点比对知情同意日期、不良事件记录与生命体征三类字段。空值视为差异并标红，输出 Excel 报告，按受试者编号排序。</div>
           </div>
           <div class="nl-msg">
-            <div class="nl-av you">您</div>
-            <div class="nl-text">请重点比对知情同意日期、不良事件记录与生命体征三类字段。空值视为差异并标红，输出 Excel 报告，按受试者编号排序。</div>
-          </div>
-          <div class="nl-msg">
-            <div class="nl-av">智</div>
-            <div class="nl-text">已理解。我会：① 锁定上述三类共 18 个字段进行比对；② 空值标红并归入"缺失值"差异类型；③ 输出按受试者编号升序排列的 Excel。准备开始？</div>
+            <div class="nl-av ai"><svg class="ic"><use href="#i-quantum"/></svg></div>
+            <div class="nl-text">已理解。执行计划：① 锁定上述三类共 18 个字段进行比对；② 空值标红并归入"缺失值"差异类型；③ 输出按受试者编号升序排列的 Excel 报告。准备开始执行？</div>
           </div>
           <div class="nl-input-row">
-            <textarea class="nl-input" placeholder="继续补充指令... 比如：只比对第14周以后的数据"></textarea>
-            <button class="nl-send">↑</button>
+            <textarea class="nl-input" placeholder="继续补充指令，例如：只比对第14周以后的数据..."></textarea>
+            <button class="nl-send"><svg class="ic ic-sm"><use href="#i-up"/></svg></button>
           </div>
         </div>
 
         <div class="wiz-foot">
-          <button class="btn btn-ghost">← 上一步</button>
+          <button class="btn btn-ghost"><svg class="ic ic-sm"><use href="#i-arrow-left"/></svg>上一步</button>
           <div style="display:flex;gap:10px">
             <button class="btn btn-ghost">保存为草稿</button>
-            <button class="btn btn-accent" onclick="go('exec')">开始执行 →</button>
+            <button class="btn btn-accent" onclick="go('exec')">开始执行<svg class="ic ic-sm"><use href="#i-arrow-right"/></svg></button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ─── SCREEN: EXEC (执行详情) ─── -->
+    <!-- ─── EXEC ─── -->
     <section class="screen" id="screen-exec">
       <div class="exec-layout">
         <div class="exec-main">
           <div class="panel" style="margin-bottom:0">
             <div style="display:flex;align-items:center;gap:14px">
-              <div class="cell-ico ci-pink" style="width:48px;height:48px;font-size:20px">⚠</div>
+              <div class="cell-ico v-info" style="width:48px;height:48px"><svg class="ic ic-lg"><use href="#i-alert"/></svg></div>
               <div style="flex:1">
                 <div style="font-size:16px;font-weight:600;color:var(--t1)">疫苗V-203不良反应汇总</div>
-                <div style="font-size:12px;color:var(--t3);margin-top:2px">使用技能：AE/SAE 汇总 · 输入 3 个文件 · 启动于 14:23</div>
+                <div style="font-size:12px;color:var(--t3);margin-top:2px">技能：AE/SAE 汇总 · 输入 3 个文件 · 启动于 14:23</div>
               </div>
               <span class="status-pill sp-running"><span class="sp-dot"></span>执行中</span>
-              <button class="btn btn-ghost" style="padding:7px 14px">取消任务</button>
+              <button class="btn btn-ghost" style="padding:8px 14px">取消任务</button>
             </div>
           </div>
 
           <div class="progress-card">
             <div class="pc-head">
-              <div class="pc-name">⚡ 实时执行进度</div>
+              <div class="pc-name"><svg class="ic ic-lg" style="color:var(--primary)"><use href="#i-bolt"/></svg>实时执行进度</div>
               <div class="pc-pct">68%</div>
             </div>
             <div class="pc-bar"><div class="pc-bar-fill" style="width:68%"></div></div>
-            <div class="pc-step">
-              <div class="pc-step-ic done">✓</div>
-              <div class="pc-step-t">解析输入文件（3 份）</div>
-              <div class="pc-step-time">14:23 · 4 秒</div>
-            </div>
-            <div class="pc-step">
-              <div class="pc-step-ic done">✓</div>
-              <div class="pc-step-t">提取不良反应记录（共 892 条）</div>
-              <div class="pc-step-time">14:24 · 38 秒</div>
-            </div>
-            <div class="pc-step">
-              <div class="pc-step-ic done">✓</div>
-              <div class="pc-step-t">按 MedDRA v26 标准分类</div>
-              <div class="pc-step-time">14:25 · 1 分 12 秒</div>
-            </div>
-            <div class="pc-step">
-              <div class="pc-step-ic active">⟳</div>
-              <div class="pc-step-t" style="color:var(--t1);font-weight:500">生成频率分布表与可视化</div>
-              <div class="pc-step-time" style="color:var(--accent)">进行中…</div>
-            </div>
-            <div class="pc-step pending">
-              <div class="pc-step-ic pending">4</div>
-              <div class="pc-step-t">导出报告与归档</div>
-              <div class="pc-step-time">等待</div>
-            </div>
+            <div class="pc-step"><div class="pc-step-ic done"><svg class="ic"><use href="#i-check"/></svg></div><div class="pc-step-t">解析输入文件（3 份）</div><div class="pc-step-time">14:23 · 4 秒</div></div>
+            <div class="pc-step"><div class="pc-step-ic done"><svg class="ic"><use href="#i-check"/></svg></div><div class="pc-step-t">提取不良反应记录（共 892 条）</div><div class="pc-step-time">14:24 · 38 秒</div></div>
+            <div class="pc-step"><div class="pc-step-ic done"><svg class="ic"><use href="#i-check"/></svg></div><div class="pc-step-t">按 MedDRA v26 标准分类</div><div class="pc-step-time">14:25 · 1 分 12 秒</div></div>
+            <div class="pc-step active"><div class="pc-step-ic active"><svg class="ic"><use href="#i-refresh"/></svg></div><div class="pc-step-t" style="color:var(--t1);font-weight:500">生成频率分布表与可视化</div><div class="pc-step-time">进行中…</div></div>
+            <div class="pc-step pending"><div class="pc-step-ic pending">5</div><div class="pc-step-t">导出报告与归档</div><div class="pc-step-time">等待</div></div>
           </div>
 
           <div class="panel" style="margin-bottom:0">
             <div class="panel-head"><div class="panel-title">最近活动</div></div>
-            <div style="display:flex;flex-direction:column;gap:10px;font-size:12.5px;color:var(--t2)">
-              <div>· 14:26:18 — 检测到 V203-001-089 缺失合并用药字段，已标记</div>
-              <div>· 14:26:02 — 完成中心03 数据合并，共 312 条记录</div>
-              <div>· 14:25:47 — MedDRA 编码完成，识别到 12 个 PT 术语</div>
-              <div>· 14:25:12 — 开始按系统器官分类（SOC）汇总</div>
+            <div style="display:flex;flex-direction:column;gap:11px;font-size:12.5px;color:var(--t2)">
+              <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--t3);font-variant-numeric:tabular-nums">14:26:18</span><span style="color:var(--t1)">检测到 V203-001-089 缺失合并用药字段，已标记</span></div>
+              <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--t3);font-variant-numeric:tabular-nums">14:26:02</span><span style="color:var(--t1)">完成中心03 数据合并，共 312 条记录</span></div>
+              <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--t3);font-variant-numeric:tabular-nums">14:25:47</span><span style="color:var(--t1)">MedDRA 编码完成，识别到 12 个 PT 术语</span></div>
+              <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--t3);font-variant-numeric:tabular-nums">14:25:12</span><span style="color:var(--t1)">开始按系统器官分类（SOC）汇总</span></div>
             </div>
           </div>
         </div>
 
-        <!-- 右侧面板：对话 / 文件 -->
         <aside class="exec-side" id="execSide">
           <div class="exec-side-tabs">
-            <div class="es-tab active" onclick="switchSide(this,'chat')">💬 对话</div>
-            <div class="es-tab" onclick="switchSide(this,'files')">📁 文件</div>
-            <div class="es-collapse" onclick="toggleSide()">⇥</div>
+            <div class="es-tab active" onclick="switchSide(this,'chat')"><svg class="ic ic-sm"><use href="#i-message"/></svg>对话</div>
+            <div class="es-tab" onclick="switchSide(this,'files')"><svg class="ic ic-sm"><use href="#i-folder"/></svg>文件</div>
+            <div class="es-collapse" onclick="toast('折叠面板')"><svg class="ic ic-sm"><use href="#i-arrow-right"/></svg></div>
           </div>
           <div class="es-body" id="esBodyChat">
-            <div class="chat-msg">
-              <div class="chat-meta">智枢 · AI</div>
-              <div class="chat-bubble ai">已完成 3/5 步骤。当前正在按 MedDRA 标准对 892 条不良反应记录进行编码归类。</div>
-            </div>
-            <div class="chat-row user">
-              <div class="chat-msg">
-                <div class="chat-meta" style="text-align:right">您</div>
-                <div class="chat-bubble user">注射部位反应也要单独统计吗？</div>
-              </div>
-            </div>
-            <div class="chat-msg">
-              <div class="chat-meta">智枢 · AI</div>
-              <div class="chat-bubble ai">是的，根据 SOC 分类规则，"局部注射反应"会作为独立 SOC 单独统计。当前已识别 47 条相关记录，将在频率分布表第 3 节展示。</div>
-            </div>
-            <div class="chat-row user">
-              <div class="chat-msg">
-                <div class="chat-meta" style="text-align:right">您</div>
-                <div class="chat-bubble user">把严重不良反应单独导出一份</div>
-              </div>
-            </div>
-            <div class="chat-msg">
-              <div class="chat-meta">智枢 · AI</div>
-              <div class="chat-bubble ai">好的，已加入任务清单。完成主报告后会生成 "SAE_单独清单.xlsx" 并保存至 任务输出 文件夹。</div>
-            </div>
+            <div class="chat-msg"><div class="chat-meta">量子链 · AI</div><div class="chat-bubble ai">已完成 3/5 步骤。当前正在按 MedDRA 标准对 892 条不良反应记录进行编码归类。</div></div>
+            <div class="chat-row user"><div class="chat-msg"><div class="chat-meta">您</div><div class="chat-bubble user">注射部位反应也要单独统计吗？</div></div></div>
+            <div class="chat-msg"><div class="chat-meta">量子链 · AI</div><div class="chat-bubble ai">是的，根据 SOC 分类规则，"局部注射反应"会作为独立 SOC 单独统计。当前已识别 47 条相关记录，将在频率分布表第 3 节展示。</div></div>
+            <div class="chat-row user"><div class="chat-msg"><div class="chat-meta">您</div><div class="chat-bubble user">把严重不良反应单独导出一份</div></div></div>
+            <div class="chat-msg"><div class="chat-meta">量子链 · AI</div><div class="chat-bubble ai">好的，已加入任务清单。完成主报告后会生成 "SAE_单独清单.xlsx" 并保存至 任务输出 文件夹。</div></div>
           </div>
           <div class="es-body hidden" id="esBodyFiles">
             <div class="es-file-group">输入文件 (3)</div>
-            <div class="es-file"><div class="uf-ico" style="width:28px;height:28px;font-size:10px">XLS</div><div style="flex:1"><div style="font-size:12px;color:var(--t1)">中心01_AE数据.xlsx</div><div style="font-size:10px;color:var(--t3)">2.4 MB</div></div><span style="font-size:13px;color:var(--t3)">⇣</span></div>
-            <div class="es-file"><div class="uf-ico" style="width:28px;height:28px;font-size:10px;background:var(--sky-soft);color:var(--sky)">XLS</div><div style="flex:1"><div style="font-size:12px;color:var(--t1)">中心02_AE数据.xlsx</div><div style="font-size:10px;color:var(--t3)">2.1 MB</div></div><span style="font-size:13px;color:var(--t3)">⇣</span></div>
-            <div class="es-file"><div class="uf-ico" style="width:28px;height:28px;font-size:10px;background:var(--amber-soft);color:var(--amber)">XLS</div><div style="flex:1"><div style="font-size:12px;color:var(--t1)">中心03_AE数据.xlsx</div><div style="font-size:10px;color:var(--t3)">1.8 MB</div></div><span style="font-size:13px;color:var(--t3)">⇣</span></div>
+            <div class="es-file"><div class="ws-fic">XLS</div><div style="flex:1;min-width:0"><div style="font-size:12.5px;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">中心01_AE数据.xlsx</div><div style="font-size:10.5px;color:var(--t3)">2.4 MB</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-download"/></svg></div>
+            <div class="es-file"><div class="ws-fic">XLS</div><div style="flex:1;min-width:0"><div style="font-size:12.5px;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">中心02_AE数据.xlsx</div><div style="font-size:10.5px;color:var(--t3)">2.1 MB</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-download"/></svg></div>
+            <div class="es-file"><div class="ws-fic">XLS</div><div style="flex:1;min-width:0"><div style="font-size:12.5px;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">中心03_AE数据.xlsx</div><div style="font-size:10.5px;color:var(--t3)">1.8 MB</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-download"/></svg></div>
             <div class="es-file-group">输出文件 (生成中)</div>
-            <div class="es-file" style="opacity:.6"><div class="uf-ico" style="width:28px;height:28px;font-size:10px;background:var(--bg-tint);color:var(--t3)">…</div><div style="flex:1"><div style="font-size:12px;color:var(--t1)">AE_频率分布表.xlsx</div><div style="font-size:10px;color:var(--accent)">生成中 68%</div></div></div>
+            <div class="es-file" style="opacity:.7"><div class="ws-fic" style="background:var(--bg-tint);color:var(--t3);border-color:var(--border)">…</div><div style="flex:1;min-width:0"><div style="font-size:12.5px;color:var(--t1)">AE_频率分布表.xlsx</div><div style="font-size:10.5px;color:var(--primary)">生成中 68%</div></div></div>
           </div>
-          <div style="padding:10px;border-top:1px solid var(--border)" id="esInput">
+          <div style="padding:10px;border-top:1px solid var(--border)">
             <div class="nl-input-row" style="padding:8px 10px">
               <input class="nl-input" placeholder="向 AI 提问..." style="min-height:18px"/>
-              <button class="nl-send" style="width:28px;height:28px;font-size:12px">↑</button>
+              <button class="nl-send" style="width:30px;height:30px"><svg class="ic ic-sm"><use href="#i-up"/></svg></button>
             </div>
           </div>
         </aside>
       </div>
     </section>
 
-    <!-- ─── SCREEN: REVIEW (审核) ─── -->
+    <!-- ─── REVIEW ─── -->
     <section class="screen" id="screen-review">
       <div class="panel" style="margin-bottom:14px">
         <div style="display:flex;align-items:center;gap:14px">
-          <div class="cell-ico ci-amber" style="width:48px;height:48px;font-size:20px">📋</div>
+          <div class="cell-ico v-warn" style="width:48px;height:48px"><svg class="ic ic-lg"><use href="#i-clip"/></svg></div>
           <div style="flex:1">
             <div style="font-size:16px;font-weight:600;color:var(--t1)">CRF 数据比对结果</div>
             <div style="font-size:12px;color:var(--t3);margin-top:2px">中心01 vs 中心02 · V-203 第14周 · 共比对 231 行，发现 12 处差异</div>
@@ -978,11 +1079,11 @@ tbody tr:hover td{background:var(--bg-soft)}
 
       <div class="review-toolbar" style="margin-bottom:14px">
         <span style="font-size:13px;color:var(--t2)">需要确认</span>
-        <span style="font-size:12px;font-weight:600;color:var(--amber);background:var(--amber-soft);padding:3px 10px;border-radius:99px">3 项</span>
+        <span style="font-size:12px;font-weight:600;color:var(--warn);background:var(--warn-soft);padding:3px 10px;border-radius:99px;border:1px solid #fde68a">3 项</span>
         <div style="width:1px;height:18px;background:var(--border);margin:0 4px"></div>
-        <button class="confirm-btn">仅显示待确认</button>
-        <button class="confirm-btn">📥 导出报告</button>
-        <button class="btn btn-accent" style="margin-left:auto;padding:8px 18px;font-size:12px" onclick="toast('全部已确认 · 报告已归档')">✓ 全部确认并导出</button>
+        <button class="confirm-btn"><svg class="ic ic-sm"><use href="#i-filter"/></svg>仅显示待确认</button>
+        <button class="confirm-btn"><svg class="ic ic-sm"><use href="#i-download"/></svg>导出报告</button>
+        <button class="btn btn-accent" style="margin-left:auto;padding:9px 18px;font-size:12px" onclick="toast('全部已确认 · 报告已归档至工作区')"><svg class="ic ic-sm"><use href="#i-check"/></svg>全部确认并导出</button>
       </div>
 
       <div class="panel" style="padding:0;overflow:hidden">
@@ -990,11 +1091,11 @@ tbody tr:hover td{background:var(--bg-soft)}
           <thead><tr><th>受试者编号</th><th>字段</th><th>中心01</th><th>中心02</th><th>差异类型</th><th>操作</th></tr></thead>
           <tbody>
             <tr><td style="color:var(--t1);font-weight:500">V203-001-023</td><td>访视日期</td><td>2026-03-12</td><td>2026-03-14</td><td><span class="status-pill sp-queue"><span class="sp-dot"></span>已标注</span></td><td style="font-size:12px;color:var(--t3)">系统处理</td></tr>
-            <tr style="background:#fffbeb"><td style="color:var(--t1);font-weight:500">V203-001-047</td><td><span style="display:inline-flex;align-items:center;gap:6px"><span class="flag-icon">!</span>体重 (kg)</span></td><td style="color:var(--amber);font-weight:500">68.5</td><td style="color:var(--rose)">—</td><td><span class="status-pill sp-fail"><span class="sp-dot"></span>缺失值</span></td><td><button class="confirm-btn" onclick="this.classList.add('done');this.textContent='✓ 已确认'">确认</button></td></tr>
+            <tr style="background:#fffbeb"><td style="color:var(--t1);font-weight:500">V203-001-047</td><td><span style="display:inline-flex;align-items:center;gap:7px"><span class="flag-icon"><svg class="ic"><use href="#i-alert"/></svg></span>体重 (kg)</span></td><td style="color:var(--warn);font-weight:500">68.5</td><td style="color:var(--bad)">—</td><td><span class="status-pill sp-fail"><span class="sp-dot"></span>缺失值</span></td><td><button class="confirm-btn" onclick="this.classList.add('done');this.innerHTML='<svg class=\'ic ic-sm\'><use href=&quot;#i-check&quot;/></svg>已确认'">确认</button></td></tr>
             <tr><td style="color:var(--t1);font-weight:500">V203-001-052</td><td>收缩压</td><td>118</td><td>120</td><td><span class="status-pill sp-queue"><span class="sp-dot"></span>已标注</span></td><td style="font-size:12px;color:var(--t3)">系统处理</td></tr>
-            <tr style="background:#fffbeb"><td style="color:var(--t1);font-weight:500">V203-001-061</td><td><span style="display:inline-flex;align-items:center;gap:6px"><span class="flag-icon">!</span>知情同意日期</span></td><td style="color:var(--amber);font-weight:500">2026-01-08</td><td style="color:var(--amber);font-weight:500">2026-01-15</td><td><span class="status-pill sp-review"><span class="sp-dot"></span>日期差异</span></td><td><button class="confirm-btn" onclick="this.classList.add('done');this.textContent='✓ 已确认'">确认</button></td></tr>
+            <tr style="background:#fffbeb"><td style="color:var(--t1);font-weight:500">V203-001-061</td><td><span style="display:inline-flex;align-items:center;gap:7px"><span class="flag-icon"><svg class="ic"><use href="#i-alert"/></svg></span>知情同意日期</span></td><td style="color:var(--warn);font-weight:500">2026-01-08</td><td style="color:var(--warn);font-weight:500">2026-01-15</td><td><span class="status-pill sp-review"><span class="sp-dot"></span>日期差异</span></td><td><button class="confirm-btn" onclick="this.classList.add('done');this.innerHTML='已确认'">确认</button></td></tr>
             <tr><td style="color:var(--t1);font-weight:500">V203-001-074</td><td>AE是否发生</td><td>否</td><td>否</td><td><span class="status-pill sp-done"><span class="sp-dot"></span>一致</span></td><td style="font-size:12px;color:var(--t3)">无需处理</td></tr>
-            <tr style="background:#fffbeb"><td style="color:var(--t1);font-weight:500">V203-001-089</td><td><span style="display:inline-flex;align-items:center;gap:6px"><span class="flag-icon">!</span>合并用药</span></td><td style="color:var(--amber);font-weight:500">布洛芬 200mg</td><td style="color:var(--rose)">—</td><td><span class="status-pill sp-fail"><span class="sp-dot"></span>缺失值</span></td><td><button class="confirm-btn" onclick="this.classList.add('done');this.textContent='✓ 已确认'">确认</button></td></tr>
+            <tr style="background:#fffbeb"><td style="color:var(--t1);font-weight:500">V203-001-089</td><td><span style="display:inline-flex;align-items:center;gap:7px"><span class="flag-icon"><svg class="ic"><use href="#i-alert"/></svg></span>合并用药</span></td><td style="color:var(--warn);font-weight:500">布洛芬 200mg</td><td style="color:var(--bad)">—</td><td><span class="status-pill sp-fail"><span class="sp-dot"></span>缺失值</span></td><td><button class="confirm-btn" onclick="this.classList.add('done');this.innerHTML='已确认'">确认</button></td></tr>
             <tr><td style="color:var(--t1);font-weight:500">V203-001-103</td><td>实验室编号</td><td>LAB-0231</td><td>LAB-0231</td><td><span class="status-pill sp-done"><span class="sp-dot"></span>一致</span></td><td style="font-size:12px;color:var(--t3)">无需处理</td></tr>
             <tr><td style="color:var(--t1);font-weight:500">V203-001-112</td><td>舒张压</td><td>78</td><td>76</td><td><span class="status-pill sp-queue"><span class="sp-dot"></span>已标注</span></td><td style="font-size:12px;color:var(--t3)">系统处理</td></tr>
             <tr><td style="color:var(--t1);font-weight:500">V203-001-118</td><td>体温 (°C)</td><td>36.7</td><td>36.5</td><td><span class="status-pill sp-done"><span class="sp-dot"></span>一致</span></td><td style="font-size:12px;color:var(--t3)">无需处理</td></tr>
@@ -1004,28 +1105,28 @@ tbody tr:hover td{background:var(--bg-soft)}
       </div>
     </section>
 
-    <!-- ─── SCREEN: FILES (工作区) ─── -->
+    <!-- ─── FILES ─── -->
     <section class="screen" id="screen-files">
       <div class="file-toolbar">
-        <div class="fb-crumb"><b>工作区</b><span class="sep">/</span><span>01_原始数据</span></div>
+        <div class="fb-crumb"><svg class="ic"><use href="#i-folder"/></svg><b>工作区</b><span style="color:var(--t-light)">/</span><span>01_原始数据</span></div>
         <div style="margin-left:auto;display:flex;gap:8px">
-          <div class="search" style="width:240px"><span class="search-i">⌕</span><input placeholder="搜索文件..."/></div>
-          <button class="btn btn-ghost" style="padding:8px 14px">＋ 新建文件夹</button>
-          <button class="btn btn-primary" style="padding:8px 14px">↑ 上传</button>
+          <div class="search" style="width:240px"><svg class="ic ic-sm"><use href="#i-search"/></svg><input placeholder="搜索文件..."/></div>
+          <button class="btn btn-ghost" style="padding:9px 14px"><svg class="ic ic-sm"><use href="#i-plus"/></svg>新建文件夹</button>
+          <button class="btn btn-primary" style="padding:9px 14px"><svg class="ic ic-sm"><use href="#i-up"/></svg>上传</button>
         </div>
       </div>
 
       <div class="stats-row">
-        <div class="stat-card lavender" style="cursor:pointer">
-          <div class="stat-ico" style="color:var(--accent)">📁</div>
+        <div class="stat-card" style="cursor:pointer">
+          <div class="stat-ico"><svg class="ic"><use href="#i-folder"/></svg></div>
           <div><div class="stat-meta">我的上传</div><div class="stat-val">48<span class="u">文件</span></div></div>
         </div>
-        <div class="stat-card pink" style="cursor:pointer">
-          <div class="stat-ico" style="color:var(--pink)">📁</div>
+        <div class="stat-card v2" style="cursor:pointer">
+          <div class="stat-ico"><svg class="ic"><use href="#i-down"/></svg></div>
           <div><div class="stat-meta">任务输入</div><div class="stat-val">22<span class="u">文件</span></div></div>
         </div>
-        <div class="stat-card mint" style="cursor:pointer">
-          <div class="stat-ico" style="color:var(--mint)">📁</div>
+        <div class="stat-card v3" style="cursor:pointer">
+          <div class="stat-ico"><svg class="ic"><use href="#i-up"/></svg></div>
           <div><div class="stat-meta">任务输出</div><div class="stat-val">36<span class="u">文件</span></div></div>
         </div>
       </div>
@@ -1035,27 +1136,27 @@ tbody tr:hover td{background:var(--bg-soft)}
           <div class="panel-title">所有文件</div>
           <div class="panel-tag">106 个</div>
           <div style="margin-left:auto;display:flex;gap:6px">
-            <button class="panel-pill">↻ 共享</button>
-            <button class="panel-pill">🗑 回收站 (12)</button>
-            <button class="panel-pill">视图 ▾</button>
+            <button class="panel-pill"><svg class="ic ic-sm"><use href="#i-share"/></svg>共享</button>
+            <button class="panel-pill"><svg class="ic ic-sm"><use href="#i-trash"/></svg>回收站 (12)</button>
+            <button class="panel-pill">视图<svg class="ic ic-sm"><use href="#i-chev-down"/></svg></button>
           </div>
         </div>
-        <div class="tbl-wrap file-table"><table>
-          <thead><tr><th><input type="checkbox"/></th><th>文件名</th><th>大小</th><th>修改时间</th><th>来源</th><th>操作</th></tr></thead>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th style="width:32px"><input type="checkbox"/></th><th>文件名</th><th>大小</th><th>修改时间</th><th>来源</th><th>操作</th></tr></thead>
           <tbody>
-            <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="cell-ico ci-mint">XLS</div>中心01_CRF_V203_W14.xlsx</div></td><td>2.4 MB</td><td>今天 14:23</td><td><span class="fi-tag">手动上传</span></td><td><button class="row-more">⋯</button></td></tr>
-            <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="cell-ico ci-sky">XLS</div>中心02_CRF_V203_W14.xlsx</div></td><td>2.1 MB</td><td>今天 14:23</td><td><span class="fi-tag">手动上传</span></td><td><button class="row-more">⋯</button></td></tr>
-            <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="cell-ico ci-amber">PDF</div>临床试验方案_V203_v3.1.pdf</div></td><td>8.4 MB</td><td>昨天</td><td><span class="fi-tag">企微导入</span></td><td><button class="row-more">⋯</button></td></tr>
-            <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="cell-ico ci-mint">XLS</div>不良反应_频率分布表.xlsx</div></td><td>1.6 MB</td><td>2小时前</td><td><span class="fi-tag" style="background:var(--mint-soft);color:var(--mint)">任务输出</span></td><td><button class="row-more">⋯</button></td></tr>
-            <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="cell-ico ci-pink">DOC</div>SAE周报_第14周_草稿.docx</div></td><td>0.8 MB</td><td>昨天</td><td><span class="fi-tag" style="background:var(--mint-soft);color:var(--mint)">任务输出</span></td><td><button class="row-more">⋯</button></td></tr>
-            <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="cell-ico ci-lav">PDF</div>DSMB安全报告_2026年5月.pdf</div></td><td>2.1 MB</td><td>上周</td><td><span class="fi-tag" style="background:var(--mint-soft);color:var(--mint)">任务输出</span></td><td><button class="row-more">⋯</button></td></tr>
-            <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="cell-ico ci-sky">CSV</div>受试者入组记录.csv</div></td><td>0.8 MB</td><td>3天前</td><td><span class="fi-tag">手动上传</span></td><td><button class="row-more">⋯</button></td></tr>
+            <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="ws-fic">XLS</div>中心01_CRF_V203_W14.xlsx</div></td><td>2.4 MB</td><td>今天 14:23</td><td><span class="fi-tag">手动上传</span></td><td><button class="row-btn"><svg class="ic"><use href="#i-more"/></svg></button></td></tr>
+            <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="ws-fic">XLS</div>中心02_CRF_V203_W14.xlsx</div></td><td>2.1 MB</td><td>今天 14:23</td><td><span class="fi-tag">手动上传</span></td><td><button class="row-btn"><svg class="ic"><use href="#i-more"/></svg></button></td></tr>
+            <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="ws-fic t-pdf">PDF</div>临床试验方案_V203_v3.1.pdf</div></td><td>8.4 MB</td><td>昨天</td><td><span class="fi-tag">企微导入</span></td><td><button class="row-btn"><svg class="ic"><use href="#i-more"/></svg></button></td></tr>
+            <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="ws-fic">XLS</div>不良反应_频率分布表.xlsx</div></td><td>1.6 MB</td><td>2小时前</td><td><span class="fi-tag out">任务输出</span></td><td><button class="row-btn"><svg class="ic"><use href="#i-more"/></svg></button></td></tr>
+            <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="ws-fic t-doc">DOC</div>SAE周报_第14周_草稿.docx</div></td><td>0.8 MB</td><td>昨天</td><td><span class="fi-tag out">任务输出</span></td><td><button class="row-btn"><svg class="ic"><use href="#i-more"/></svg></button></td></tr>
+            <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="ws-fic t-pdf">PDF</div>DSMB安全报告_2026年5月.pdf</div></td><td>2.1 MB</td><td>上周</td><td><span class="fi-tag out">任务输出</span></td><td><button class="row-btn"><svg class="ic"><use href="#i-more"/></svg></button></td></tr>
+            <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="ws-fic t-csv">CSV</div>受试者入组记录.csv</div></td><td>0.8 MB</td><td>3天前</td><td><span class="fi-tag">手动上传</span></td><td><button class="row-btn"><svg class="ic"><use href="#i-more"/></svg></button></td></tr>
           </tbody>
         </table></div>
       </div>
     </section>
 
-    <!-- ─── SCREEN: NOTIFICATION ─── -->
+    <!-- ─── NOTIF ─── -->
     <section class="screen" id="screen-notif">
       <div class="market-filter">
         <button class="chip active">全部 12</button>
@@ -1064,133 +1165,53 @@ tbody tr:hover td{background:var(--bg-soft)}
         <button class="chip">授权</button>
         <button class="chip">分享</button>
         <button class="chip">系统</button>
-        <button class="chip" style="margin-left:auto">全部标记为已读</button>
+        <button class="chip" style="margin-left:auto"><svg class="ic ic-sm"><use href="#i-check"/></svg>全部标记已读</button>
       </div>
       <div class="notif-list">
-        <div class="notif unread">
-          <div class="notif-ic" style="background:var(--mint-soft);color:var(--mint)">✓</div>
-          <div class="notif-body">
-            <div class="notif-t">任务已完成 · 进入待审核</div>
-            <div class="notif-d">"中心01 vs 中心02 CRF比对" 已完成，共发现 12 处差异，其中 3 项需要您人工确认。</div>
-          </div>
-          <div class="notif-time">5 分钟前</div>
-        </div>
-        <div class="notif unread">
-          <div class="notif-ic" style="background:var(--accent-soft);color:var(--accent)">◈</div>
-          <div class="notif-body">
-            <div class="notif-t">技能授权申请已批准</div>
-            <div class="notif-d">您申请使用 "实验室异常复核" 技能的申请已被管理员李主任批准，有效期 90 天。</div>
-          </div>
-          <div class="notif-time">25 分钟前</div>
-        </div>
-        <div class="notif unread">
-          <div class="notif-ic" style="background:var(--pink-soft);color:var(--pink)">📎</div>
-          <div class="notif-body">
-            <div class="notif-t">收到文件分享</div>
-            <div class="notif-d">陈泽明 通过企业微信向您分享了 "受试者基线数据_V203.xlsx"。</div>
-          </div>
-          <div class="notif-time">1 小时前</div>
-        </div>
-        <div class="notif unread">
-          <div class="notif-ic" style="background:var(--amber-soft);color:var(--amber)">⚠</div>
-          <div class="notif-body">
-            <div class="notif-t">工作区使用提醒</div>
-            <div class="notif-d">您的工作区使用已达 92%（46.2 GB / 50 GB），请及时清理或联系管理员扩容。</div>
-          </div>
-          <div class="notif-time">今天 09:12</div>
-        </div>
-        <div class="notif">
-          <div class="notif-ic" style="background:var(--mint-soft);color:var(--mint)">✓</div>
-          <div class="notif-body">
-            <div class="notif-t">SAE周报已完成</div>
-            <div class="notif-d">"SAE周报草稿 · 第14周" 已生成，共 12 页 · 已自动保存至 任务输出 文件夹。</div>
-          </div>
-          <div class="notif-time">昨天 16:48</div>
-        </div>
-        <div class="notif">
-          <div class="notif-ic" style="background:var(--sky-soft);color:var(--sky)">📱</div>
-          <div class="notif-body">
-            <div class="notif-t">系统维护公告</div>
-            <div class="notif-d">本平台将于本周六 02:00 - 04:00 进行例行维护升级，期间任务执行可能受影响。</div>
-          </div>
-          <div class="notif-time">2 天前</div>
-        </div>
+        <div class="notif unread"><div class="notif-ic ok"><svg class="ic"><use href="#i-check"/></svg></div><div class="notif-body"><div class="notif-t">任务已完成 · 进入待审核</div><div class="notif-d">"中心01 vs 中心02 CRF比对" 已完成，共发现 12 处差异，其中 3 项需要您人工确认。</div></div><div class="notif-time">5 分钟前</div></div>
+        <div class="notif unread"><div class="notif-ic"><svg class="ic"><use href="#i-cube"/></svg></div><div class="notif-body"><div class="notif-t">技能授权申请已批准</div><div class="notif-d">您申请使用 "实验室异常复核" 技能的申请已被管理员李主任批准，有效期 90 天。</div></div><div class="notif-time">25 分钟前</div></div>
+        <div class="notif unread"><div class="notif-ic"><svg class="ic"><use href="#i-share"/></svg></div><div class="notif-body"><div class="notif-t">收到文件分享</div><div class="notif-d">陈泽明 通过企业微信向您分享了 "受试者基线数据_V203.xlsx"。</div></div><div class="notif-time">1 小时前</div></div>
+        <div class="notif unread"><div class="notif-ic warn"><svg class="ic"><use href="#i-alert"/></svg></div><div class="notif-body"><div class="notif-t">工作区使用提醒</div><div class="notif-d">您的工作区使用已达 92%（46.2 GB / 50 GB），请及时清理或联系管理员扩容。</div></div><div class="notif-time">今天 09:12</div></div>
+        <div class="notif"><div class="notif-ic ok"><svg class="ic"><use href="#i-check"/></svg></div><div class="notif-body"><div class="notif-t">SAE周报已完成</div><div class="notif-d">"SAE周报草稿 · 第14周" 已生成，共 12 页，已自动保存至 任务输出 文件夹。</div></div><div class="notif-time">昨天 16:48</div></div>
+        <div class="notif"><div class="notif-ic"><svg class="ic"><use href="#i-message"/></svg></div><div class="notif-body"><div class="notif-t">系统维护公告</div><div class="notif-d">本平台将于本周六 02:00 - 04:00 进行例行维护升级，期间任务执行可能受影响。</div></div><div class="notif-time">2 天前</div></div>
       </div>
     </section>
 
-    <!-- ─── SCREEN: ADMIN (组织管理) ─── -->
+    <!-- ─── ADMIN ─── -->
     <section class="screen" id="screen-admin">
       <div class="subtabs">
-        <div class="subtab active">概览</div>
-        <div class="subtab">成员管理</div>
-        <div class="subtab">技能管理</div>
-        <div class="subtab">授权审批 <span style="background:var(--rose);color:#fff;font-size:10px;padding:1px 6px;border-radius:99px;margin-left:4px">5</span></div>
-        <div class="subtab">组织设置</div>
-        <div class="subtab">审计日志</div>
+        <div class="subtab active"><svg class="ic ic-sm"><use href="#i-grid"/></svg>概览</div>
+        <div class="subtab"><svg class="ic ic-sm"><use href="#i-users"/></svg>成员管理</div>
+        <div class="subtab"><svg class="ic ic-sm"><use href="#i-cube"/></svg>技能管理</div>
+        <div class="subtab"><svg class="ic ic-sm"><use href="#i-check"/></svg>授权审批<span class="pill-red">5</span></div>
+        <div class="subtab"><svg class="ic ic-sm"><use href="#i-gear"/></svg>组织设置</div>
+        <div class="subtab"><svg class="ic ic-sm"><use href="#i-clock"/></svg>审计日志</div>
       </div>
 
       <div class="stats-row">
-        <div class="stat-card lavender">
-          <div class="stat-ico" style="color:var(--accent)">👥</div>
-          <div><div class="stat-meta">组织成员</div><div class="stat-val">42<span class="u">人</span></div></div>
-          <div class="stat-trend">+ 3 本周</div>
-        </div>
-        <div class="stat-card pink">
-          <div class="stat-ico" style="color:var(--pink)">◈</div>
-          <div><div class="stat-meta">已上架技能</div><div class="stat-val">18<span class="u">个</span></div></div>
-          <div class="stat-trend">+ 1 本周</div>
-        </div>
-        <div class="stat-card mint">
-          <div class="stat-ico" style="color:var(--mint)">⟳</div>
-          <div><div class="stat-meta">本周任务</div><div class="stat-val">186<span class="u">次执行</span></div></div>
-          <div class="stat-trend">↑ 22%</div>
-        </div>
+        <div class="stat-card"><div class="stat-ico"><svg class="ic"><use href="#i-users"/></svg></div><div><div class="stat-meta">组织成员</div><div class="stat-val">42<span class="u">人</span></div></div><div class="stat-trend">+ 3 本周</div></div>
+        <div class="stat-card v2"><div class="stat-ico"><svg class="ic"><use href="#i-cube"/></svg></div><div><div class="stat-meta">已上架技能</div><div class="stat-val">18<span class="u">个</span></div></div><div class="stat-trend">+ 1 本周</div></div>
+        <div class="stat-card v3"><div class="stat-ico"><svg class="ic"><use href="#i-refresh"/></svg></div><div><div class="stat-meta">本周任务</div><div class="stat-val">186<span class="u">次执行</span></div></div><div class="stat-trend"><svg class="ic ic-sm"><use href="#i-up"/></svg>22%</div></div>
       </div>
 
       <div class="cols">
         <div class="col-left">
           <div class="panel">
-            <div class="panel-head">
-              <div class="panel-title">待处理事项</div>
-              <div class="panel-tag" style="background:var(--rose-soft);color:var(--rose)">5 项</div>
-            </div>
+            <div class="panel-head"><div class="panel-title">待处理事项</div><div class="panel-tag" style="background:var(--bad-soft);color:var(--bad);border-color:#fecaca">5 项</div></div>
             <div class="care-list">
-              <div class="care-row">
-                <div class="cell-ico ci-amber" style="width:38px;height:38px">◈</div>
-                <div class="care-info">
-                  <div class="care-name">张瑞 申请使用 "实验室异常复核"</div>
-                  <div class="care-mail">理由：W12 实验室数据复核 · 提交于 2 小时前</div>
-                </div>
-                <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px">拒绝</button>
-                <button class="btn btn-primary" style="padding:6px 12px;font-size:12px">批准</button>
-              </div>
-              <div class="care-row">
-                <div class="cell-ico ci-amber" style="width:38px;height:38px">◈</div>
-                <div class="care-info">
-                  <div class="care-name">刘宇航 申请使用 "DSMB 安全报告"</div>
-                  <div class="care-mail">理由：3 月度 DSMB 报告 · 提交于 4 小时前</div>
-                </div>
-                <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px">拒绝</button>
-                <button class="btn btn-primary" style="padding:6px 12px;font-size:12px">批准</button>
-              </div>
-              <div class="care-row">
-                <div class="cell-ico ci-pink" style="width:38px;height:38px">👤</div>
-                <div class="care-info">
-                  <div class="care-name">新成员邀请待发送</div>
-                  <div class="care-mail">3 位通讯录成员待邀请</div>
-                </div>
-                <button class="btn btn-primary" style="padding:6px 12px;font-size:12px">查看</button>
-              </div>
+              <div class="care-row"><div class="cell-ico v-warn"><svg class="ic"><use href="#i-cube"/></svg></div><div class="care-info"><div class="care-name">张瑞 申请使用 "实验室异常复核"</div><div class="care-mail">理由：W12 实验室数据复核 · 提交于 2 小时前</div></div><button class="btn btn-ghost" style="padding:6px 12px;font-size:12px">拒绝</button><button class="btn btn-primary" style="padding:6px 12px;font-size:12px">批准</button></div>
+              <div class="care-row"><div class="cell-ico v-warn"><svg class="ic"><use href="#i-cube"/></svg></div><div class="care-info"><div class="care-name">刘宇航 申请使用 "DSMB 安全报告"</div><div class="care-mail">理由：3 月度 DSMB 报告 · 提交于 4 小时前</div></div><button class="btn btn-ghost" style="padding:6px 12px;font-size:12px">拒绝</button><button class="btn btn-primary" style="padding:6px 12px;font-size:12px">批准</button></div>
+              <div class="care-row"><div class="cell-ico"><svg class="ic"><use href="#i-user"/></svg></div><div class="care-info"><div class="care-name">新成员邀请待发送</div><div class="care-mail">3 位通讯录成员待邀请</div></div><button class="btn btn-primary" style="padding:6px 12px;font-size:12px">查看</button></div>
             </div>
           </div>
 
           <div class="panel">
             <div class="panel-head"><div class="panel-title">技能使用频率</div><div class="panel-tag">最近 30 天</div></div>
             <div class="care-list">
-              <div class="care-row"><div class="cell-ico ci-lav" style="width:36px;height:36px">📋</div><div class="care-info"><div class="care-name">CRF 数据比对</div><div class="care-mail">62 次执行 · 8 位用户</div></div><div style="width:120px;height:6px;background:var(--bg-tint);border-radius:99px;overflow:hidden"><div style="width:88%;height:100%;background:var(--accent-grad)"></div></div></div>
-              <div class="care-row"><div class="cell-ico ci-mint" style="width:36px;height:36px">📊</div><div class="care-info"><div class="care-name">SAE 周报生成</div><div class="care-mail">48 次执行 · 6 位用户</div></div><div style="width:120px;height:6px;background:var(--bg-tint);border-radius:99px;overflow:hidden"><div style="width:68%;height:100%;background:var(--accent-grad)"></div></div></div>
-              <div class="care-row"><div class="cell-ico ci-pink" style="width:36px;height:36px">⚠</div><div class="care-info"><div class="care-name">不良反应汇总</div><div class="care-mail">32 次执行 · 5 位用户</div></div><div style="width:120px;height:6px;background:var(--bg-tint);border-radius:99px;overflow:hidden"><div style="width:46%;height:100%;background:var(--accent-grad)"></div></div></div>
-              <div class="care-row"><div class="cell-ico ci-sky" style="width:36px;height:36px">🔬</div><div class="care-info"><div class="care-name">实验室异常复核</div><div class="care-mail">22 次执行 · 4 位用户</div></div><div style="width:120px;height:6px;background:var(--bg-tint);border-radius:99px;overflow:hidden"><div style="width:32%;height:100%;background:var(--accent-grad)"></div></div></div>
+              <div class="care-row"><div class="cell-ico"><svg class="ic"><use href="#i-clip"/></svg></div><div class="care-info"><div class="care-name">CRF 数据比对</div><div class="care-mail">62 次执行 · 8 位用户</div></div><div class="mini-bar"><div class="mini-bar-fill" style="width:88%"></div></div></div>
+              <div class="care-row"><div class="cell-ico v-ok"><svg class="ic"><use href="#i-chart"/></svg></div><div class="care-info"><div class="care-name">SAE 周报生成</div><div class="care-mail">48 次执行 · 6 位用户</div></div><div class="mini-bar"><div class="mini-bar-fill" style="width:68%"></div></div></div>
+              <div class="care-row"><div class="cell-ico v-info"><svg class="ic"><use href="#i-alert"/></svg></div><div class="care-info"><div class="care-name">不良反应汇总</div><div class="care-mail">32 次执行 · 5 位用户</div></div><div class="mini-bar"><div class="mini-bar-fill" style="width:46%"></div></div></div>
+              <div class="care-row"><div class="cell-ico"><svg class="ic"><use href="#i-flask"/></svg></div><div class="care-info"><div class="care-name">实验室异常复核</div><div class="care-mail">22 次执行 · 4 位用户</div></div><div class="mini-bar"><div class="mini-bar-fill" style="width:32%"></div></div></div>
             </div>
           </div>
         </div>
@@ -1198,15 +1219,15 @@ tbody tr:hover td{background:var(--bg-soft)}
         <div class="col-right">
           <div class="panel">
             <div class="panel-head"><div class="panel-title">企业微信状态</div></div>
-            <div style="display:flex;align-items:center;gap:14px;padding:8px 0">
-              <div style="width:48px;height:48px;border-radius:14px;background:#07c160;color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px">✓</div>
+            <div style="display:flex;align-items:center;gap:14px;padding:6px 0">
+              <div style="width:50px;height:50px;border-radius:14px;background:#07c160;color:#fff;display:flex;align-items:center;justify-content:center"><svg class="ic ic-lg"><use href="#i-check"/></svg></div>
               <div>
                 <div style="font-size:14px;color:var(--t1);font-weight:600">已绑定</div>
                 <div style="font-size:11px;color:var(--t3)">应用 ID: ww1234···7890</div>
               </div>
               <button class="btn btn-ghost" style="margin-left:auto;padding:7px 14px">管理</button>
             </div>
-            <div style="border-top:1px solid var(--border);margin-top:12px;padding-top:12px;display:flex;justify-content:space-between;font-size:12px;color:var(--t2)">
+            <div style="border-top:1px solid var(--border);margin-top:14px;padding-top:14px;display:flex;justify-content:space-between;font-size:12px;color:var(--t2)">
               <span>同步成员</span><span style="color:var(--t1);font-weight:500">42 / 42</span>
             </div>
             <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);padding-top:8px">
@@ -1215,13 +1236,13 @@ tbody tr:hover td{background:var(--bg-soft)}
           </div>
 
           <div class="panel">
-            <div class="panel-head"><div class="panel-title">最近审计日志</div><div class="panel-action" onclick="toast('日志详情')">查看全部 →</div></div>
-            <div style="display:flex;flex-direction:column;gap:10px;font-size:12px">
-              <div style="display:flex;gap:8px"><span style="color:var(--t3);min-width:64px">14:26</span><span style="color:var(--t1)"><b>王思远</b> 批准技能授权</span></div>
-              <div style="display:flex;gap:8px"><span style="color:var(--t3);min-width:64px">14:12</span><span style="color:var(--t1)"><b>陈泽明</b> 创建任务</span></div>
-              <div style="display:flex;gap:8px"><span style="color:var(--t3);min-width:64px">13:48</span><span style="color:var(--t1)"><b>系统</b> 完成 AE 汇总</span></div>
-              <div style="display:flex;gap:8px"><span style="color:var(--t3);min-width:64px">12:34</span><span style="color:var(--t1)"><b>李主任</b> 上传新技能 v1.8</span></div>
-              <div style="display:flex;gap:8px"><span style="color:var(--t3);min-width:64px">11:02</span><span style="color:var(--t1)"><b>徐子涵</b> 分享文件</span></div>
+            <div class="panel-head"><div class="panel-title">最近审计日志</div><div class="panel-link" onclick="toast('日志详情')">查看全部<svg class="ic ic-sm"><use href="#i-arrow-right"/></svg></div></div>
+            <div style="display:flex;flex-direction:column;gap:11px;font-size:12.5px">
+              <div style="display:flex;gap:10px"><span style="color:var(--t3);min-width:64px;font-variant-numeric:tabular-nums">14:26</span><span style="color:var(--t1)"><b>王思远</b> 批准技能授权</span></div>
+              <div style="display:flex;gap:10px"><span style="color:var(--t3);min-width:64px;font-variant-numeric:tabular-nums">14:12</span><span style="color:var(--t1)"><b>陈泽明</b> 创建任务</span></div>
+              <div style="display:flex;gap:10px"><span style="color:var(--t3);min-width:64px;font-variant-numeric:tabular-nums">13:48</span><span style="color:var(--t1)"><b>系统</b> 完成 AE 汇总</span></div>
+              <div style="display:flex;gap:10px"><span style="color:var(--t3);min-width:64px;font-variant-numeric:tabular-nums">12:34</span><span style="color:var(--t1)"><b>李主任</b> 上传新技能 v1.8</span></div>
+              <div style="display:flex;gap:10px"><span style="color:var(--t3);min-width:64px;font-variant-numeric:tabular-nums">11:02</span><span style="color:var(--t1)"><b>徐子涵</b> 分享文件</span></div>
             </div>
           </div>
         </div>
@@ -1231,15 +1252,15 @@ tbody tr:hover td{background:var(--bg-soft)}
   </main>
 </div>
 
-<!-- ─── MODAL: 申请技能 ─── -->
+<!-- 申请技能 modal -->
 <div class="modal-bg" id="applyModal">
   <div class="modal">
     <div class="modal-t">申请使用 · 实验室异常复核</div>
-    <div class="modal-d">提交申请后，管理员会审批授权。请简要说明用途，有助于加快审批。</div>
+    <div class="modal-d">提交申请后，管理员会进行审批。请简要说明用途，有助于加快审批。</div>
     <textarea class="modal-input" placeholder="例：用于本期临床试验 W12 实验室数据异常值复核..."></textarea>
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="document.getElementById('applyModal').classList.remove('show')">取消</button>
-      <button class="btn btn-accent" onclick="document.getElementById('applyModal').classList.remove('show');toast('✓ 申请已提交，等待管理员审批')">提交申请</button>
+      <button class="btn btn-accent" onclick="document.getElementById('applyModal').classList.remove('show');toast('申请已提交，等待管理员审批')">提交申请</button>
     </div>
   </div>
 </div>
@@ -1257,31 +1278,56 @@ function go(screen){
   const titles={dashboard:'今天有 3 项任务待审核，2 项正在执行中',tasks:'任务中心 · 共 24 项任务',market:'技能市场 · 共 18 个技能可用',files:'工作区文件 · 共 106 个文件',wizard:'新建任务 · 跟随向导逐步完成',exec:'执行详情 · AI 正在为您处理任务',review:'结果审核 · 请逐项确认 AI 产出',notif:'通知中心 · 4 条未读',admin:'组织管理 · 5 项待处理'};
   document.getElementById('greetSub').textContent=titles[screen]||'';
 }
-document.querySelectorAll('.nav[data-screen]').forEach(el=>{
-  el.onclick=()=>go(el.dataset.screen);
-});
+document.querySelectorAll('.nav[data-screen]').forEach(el=>el.onclick=()=>go(el.dataset.screen));
+
 function switchSide(el,which){
   el.parentElement.querySelectorAll('.es-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('esBodyChat').classList.toggle('hidden',which!=='chat');
   document.getElementById('esBodyFiles').classList.toggle('hidden',which!=='files');
-  document.getElementById('esInput').style.display = which==='chat'?'block':'none';
 }
-function toggleSide(){
-  const side=document.getElementById('execSide');
-  side.parentElement.classList.toggle('collapsed');
-  side.style.display=side.style.display==='none'?'flex':'none';
-  setTimeout(()=>{side.style.display='flex'},250);
+function switchWsTab(el,idx){
+  el.parentElement.querySelectorAll('.ws-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
 }
-function showApply(ev){
-  ev.stopPropagation();
-  document.getElementById('applyModal').classList.add('show');
+function togglePick(row,name,size){
+  const ck=row.querySelector('.ws-check');
+  const on=ck.classList.toggle('on');
+  row.classList.toggle('checked',on);
+  recalcSelected();
 }
+function recalcSelected(){
+  const rows=document.querySelectorAll('#wsList .ws-row.checked');
+  let total=0;rows.forEach(r=>{const m=r.querySelector('.ws-fmeta').textContent.match(/(\d+\.?\d*)\s*MB/);if(m)total+=parseFloat(m[1])});
+  document.getElementById('selCount').textContent='已选 '+rows.length+' 个';
+  document.getElementById('selCount2').textContent=rows.length;
+  document.getElementById('selSize').textContent=total.toFixed(1);
+  // 更新已选预览
+  const preview=document.getElementById('selPreview');
+  preview.innerHTML='';
+  rows.forEach(r=>{
+    const name=r.querySelector('.ws-fname').textContent;
+    const meta=r.querySelector('.ws-fmeta').textContent;
+    const ficCls=r.querySelector('.ws-fic').className;
+    const ficTxt=r.querySelector('.ws-fic').textContent;
+    preview.insertAdjacentHTML('beforeend',
+      `<div class="sf-row"><div class="${ficCls}">${ficTxt}</div><div class="sf-name">${name}</div><div class="sf-meta">${meta}</div><div class="sf-x" onclick="event.stopPropagation();this.closest('.sf-row').remove();uncheckByName('${name.replace(/'/g,"\\'")}')"><svg class="ic ic-sm"><use href="#i-x"/></svg></div></div>`);
+  });
+}
+function uncheckByName(name){
+  document.querySelectorAll('#wsList .ws-row').forEach(r=>{
+    if(r.querySelector('.ws-fname').textContent===name){
+      r.querySelector('.ws-check').classList.remove('on');
+      r.classList.remove('checked');
+    }
+  });
+  recalcSelected();
+}
+function showApply(ev){ev.stopPropagation();document.getElementById('applyModal').classList.add('show')}
 function toast(msg){
-  const t=document.createElement('div');
-  t.className='toast';t.textContent=msg;
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(),2400);
+  const t=document.createElement('div');t.className='toast';
+  t.innerHTML='<svg class="ic ic-sm"><use href="#i-check"/></svg>'+msg;
+  document.body.appendChild(t);setTimeout(()=>t.remove(),2400);
 }
 </script>
 </body>
