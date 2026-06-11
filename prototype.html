@@ -1249,8 +1249,6 @@ body::after{width:500px;height:500px;background:radial-gradient(circle,#67e8f9 0
           </div>
         </div>
 
-        <div class="exec-grid">
-          <div class="exec-main">
         <div class="card">
           <div class="wizard-stepper">
             <div class="ws-step done"><div class="ws-num"><svg class="ic"><use href="#i-check"/></svg></div>选择技能</div>
@@ -1327,33 +1325,6 @@ body::after{width:500px;height:500px;background:radial-gradient(circle,#67e8f9 0
               <button class="btn btn-accent" onclick="openTask('ae')">开始执行<svg class="ic ic-sm"><use href="#i-arrow-right"/></svg></button>
             </div>
           </div>
-        </div>
-          </div>
-
-          <aside class="exec-side">
-            <div class="es-tabs">
-              <div class="es-tab active" onclick="esTab(this,'chat')"><svg class="ic ic-sm"><use href="#i-message"/></svg>对话</div>
-              <div class="es-tab" onclick="esTab(this,'files')"><svg class="ic ic-sm"><use href="#i-folder"/></svg>文件</div>
-              <div class="es-collapse" onclick="toast('已折叠')"><svg class="ic ic-sm"><use href="#i-arrow-right"/></svg></div>
-            </div>
-            <div class="es-body es-chat">
-              <div class="es-chat-msg"><div class="es-chat-meta">量子链 · AI</div><div class="es-bubble ai">您好，我会引导您完成本次"知情同意文件审查"。请先在左侧勾选要审查的同意书 PDF。</div></div>
-              <div class="es-chat-msg"><div class="es-chat-meta">量子链 · AI</div><div class="es-bubble ai">建议先用 CRF 比对锁定字段差异，再进入审查。需要的话我可以一并准备。</div></div>
-              <div class="es-chat-msg user"><div class="es-chat-meta">您</div><div class="es-bubble user">这次只做 CRF 比对，输出 Excel 即可。</div></div>
-              <div class="es-chat-msg"><div class="es-chat-meta">量子链 · AI</div><div class="es-bubble ai">明白。我将以"差异类型 + 受试者编号"两个维度排序。点击下方"开始执行"即可启动。</div></div>
-            </div>
-            <div class="es-body es-files hidden">
-              <div class="es-files-group">已选输入文件 (2)</div>
-              <div class="es-file"><div class="wsp-fic">XLS</div><div class="es-fn"><div class="es-fn-name">中心01_CRF_V203_W14.xlsx</div><div class="es-fn-m">2.4 MB · 248 行</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-eye"/></svg></div>
-              <div class="es-file"><div class="wsp-fic">XLS</div><div class="es-fn"><div class="es-fn-name">中心02_CRF_V203_W14.xlsx</div><div class="es-fn-m">2.1 MB · 231 行</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-eye"/></svg></div>
-              <div class="es-files-group">参考资料</div>
-              <div class="es-file"><div class="wsp-fic">XLS</div><div class="es-fn"><div class="es-fn-name">CRF字段定义_v2.3.xlsx</div><div class="es-fn-m">1.2 MB · 312 行</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-eye"/></svg></div>
-              <div class="es-file"><div class="wsp-fic t-pdf">PDF</div><div class="es-fn"><div class="es-fn-name">临床试验方案_V203_v3.1.pdf</div><div class="es-fn-m">8.4 MB · 128 页</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-eye"/></svg></div>
-            </div>
-            <div class="es-input-wrap">
-              <div class="nl-input" style="padding:8px 12px"><input style="flex:1;border:none;outline:none;background:transparent;font-size:12.5px;padding:0;font-family:inherit;color:var(--t1)" placeholder="向 AI 提问..."/><button class="nl-send" style="width:32px;height:32px;border-radius:9px" onclick="toast('已发送')"><svg class="ic ic-sm"><use href="#i-up"/></svg></button></div>
-            </div>
-          </aside>
         </div>
       </section>
 
