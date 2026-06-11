@@ -226,8 +226,20 @@ body::after{width:500px;height:500px;background:radial-gradient(circle,#67e8f9 0
 .qs-sub{font-size:12px;color:var(--t3);font-weight:500}
 .qs-action{margin-left:auto;display:flex;gap:8px}
 
-.qs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;position:relative}
-.qs-skill{background:#fff;border:1.5px solid var(--hairline-2);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px}
+.qs-grid{display:flex;gap:12px;position:relative;overflow-x:auto;overflow-y:hidden;padding:4px 2px 10px;scroll-snap-type:x mandatory;scroll-padding-left:2px;-webkit-overflow-scrolling:touch}
+.qs-grid::-webkit-scrollbar{height:6px}
+.qs-grid::-webkit-scrollbar-track{background:rgba(99,102,241,.05);border-radius:99px}
+.qs-grid::-webkit-scrollbar-thumb{background:rgba(99,102,241,.25);border-radius:99px}
+.qs-grid::-webkit-scrollbar-thumb:hover{background:rgba(99,102,241,.4)}
+.qs-skill{flex:0 0 296px;scroll-snap-align:start;background:#fff;border:1.5px solid var(--hairline-2);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px}
+.qs-nav{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;background:#fff;border:1px solid var(--hairline-2);color:var(--t2);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--sh-2);z-index:2;transition:all .15s}
+.qs-nav:hover{color:var(--iris-600);border-color:var(--iris-200);box-shadow:var(--sh-3)}
+.qs-nav.prev{left:-12px}.qs-nav.next{right:-12px}
+.qs-nav .ic{width:14px;height:14px;stroke-width:2.2}
+.qs-grid-wrap{position:relative}
+.qs-grid-wrap::before,.qs-grid-wrap::after{content:'';position:absolute;top:4px;bottom:14px;width:32px;pointer-events:none;z-index:1;transition:opacity .2s}
+.qs-grid-wrap::before{left:0;background:linear-gradient(90deg,rgba(255,255,255,.9),transparent)}
+.qs-grid-wrap::after{right:0;background:linear-gradient(-90deg,rgba(255,255,255,.9),transparent)}
 .qs-skill::before{content:'';position:absolute;top:0;right:0;width:100px;height:100px;background:radial-gradient(circle at top right,var(--iris-100),transparent 65%);opacity:0;transition:opacity .25s;pointer-events:none}
 .qs-skill:hover{border-color:var(--iris-300,#a5b4fc);transform:translateY(-3px);box-shadow:var(--sh-3)}
 .qs-skill:hover::before{opacity:.8}
@@ -560,6 +572,16 @@ body::after{width:500px;height:500px;background:radial-gradient(circle,#67e8f9 0
 .confirm-btn.done{background:rgba(16,185,129,.12);border-color:var(--green);color:#065f46;font-weight:700}
 
 /* market */
+.market-banner{background:linear-gradient(135deg,rgba(238,242,255,.8),rgba(255,255,255,.5));backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.85);border-radius:var(--r-lg);padding:18px 22px;margin-bottom:14px;display:flex;align-items:center;gap:18px;box-shadow:var(--sh-1);position:relative;overflow:hidden}
+.market-banner::before{content:'';position:absolute;top:-50%;right:-5%;width:340px;height:340px;background:radial-gradient(circle,rgba(99,102,241,.14),transparent 65%);pointer-events:none}
+.mb-l{display:flex;align-items:center;gap:14px;position:relative;flex:1;min-width:0}
+.mb-ic{width:50px;height:50px;border-radius:14px;background:#fff;border:1px solid var(--iris-200);color:var(--iris-700);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 6px 18px rgba(99,102,241,.18)}
+.mb-ic .ic{width:24px;height:24px}
+.mb-t{font-size:15px;font-weight:700;color:var(--t1);margin-bottom:4px;letter-spacing:-.005em}
+.mb-d{font-size:12px;color:var(--t3)}
+.mb-d b{color:var(--t1);font-weight:700;font-variant-numeric:tabular-nums}
+.mb-r{display:flex;gap:9px;position:relative}
+
 .market-head{display:flex;align-items:center;gap:8px;margin-bottom:20px;flex-wrap:wrap}
 .chip{background:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.9);border-radius:99px;padding:8px 18px;font-size:12.5px;color:var(--t2);cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;transition:all .2s;font-weight:500;box-shadow:var(--sh-1)}
 .chip:hover{background:#fff;color:var(--iris-600);transform:translateY(-1px);box-shadow:var(--sh-2)}
@@ -726,6 +748,38 @@ body::after{width:500px;height:500px;background:radial-gradient(circle,#67e8f9 0
 .fm-empty{padding:40px 20px;text-align:center;color:var(--t3)}
 .fm-empty .ic{width:32px;height:32px;color:var(--t-mute);margin-bottom:10px}
 .fm-empty b{font-size:13px;color:var(--t1);font-weight:600;display:block;margin-bottom:4px}
+
+/* upload skill modal */
+.up-stepper{display:flex;align-items:center;margin-bottom:20px}
+.up-step{display:flex;align-items:center;gap:9px;color:var(--t3);font-size:12.5px;font-weight:500}
+.up-num{width:26px;height:26px;border-radius:50%;background:rgba(99,102,241,.08);color:var(--t3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;border:2px solid #fff}
+.up-step.active{color:var(--t1)}
+.up-step.active .up-num{background:var(--grad-iris);color:#fff;box-shadow:0 0 0 4px var(--iris-100)}
+.up-step.done .up-num{background:var(--grad-iris);color:#fff}
+.up-step.done .up-num .ic{width:12px;height:12px;stroke-width:3}
+.up-line{flex:1;height:2px;background:rgba(99,102,241,.1);margin:0 12px;border-radius:2px}
+.up-line.done{background:var(--grad-iris)}
+
+.up-dropzone{display:flex;align-items:center;gap:14px;padding:18px 20px;border:1.5px dashed var(--iris-200);border-radius:var(--r);background:linear-gradient(135deg,rgba(238,242,255,.5),rgba(255,255,255,.3));cursor:pointer;transition:all .2s;margin-bottom:20px}
+.up-dropzone:hover,.up-dropzone.has{border-color:var(--iris-400);background:linear-gradient(135deg,var(--iris-50),#fff)}
+.up-dz-ic{width:44px;height:44px;border-radius:12px;background:#fff;border:1px solid var(--iris-200);color:var(--iris-600);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:var(--sh-1)}
+.up-dz-ic .ic{width:20px;height:20px}
+.up-dz-info{flex:1;min-width:0}
+.up-dz-t{font-size:13.5px;font-weight:700;color:var(--t1);margin-bottom:3px}
+.up-dz-d{font-size:11.5px;color:var(--t3)}
+
+.up-form{display:flex;flex-direction:column;gap:14px}
+.up-row{display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}
+.up-row label{font-size:11.5px;color:var(--t2);font-weight:600;display:flex;align-items:center;gap:5px}
+.up-row label .req{color:var(--rose);font-weight:700}
+.up-row input[type=text],.up-row select,.up-row textarea{width:100%;padding:10px 13px;border:1px solid var(--hairline-2);border-radius:10px;font-size:13px;font-family:inherit;color:var(--t1);background:#fff;outline:none;transition:all .15s;resize:vertical}
+.up-row input[type=text]:focus,.up-row select:focus,.up-row textarea:focus{border-color:var(--iris-500);box-shadow:var(--sh-glow)}
+.up-row-2{display:flex;gap:14px}
+.up-radio{display:flex;gap:8px;flex-wrap:wrap}
+.up-radio label{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid var(--hairline-2);border-radius:10px;cursor:pointer;font-size:12.5px;color:var(--t2);background:#fff;font-weight:500;transition:all .15s}
+.up-radio label:hover{border-color:var(--iris-200);color:var(--iris-600)}
+.up-radio label:has(input:checked){border-color:var(--iris-500);color:var(--iris-700);background:var(--iris-50);font-weight:600}
+.up-radio input{display:none}
 
 /* share dialog (modal) */
 .modal-mask{position:fixed;inset:0;background:rgba(30,27,75,.4);backdrop-filter:blur(6px);z-index:500;display:none;align-items:center;justify-content:center;animation:fadeIn .2s ease}
@@ -1005,8 +1059,6 @@ body::after{width:500px;height:500px;background:radial-gradient(circle,#67e8f9 0
             <div class="tc-greet-d">任务中心 · 共 24 项任务，其中 2 项执行中，3 项等待您的确认</div>
           </div>
           <div class="tc-greet-r">
-            <span class="tc-stat-chip"><svg class="ic ic-sm"><use href="#i-pulse"/></svg>本周完成 <b>24</b>/28</span>
-            <span class="tc-stat-chip"><svg class="ic ic-sm"><use href="#i-clock"/></svg>平均 <b>3.4</b> 分钟</span>
           </div>
         </div>
 
@@ -1018,7 +1070,10 @@ body::after{width:500px;height:500px;background:radial-gradient(circle,#67e8f9 0
               <button class="pill" onclick="go('market')"><svg class="ic ic-sm"><use href="#i-cube"/></svg>浏览技能市场</button>
             </div>
           </div>
-          <div class="qs-grid">
+          <div class="qs-grid-wrap">
+            <button class="qs-nav prev" onclick="qsScroll(-1)" aria-label="prev"><svg class="ic"><use href="#i-arrow-left"/></svg></button>
+            <button class="qs-nav next" onclick="qsScroll(1)" aria-label="next"><svg class="ic"><use href="#i-arrow-right"/></svg></button>
+          <div class="qs-grid" id="qsGrid">
             <div class="qs-skill" onclick="openTask('ic')">
               <div class="qs-skill-top">
                 <div class="qs-skill-ic"><svg class="ic"><use href="#i-clip"/></svg></div>
@@ -1099,11 +1154,7 @@ body::after{width:500px;height:500px;background:radial-gradient(circle,#67e8f9 0
               </div>
             </div>
 
-            <div class="qs-more" onclick="go('market')">
-              <svg class="ic"><use href="#i-plus"/></svg>
-              <b>查看全部技能</b>
-              <span>已授权 12 · 可申请 6</span>
-            </div>
+          </div>
           </div>
         </div>
 
@@ -1513,11 +1564,25 @@ body::after{width:500px;height:500px;background:radial-gradient(circle,#67e8f9 0
 
       <!-- MARKET -->
       <section class="screen" id="screen-market">
+        <div class="market-banner">
+          <div class="mb-l">
+            <div class="mb-ic"><svg class="ic"><use href="#i-cube"/></svg></div>
+            <div>
+              <div class="mb-t">技能市场</div>
+              <div class="mb-d">共 <b>18</b> 个技能 · 您已授权 <b>12</b> 个 · 还可申请 <b>6</b> 个 · 审批中 <b>2</b> 项</div>
+            </div>
+          </div>
+          <div class="mb-r">
+            <button class="btn btn-ghost" onclick="toast('打开技能开发文档')"><svg class="ic ic-sm"><use href="#i-info"/></svg>开发文档</button>
+            <button class="btn btn-accent" onclick="openUpload()"><svg class="ic ic-sm"><use href="#i-up"/></svg>上传技能</button>
+          </div>
+        </div>
         <div class="market-head">
           <button class="chip active">全部</button>
           <button class="chip">已授权 12</button>
           <button class="chip">未授权 6</button>
           <button class="chip">审批中 2</button>
+          <button class="chip"><svg class="ic ic-sm"><use href="#i-user"/></svg>我上传的 3</button>
           <div style="margin-left:auto;display:flex;gap:6px">
             <button class="chip">数据核查</button>
             <button class="chip">报告生成</button>
@@ -1832,6 +1897,87 @@ body::after{width:500px;height:500px;background:radial-gradient(circle,#67e8f9 0
   </div>
 </div>
 
+<!-- 上传技能对话框 -->
+<div class="modal-mask" id="uploadModal">
+  <div class="modal" style="width:620px" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <b>上传技能</b>
+      <span style="margin-left:8px;font-size:11px;color:var(--iris-700);background:var(--iris-100);padding:2px 10px;border-radius:99px;font-weight:600">提交后由组织管理员审核</span>
+      <div class="x" onclick="closeUpload()"><svg class="ic ic-sm"><use href="#i-x"/></svg></div>
+    </div>
+    <div class="modal-body">
+      <div class="up-stepper">
+        <div class="up-step done"><div class="up-num"><svg class="ic"><use href="#i-check"/></svg></div>上传包</div>
+        <div class="up-line done"></div>
+        <div class="up-step active"><div class="up-num">2</div>填写信息</div>
+        <div class="up-line"></div>
+        <div class="up-step"><div class="up-num">3</div>提交审核</div>
+      </div>
+
+      <div class="up-dropzone" id="upDropzone" onclick="upPickFile()">
+        <div class="up-dz-ic"><svg class="ic"><use href="#i-up"/></svg></div>
+        <div class="up-dz-info">
+          <div class="up-dz-t" id="upDzT">拖拽 .skill 或 .zip 文件到此</div>
+          <div class="up-dz-d" id="upDzD">单包最大 50 MB · 包含 skill.json / README.md / 入口脚本</div>
+        </div>
+        <button class="pill primary" onclick="event.stopPropagation();upPickFile()">浏览本地文件</button>
+      </div>
+
+      <div class="up-form">
+        <div class="up-row">
+          <label>技能名称<span class="req">*</span></label>
+          <input type="text" value="CRF 字段映射器" placeholder="例如：CRF 字段映射器"/>
+        </div>
+        <div class="up-row-2">
+          <div class="up-row">
+            <label>分类<span class="req">*</span></label>
+            <select>
+              <option>数据核查</option>
+              <option>报告生成</option>
+              <option>安全监查</option>
+              <option>文档审查</option>
+              <option>其他</option>
+            </select>
+          </div>
+          <div class="up-row">
+            <label>版本号<span class="req">*</span></label>
+            <input type="text" value="v1.0.0" placeholder="v1.0.0"/>
+          </div>
+        </div>
+        <div class="up-row">
+          <label>能力描述<span class="req">*</span></label>
+          <textarea rows="3" placeholder="一句话说明这个技能能做什么，AI 会用它向用户解释。">将旧版 EDC 字段命名自动映射到 SDTM 标准，支持多映射规则与冲突提示。</textarea>
+        </div>
+        <div class="up-row-2">
+          <div class="up-row">
+            <label>输入格式</label>
+            <input type="text" value="XLS / CSV" placeholder="XLS, CSV, PDF"/>
+          </div>
+          <div class="up-row">
+            <label>输出格式</label>
+            <input type="text" value="XLS" placeholder="XLS, PDF"/>
+          </div>
+        </div>
+        <div class="up-row">
+          <label>授权范围</label>
+          <div class="up-radio">
+            <label><input type="radio" name="scope" checked/><span>本组织内</span></label>
+            <label><input type="radio" name="scope"/><span>仅自己使用</span></label>
+            <label><input type="radio" name="scope"/><span>申请上架公开市场</span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span class="sel">提交后将进入「授权审批」队列，预计 1 个工作日内回复</span>
+      <div class="actions">
+        <button class="btn btn-ghost" onclick="closeUpload()">取消</button>
+        <button class="btn btn-accent" onclick="confirmUpload()"><svg class="ic ic-sm"><use href="#i-check"/></svg>提交审核</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- 文件预览对话框 -->
 <div class="modal-mask" id="previewModal">
   <div class="modal" style="width:680px" onclick="event.stopPropagation()">
@@ -1922,7 +2068,7 @@ function toggleNotif(e){e.stopPropagation();const p=document.getElementById('not
 function toggleUserMenu(e){e.stopPropagation();const m=document.getElementById('userMenu');const wasOpen=m.classList.contains('show');closeAllPops();if(!wasOpen)m.classList.add('show')}
 function toggleOrgSwitcher(e){e.stopPropagation();const s=document.getElementById('orgSwitcher');const wasOpen=s.classList.contains('show');closeAllPops();if(!wasOpen)s.classList.add('show')}
 document.addEventListener('click',closeAllPops);
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAllPops();closeShare();closePreview()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAllPops();closeShare();closePreview();closeUpload()}});
 
 function esTab(el,which){const side=el.closest('.exec-side');side.querySelectorAll('.es-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');side.querySelectorAll('.es-body').forEach(b=>b.classList.add('hidden'));side.querySelector('.es-body.es-'+which)?.classList.remove('hidden')}
 function wsTab(el){el.parentElement.querySelectorAll('.wsp-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active')}
@@ -1988,6 +2134,21 @@ function updShareCount(){document.getElementById('shareN').textContent=document.
 function confirmShare(){const n=document.querySelectorAll('#contactList .contact.checked').length;closeShare();toast(`已通过企业微信向 ${n} 位好友发送文件卡片`)}
 document.getElementById('shareModal')?.addEventListener('click',e=>{if(e.target.id==='shareModal')closeShare()});
 document.getElementById('previewModal')?.addEventListener('click',e=>{if(e.target.id==='previewModal')closePreview()});
+
+/* ---- upload skill modal ---- */
+function openUpload(){document.getElementById('uploadModal').classList.add('show')}
+function closeUpload(){document.getElementById('uploadModal').classList.remove('show')}
+function upPickFile(){
+  const dz=document.getElementById('upDropzone');dz.classList.add('has');
+  document.getElementById('upDzT').innerHTML='<span style="color:var(--iris-700)">crf-field-mapper-v1.0.0.skill</span> · 已选择';
+  document.getElementById('upDzD').textContent='38.4 MB · 包含 skill.json · README.md · main.py（已通过包结构校验）';
+  toast('已选择技能包');
+}
+function confirmUpload(){closeUpload();toast('技能已提交 · 等待管理员审核')}
+document.getElementById('uploadModal')?.addEventListener('click',e=>{if(e.target.id==='uploadModal')closeUpload()});
+
+/* ---- quick start horizontal scroll ---- */
+function qsScroll(dir){const g=document.getElementById('qsGrid');if(!g)return;g.scrollBy({left:dir*(296+12)*1.5,behavior:'smooth'})}
 </script>
 </body>
 </html>
