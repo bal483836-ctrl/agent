@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>量子链 · Aurora Light</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-base:#f5f7fc;
+  --surface:rgba(255,255,255,.72);
+  --surface-solid:#ffffff;
+  --surface-soft:#f9faff;
+  --hairline:rgba(99,102,241,.08);
+  --hairline-2:rgba(99,102,241,.14);
+
+  --t1:#1e1b4b;
+  --t2:#4f4d7a;
+  --t3:#8b89ac;
+  --t-mute:#b5b3cf;
+
+  --iris-50:#eef2ff;
+  --iris-100:#e0e7ff;
+  --iris-200:#c7d2fe;
+  --iris-400:#818cf8;
+  --iris-500:#6366f1;
+  --iris-600:#4f46e5;
+  --iris-700:#4338ca;
+  --sky-400:#38bdf8;
+  --sky-500:#0ea5e9;
+
+  --mint:#06b6d4;--mint-soft:rgba(6,182,212,.12);
+  --amber:#f59e0b;--amber-soft:rgba(245,158,11,.12);
+  --rose:#f43f5e;--rose-soft:rgba(244,63,94,.12);
+  --green:#10b981;--green-soft:rgba(16,185,129,.12);
+
+  --grad-iris:linear-gradient(135deg,#6366f1 0%,#818cf8 50%,#38bdf8 100%);
+  --grad-iris-soft:linear-gradient(135deg,#eef2ff 0%,#e0e7ff 100%);
+  --grad-aurora:linear-gradient(120deg,#a5b4fc 0%,#67e8f9 50%,#7dd3fc 100%);
+
+  --r-sm:12px;--r:16px;--r-lg:22px;--r-xl:28px;
+
+  --sh-1:0 1px 3px rgba(99,102,241,.05),0 1px 2px rgba(99,102,241,.03);
+  --sh-2:0 4px 16px rgba(99,102,241,.08),0 2px 6px rgba(99,102,241,.04);
+  --sh-3:0 16px 48px rgba(99,102,241,.12),0 4px 12px rgba(99,102,241,.06);
+  --sh-glow:0 0 0 4px rgba(99,102,241,.15);
+}
+html,body{height:100%}
+body{background:var(--bg-base);color:var(--t1);font-family:'PingFang SC','Inter','SF Pro Display','Helvetica Neue',system-ui,sans-serif;font-size:13.5px;line-height:1.55;overflow:hidden;-webkit-font-smoothing:antialiased;letter-spacing:.005em;position:relative}
+body::before,body::after{content:'';position:fixed;border-radius:50%;filter:blur(80px);opacity:.35;z-index:0;pointer-events:none}
+body::before{width:600px;height:600px;background:radial-gradient(circle,#a5b4fc 0%,transparent 70%);top:-200px;left:-150px;animation:float1 18s ease-in-out infinite}
+body::after{width:500px;height:500px;background:radial-gradient(circle,#67e8f9 0%,transparent 70%);bottom:-180px;right:-100px;animation:float2 22s ease-in-out infinite}
+@keyframes float1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(50px,80px) scale(1.1)}}
+@keyframes float2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-60px,-40px) scale(.95)}}
+
+.ic{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle}
+.ic-sm{width:14px;height:14px}
+.ic-lg{width:22px;height:22px}
+
+.app{display:flex;height:100vh;position:relative;z-index:1}
+
+/* ─── SIDEBAR ─── */
+.sidebar{width:268px;flex-shrink:0;background:rgba(255,255,255,.55);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-right:1px solid rgba(255,255,255,.6);display:flex;flex-direction:column;padding:18px 14px 14px;position:relative;z-index:5}
+
+/* org bar = read-only context, switch with click */
+.org-bar{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:var(--r);cursor:pointer;transition:all .2s;margin-bottom:14px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.8);box-shadow:var(--sh-1);position:relative}
+.org-bar:hover{box-shadow:var(--sh-2);transform:translateY(-1px)}
+.org-mark{width:36px;height:36px;border-radius:11px;background:var(--grad-iris);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;position:relative;overflow:hidden;box-shadow:0 4px 12px rgba(99,102,241,.35)}
+.org-mark::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.45),transparent 60%)}
+.org-mark svg{width:21px;height:21px;position:relative;z-index:1}
+.org-info{flex:1;min-width:0}
+.org-name{font-size:13.5px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:5px}
+.org-meta{font-size:11px;color:var(--t3);display:flex;align-items:center;gap:5px}
+.org-meta .dot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px rgba(16,185,129,.6)}
+.org-chev{color:var(--t-mute)}
+
+.org-switcher{position:absolute;top:calc(100% + 6px);left:0;right:0;background:rgba(255,255,255,.96);backdrop-filter:blur(20px);border-radius:var(--r);box-shadow:var(--sh-3);border:1px solid rgba(255,255,255,.8);padding:8px;z-index:80;display:none}
+.org-switcher.show{display:block;animation:fadeUp .2s ease}
+.org-sw-row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:pointer}
+.org-sw-row:hover{background:var(--iris-50)}
+.org-sw-row.active{background:var(--iris-50)}
+.org-sw-mark{width:30px;height:30px;border-radius:9px;background:var(--grad-iris);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;font-weight:600}
+.org-sw-mark.g2{background:linear-gradient(135deg,#f59e0b,#d97706)}
+.org-sw-mark.g3{background:linear-gradient(135deg,#10b981,#059669)}
+.org-sw-info{flex:1;min-width:0}
+.org-sw-n{font-size:13px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.org-sw-m{font-size:11px;color:var(--t3)}
+.org-sw-check{color:var(--iris-600)}
+.org-sw-sep{height:1px;background:var(--hairline-2);margin:6px 4px}
+.org-sw-add{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;cursor:pointer;font-size:12.5px;color:var(--iris-600);font-weight:600}
+.org-sw-add:hover{background:var(--iris-50)}
+
+.new-btn{display:flex;align-items:center;gap:10px;background:var(--grad-iris);color:#fff;padding:13px 16px;border-radius:var(--r);border:none;cursor:pointer;width:100%;font-family:inherit;font-size:13.5px;font-weight:600;transition:all .2s;box-shadow:0 6px 20px rgba(99,102,241,.32);margin-bottom:14px;position:relative;overflow:hidden}
+.new-btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transition:left .6s}
+.new-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(99,102,241,.45)}
+.new-btn:hover::before{left:100%}
+.new-btn-kbd{margin-left:auto;font-size:10px;background:rgba(255,255,255,.22);padding:2px 7px;border-radius:5px;letter-spacing:.05em}
+
+.side-search{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.8);border-radius:var(--r);padding:9px 13px;margin-bottom:18px;transition:all .15s;box-shadow:var(--sh-1)}
+.side-search:focus-within{border-color:var(--iris-400);box-shadow:var(--sh-glow)}
+.side-search .ic{color:var(--t-mute);width:15px;height:15px}
+.side-search input{flex:1;border:none;outline:none;background:transparent;font-size:12.5px;color:var(--t1);font-family:inherit;width:0}
+.side-search input::placeholder{color:var(--t-mute)}
+.side-search kbd{font-size:10px;background:rgba(255,255,255,.7);color:var(--t3);padding:2px 6px;border-radius:5px;font-family:inherit;border:1px solid rgba(99,102,241,.08)}
+
+.side-label{font-size:10.5px;font-weight:700;letter-spacing:.14em;color:var(--t3);text-transform:uppercase;padding:0 12px 8px;display:flex;align-items:center}
+.side-label .count{margin-left:auto;font-size:10px;background:rgba(99,102,241,.1);color:var(--iris-600);padding:1px 8px;border-radius:99px;text-transform:none;letter-spacing:0;font-weight:600}
+
+.nav{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:var(--r-sm);cursor:pointer;color:var(--t2);font-size:13px;transition:all .2s;margin-bottom:2px;user-select:none;position:relative}
+.nav:hover{background:rgba(255,255,255,.6)}
+.nav.active{background:var(--grad-iris-soft);color:var(--iris-700);font-weight:600;box-shadow:inset 0 0 0 1px rgba(99,102,241,.15)}
+.nav.active .ic{color:var(--iris-600)}
+.nav .ic{width:17px;height:17px;color:var(--t3);transition:color .15s}
+.nav-kbd{margin-left:auto;font-size:10px;color:var(--t-mute);font-weight:500}
+
+.tasks-section{flex:1;overflow-y:auto;margin:0 -14px;padding:18px 14px 0}
+.tasks-section::-webkit-scrollbar{width:4px}
+.tasks-section::-webkit-scrollbar-thumb{background:rgba(99,102,241,.2);border-radius:99px}
+
+.task-item{display:flex;align-items:flex-start;gap:11px;padding:10px 12px;border-radius:var(--r-sm);cursor:pointer;transition:all .2s;margin-bottom:3px;position:relative;border:1px solid transparent}
+.task-item:hover{background:rgba(255,255,255,.6);border-color:rgba(255,255,255,.8)}
+.task-item.active{background:rgba(255,255,255,.85);border-color:var(--iris-200);box-shadow:var(--sh-1)}
+.task-item.active::after{content:'';position:absolute;right:8px;top:50%;transform:translateY(-50%);width:6px;height:6px;border-radius:50%;background:var(--iris-500);box-shadow:0 0 8px var(--iris-500)}
+
+.task-dot{width:10px;height:10px;border-radius:50%;margin-top:5px;flex-shrink:0;position:relative}
+.task-dot.draft{background:#fff;border:2px solid var(--t-mute);width:9px;height:9px;margin-top:5.5px}
+.task-dot.queue{background:var(--t-mute)}
+.task-dot.running{background:var(--iris-500);box-shadow:0 0 12px rgba(99,102,241,.5)}
+.task-dot.running::after{content:'';position:absolute;inset:-4px;border-radius:50%;background:var(--iris-500);opacity:.3;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{transform:scale(.8);opacity:.3}50%{transform:scale(1.6);opacity:0}}
+.task-dot.review{background:var(--amber);box-shadow:0 0 10px rgba(245,158,11,.4)}
+.task-dot.done{background:var(--green);box-shadow:0 0 10px rgba(16,185,129,.4)}
+.task-dot.fail{background:var(--rose);box-shadow:0 0 10px rgba(244,63,94,.4)}
+
+.task-text{flex:1;min-width:0}
+.task-name{font-size:12.8px;color:var(--t1);font-weight:500;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.task-item.active .task-name{color:var(--iris-700);font-weight:600}
+.task-meta{font-size:10.5px;color:var(--t3);margin-top:3px}
+.task-progress{color:var(--iris-600);font-weight:600;font-variant-numeric:tabular-nums}
+
+.user-card{margin-top:auto;border-top:1px solid rgba(255,255,255,.6);padding:12px 8px 4px;display:flex;align-items:center;gap:11px;cursor:pointer;border-radius:var(--r-sm);transition:background .15s;position:relative}
+.user-card:hover{background:rgba(255,255,255,.5)}
+.user-av{width:38px;height:38px;border-radius:50%;background:var(--grad-iris);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;border:2px solid #fff;box-shadow:0 4px 12px rgba(99,102,241,.32);position:relative;flex-shrink:0}
+.user-av::after{content:'';position:absolute;bottom:-1px;right:-1px;width:12px;height:12px;border-radius:50%;background:var(--green);border:2.5px solid #fff;box-shadow:0 0 6px rgba(16,185,129,.4)}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:13px;color:var(--t1);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-size:11px;color:var(--t3);display:flex;align-items:center;gap:5px}
+.user-role .wechat{display:inline-flex;align-items:center;gap:3px;color:#07c160;font-size:10.5px;font-weight:500}
+.user-role .wechat::before{content:'';width:5px;height:5px;border-radius:50%;background:#07c160}
+.user-more{color:var(--t3);padding:6px;border-radius:6px;flex-shrink:0}
+.user-more:hover{background:rgba(255,255,255,.6);color:var(--t1)}
+
+.user-menu{position:absolute;bottom:calc(100% + 8px);left:8px;right:8px;background:rgba(255,255,255,.96);backdrop-filter:blur(20px);border-radius:var(--r);box-shadow:var(--sh-3);border:1px solid rgba(255,255,255,.8);padding:8px;z-index:90;display:none}
+.user-menu.show{display:block;animation:fadeUp .2s ease}
+.user-menu-head{padding:10px 12px 12px;display:flex;align-items:center;gap:11px;border-bottom:1px solid var(--hairline-2);margin-bottom:6px}
+.user-menu-head .user-av{width:42px;height:42px;font-size:14px}
+.umh-info{flex:1;min-width:0}
+.umh-n{font-size:13.5px;font-weight:600;color:var(--t1)}
+.umh-m{font-size:11px;color:var(--t3);margin-top:2px}
+.user-menu-row{padding:9px 12px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--t1);border-radius:10px;cursor:pointer;transition:background .15s}
+.user-menu-row:hover{background:var(--iris-50)}
+.user-menu-row .ic{color:var(--t3);width:16px;height:16px}
+.user-menu-row:hover .ic{color:var(--iris-600)}
+.user-menu-row .um-tail{margin-left:auto;font-size:10.5px;color:var(--t-mute)}
+.user-menu-row .um-pill{margin-left:auto;font-size:10.5px;color:var(--iris-700);background:var(--iris-50);padding:2px 8px;border-radius:99px;font-weight:600}
+.user-menu-sep{height:1px;background:var(--hairline-2);margin:6px 4px}
+
+/* ─── MAIN ─── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;position:relative}
+.topbar{height:64px;display:flex;align-items:center;gap:14px;padding:0 32px;flex-shrink:0;background:rgba(255,255,255,.5);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.6);position:relative;z-index:20}
+.topbar-title{display:flex;align-items:center;gap:10px;min-width:0}
+.topbar-crumb{font-size:12.5px;color:var(--t3);display:flex;align-items:center;gap:7px}
+.topbar-crumb b{color:var(--t1);font-weight:700;font-size:15px;letter-spacing:-.005em}
+.topbar-crumb .ic{width:13px;height:13px;color:var(--t-mute)}
+
+.topbar-status{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;padding:5px 12px;border-radius:99px;font-weight:600;margin-left:6px}
+.sp-running{background:var(--iris-100);color:var(--iris-700)}
+
+.topbar-actions{margin-left:auto;display:flex;align-items:center;gap:10px;position:relative}
+.icon-btn{width:40px;height:40px;border-radius:var(--r-sm);background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.8);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);position:relative;transition:all .2s;box-shadow:var(--sh-1)}
+.icon-btn:hover{background:#fff;color:var(--iris-600);box-shadow:var(--sh-2);transform:translateY(-1px)}
+.icon-btn .icon-dot{position:absolute;top:9px;right:9px;width:8px;height:8px;border-radius:50%;background:var(--rose);border:2px solid #fff;box-shadow:0 0 6px rgba(244,63,94,.5)}
+
+/* notif pop: anchored to topbar via fixed-style absolute on topbar */
+.notif-pop{position:absolute;top:54px;right:32px;width:380px;background:rgba(255,255,255,.96);backdrop-filter:blur(20px);border-radius:var(--r-lg);box-shadow:var(--sh-3);border:1px solid rgba(255,255,255,.8);z-index:200;display:none;overflow:hidden}
+.notif-pop.show{display:block;animation:fadeUp .25s ease}
+.notif-pop-head{padding:16px 20px;border-bottom:1px solid var(--hairline-2);display:flex;align-items:center}
+.notif-pop-head b{font-size:14px;color:var(--t1);font-weight:600}
+.notif-pop-head .link{margin-left:auto;font-size:12px;color:var(--iris-600);cursor:pointer;font-weight:500}
+.notif-list{max-height:420px;overflow-y:auto}
+.notif-item{padding:14px 20px;display:flex;gap:12px;border-bottom:1px solid var(--hairline);cursor:pointer;transition:background .15s;position:relative}
+.notif-item:hover{background:rgba(99,102,241,.04)}
+.notif-item.unread::before{content:'';position:absolute;left:8px;top:50%;transform:translateY(-50%);width:6px;height:6px;border-radius:50%;background:var(--iris-500);box-shadow:0 0 8px var(--iris-500)}
+.notif-ic{width:36px;height:36px;border-radius:11px;background:var(--iris-50);color:var(--iris-700);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--iris-100)}
+.notif-ic.ok{background:rgba(16,185,129,.1);color:var(--green);border-color:rgba(16,185,129,.2)}
+.notif-ic.warn{background:rgba(245,158,11,.1);color:var(--amber);border-color:rgba(245,158,11,.2)}
+.notif-body{flex:1;min-width:0}
+.notif-t{font-size:13px;color:var(--t1);font-weight:600;margin-bottom:2px}
+.notif-d{font-size:12px;color:var(--t2);line-height:1.5}
+.notif-time{font-size:10.5px;color:var(--t3);margin-top:4px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── SCREEN ─── */
+.screen-wrap{flex:1;overflow-y:auto;position:relative;z-index:1}
+.screen-wrap::-webkit-scrollbar{width:6px}
+.screen-wrap::-webkit-scrollbar-thumb{background:rgba(99,102,241,.2);border-radius:99px}
+.screen{padding:26px 32px 32px;display:none}
+.screen.active{display:block;animation:fadeUp .35s ease}
+
+/* ─── TASK CENTER (new dashboard) ─── */
+.tc-greet{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px;gap:18px}
+.tc-greet-t{font-size:24px;font-weight:700;color:var(--t1);letter-spacing:-.015em;line-height:1.2;margin-bottom:6px;background:linear-gradient(135deg,var(--t1) 0%,var(--iris-700) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tc-greet-d{font-size:13px;color:var(--t3);line-height:1.5}
+.tc-greet-r{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.tc-stat-chip{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.9);border-radius:99px;padding:7px 16px;font-size:12px;color:var(--t2);box-shadow:var(--sh-1)}
+.tc-stat-chip b{color:var(--t1);font-weight:700;font-variant-numeric:tabular-nums}
+.tc-stat-chip .ic{color:var(--iris-600);width:14px;height:14px}
+
+/* Quick start */
+.qs-card{background:rgba(255,255,255,.7);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.85);border-radius:var(--r-lg);padding:22px 24px;margin-bottom:18px;box-shadow:var(--sh-1);position:relative;overflow:hidden}
+.qs-card::before{content:'';position:absolute;top:-30%;right:-5%;width:380px;height:380px;background:radial-gradient(circle,rgba(99,102,241,.1),transparent 65%);pointer-events:none}
+.qs-head{display:flex;align-items:center;gap:12px;margin-bottom:18px;position:relative}
+.qs-title{font-size:17px;font-weight:700;color:var(--t1);letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
+.qs-title .ic{color:var(--iris-600);width:20px;height:20px}
+.qs-sub{font-size:12px;color:var(--t3);font-weight:500}
+.qs-action{margin-left:auto;display:flex;gap:8px}
+
+.qs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;position:relative}
+.qs-skill{background:#fff;border:1.5px solid var(--hairline-2);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px}
+.qs-skill::before{content:'';position:absolute;top:0;right:0;width:100px;height:100px;background:radial-gradient(circle at top right,var(--iris-100),transparent 65%);opacity:0;transition:opacity .25s;pointer-events:none}
+.qs-skill:hover{border-color:var(--iris-300,#a5b4fc);transform:translateY(-3px);box-shadow:var(--sh-3)}
+.qs-skill:hover::before{opacity:.8}
+.qs-skill-top{display:flex;align-items:flex-start;gap:12px}
+.qs-skill-ic{width:42px;height:42px;border-radius:13px;background:var(--grad-iris-soft);color:var(--iris-700);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(99,102,241,.15);box-shadow:0 4px 12px rgba(99,102,241,.15);position:relative}
+.qs-skill-ic.g2{background:linear-gradient(135deg,#d1fae5,#a7f3d0);color:#065f46;border-color:rgba(16,185,129,.2)}
+.qs-skill-ic.g3{background:linear-gradient(135deg,#fce7f3,#fbcfe8);color:#9d174d;border-color:rgba(236,72,153,.2)}
+.qs-skill-ic.g4{background:linear-gradient(135deg,#cffafe,#a5f3fc);color:#0e7490;border-color:rgba(6,182,212,.2)}
+.qs-skill-ic.g5{background:linear-gradient(135deg,#fef3c7,#fde68a);color:#92400e;border-color:rgba(245,158,11,.2)}
+.qs-skill-ic.g6{background:linear-gradient(135deg,#f3e8ff,#e9d5ff);color:#6b21a8;border-color:rgba(168,85,247,.2)}
+.qs-skill-ic .ic{width:21px;height:21px}
+.qs-skill-info{flex:1;min-width:0}
+.qs-skill-cat{font-size:10.5px;color:var(--iris-700);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px}
+.qs-skill-name{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:3px}
+.qs-skill-desc{font-size:11.5px;color:var(--t2);line-height:1.55}
+.qs-skill-foot{display:flex;align-items:center;gap:8px;padding-top:8px;border-top:1px dashed var(--hairline-2);position:relative}
+.qs-skill-meta{font-size:10.5px;color:var(--t3);display:inline-flex;align-items:center;gap:4px;font-variant-numeric:tabular-nums}
+.qs-skill-meta .ic{width:11px;height:11px;color:var(--iris-500)}
+.qs-skill-go{margin-left:auto;background:var(--grad-iris);color:#fff;border:none;border-radius:9px;padding:6px 12px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;transition:all .15s;box-shadow:0 4px 12px rgba(99,102,241,.32)}
+.qs-skill-go:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(99,102,241,.4)}
+.qs-skill-go .ic{width:12px;height:12px;stroke-width:2.5}
+
+.qs-more{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;background:linear-gradient(135deg,rgba(238,242,255,.6),rgba(255,255,255,.4));border:1.5px dashed var(--iris-200);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .2s;color:var(--iris-600);min-height:140px}
+.qs-more:hover{background:linear-gradient(135deg,var(--iris-50),#fff);border-color:var(--iris-400);transform:translateY(-2px)}
+.qs-more .ic{width:24px;height:24px}
+.qs-more b{font-size:13px;font-weight:700}
+.qs-more span{font-size:11px;color:var(--t3)}
+
+/* Task Center Card with tabs */
+.tc-card{background:rgba(255,255,255,.7);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.85);border-radius:var(--r-lg);box-shadow:var(--sh-1);overflow:hidden}
+.tc-toolbar{display:flex;align-items:center;padding:18px 22px 0;gap:14px;flex-wrap:wrap}
+.tc-toolbar-l{font-size:15px;font-weight:700;color:var(--t1);letter-spacing:-.005em;display:flex;align-items:center;gap:9px}
+.tc-toolbar-l .sub{font-size:12px;color:var(--t3);font-weight:500}
+.tc-toolbar-r{margin-left:auto;display:flex;align-items:center;gap:9px}
+
+.tc-tabs{display:flex;gap:6px;padding:16px 22px 0;flex-wrap:wrap;align-items:center}
+.tc-tab{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:99px;background:rgba(255,255,255,.7);border:1px solid var(--hairline-2);color:var(--t2);font-size:12.5px;font-weight:500;cursor:pointer;transition:all .2s;font-family:inherit;box-shadow:var(--sh-1)}
+.tc-tab:hover{color:var(--t1);background:#fff}
+.tc-tab.active{background:var(--grad-iris);color:#fff;border-color:transparent;box-shadow:0 6px 16px rgba(99,102,241,.3);font-weight:600}
+.tc-tab .tcc{display:inline-flex;align-items:center;justify-content:center;font-size:11px;background:rgba(99,102,241,.1);color:var(--iris-700);padding:1px 8px;border-radius:99px;font-weight:700;font-variant-numeric:tabular-nums;min-width:24px}
+.tc-tab.active .tcc{background:rgba(255,255,255,.25);color:#fff}
+
+.tc-filter-bar{padding:14px 22px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--hairline-2);margin-top:14px;background:rgba(99,102,241,.02)}
+.tc-search{flex:1;max-width:320px;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--hairline-2);border-radius:10px;padding:8px 13px;transition:all .15s}
+.tc-search:focus-within{border-color:var(--iris-400);box-shadow:var(--sh-glow)}
+.tc-search .ic{color:var(--t-mute);width:14px;height:14px}
+.tc-search input{flex:1;border:none;outline:none;background:transparent;font-size:12.5px;color:var(--t1);font-family:inherit;width:0}
+.tc-filter-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#fff;border:1px solid var(--hairline-2);border-radius:10px;font-size:12.5px;color:var(--t2);cursor:pointer;font-family:inherit;transition:all .15s}
+.tc-filter-btn:hover{border-color:var(--iris-200);color:var(--iris-600)}
+.tc-filter-btn .ic{width:13px;height:13px}
+.tc-date-chip{margin-left:auto;display:inline-flex;align-items:center;gap:7px;padding:8px 14px;background:#fff;border:1px solid var(--hairline-2);border-radius:10px;font-size:12.5px;color:var(--t2);cursor:pointer;font-family:inherit;transition:all .15s}
+.tc-date-chip:hover{border-color:var(--iris-200);color:var(--iris-600)}
+.tc-date-chip .ic{width:13px;height:13px}
+
+/* Task list (table) */
+.tbl{width:100%;border-collapse:separate;border-spacing:0}
+.tbl th{font-size:10.5px;font-weight:700;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;text-align:left;padding:12px 14px;background:rgba(99,102,241,.04);white-space:nowrap}
+.tbl th:first-child{padding-left:22px}
+.tbl th:last-child{padding-right:22px;text-align:right}
+.tbl td{padding:14px;font-size:13px;color:var(--t2);border-bottom:1px solid var(--hairline);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr{transition:background .15s;cursor:pointer}
+.tbl tbody tr:hover td{background:rgba(99,102,241,.03)}
+.tbl td:first-child{padding-left:22px}
+.tbl td:last-child{padding-right:22px;text-align:right}
+
+.cell-name{display:flex;align-items:center;gap:12px;color:var(--t1);font-weight:500}
+.cell-ico{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--grad-iris-soft);color:var(--iris-700);border:1px solid rgba(99,102,241,.15)}
+.cell-ico .ic{width:17px;height:17px;stroke-width:1.8}
+.cell-ico.v2{background:linear-gradient(135deg,#fef3c7,#fde68a);color:#b45309;border-color:rgba(245,158,11,.2)}
+.cell-ico.v3{background:linear-gradient(135deg,#d1fae5,#a7f3d0);color:#065f46;border-color:rgba(16,185,129,.2)}
+.cell-ico.v4{background:linear-gradient(135deg,#fce7f3,#fbcfe8);color:#9d174d;border-color:rgba(236,72,153,.2)}
+.cell-ico.v5{background:linear-gradient(135deg,#cffafe,#a5f3fc);color:#0e7490;border-color:rgba(6,182,212,.2)}
+.cell-ico.v6{background:linear-gradient(135deg,#e2e8f0,#cbd5e1);color:#475569;border-color:rgba(100,116,139,.2)}
+.cell-name-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.cell-name-t{font-size:13px;color:var(--t1);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell-name-m{font-size:11px;color:var(--t3);font-variant-numeric:tabular-nums}
+
+.prog-orb{width:42px;height:42px;border-radius:50%;position:relative;background:conic-gradient(var(--iris-500) var(--p,60%),rgba(99,102,241,.1) 0);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(99,102,241,.1)}
+.prog-orb::after{content:'';width:32px;height:32px;background:#fff;border-radius:50%;position:absolute;box-shadow:inset 0 0 4px rgba(99,102,241,.1)}
+.prog-orb span{position:relative;z-index:1;font-size:10px;color:var(--iris-700);font-weight:700;font-variant-numeric:tabular-nums}
+.prog-orb.done{background:conic-gradient(var(--green) 100%,rgba(16,185,129,.1) 0)}
+.prog-orb.done span{color:var(--green)}
+.prog-orb.empty{background:#f1f5f9;border:1.5px dashed var(--t-mute)}
+.prog-orb.empty::after{display:none}
+.prog-orb.empty span{color:var(--t-mute);font-size:14px}
+
+.pill-status{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;padding:5px 12px;border-radius:99px;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.psd{width:6px;height:6px;border-radius:50%}
+.ps-done{background:rgba(16,185,129,.12);color:#065f46}
+.ps-done .psd{background:var(--green);box-shadow:0 0 6px var(--green)}
+.ps-running{background:rgba(99,102,241,.12);color:var(--iris-700)}
+.ps-running .psd{background:var(--iris-500);position:relative;box-shadow:0 0 8px var(--iris-500)}
+.ps-running .psd::after{content:'';position:absolute;inset:-3px;border-radius:50%;background:var(--iris-500);opacity:.4;animation:pulse 1.4s infinite}
+.ps-review{background:rgba(245,158,11,.12);color:#92400e}
+.ps-review .psd{background:var(--amber);box-shadow:0 0 6px var(--amber)}
+.ps-queue{background:rgba(139,137,172,.15);color:var(--t2)}
+.ps-queue .psd{background:var(--t-mute)}
+.ps-fail{background:rgba(244,63,94,.12);color:#9f1239}
+.ps-fail .psd{background:var(--rose)}
+.ps-draft{background:rgba(139,137,172,.1);color:var(--t2)}
+.ps-draft .psd{background:var(--t-mute)}
+
+.row-act{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;padding:6px 13px;border-radius:9px;background:#fff;border:1px solid var(--hairline-2);color:var(--t2);cursor:pointer;font-family:inherit;font-weight:500;transition:all .15s}
+.row-act:hover{color:var(--iris-600);border-color:var(--iris-200);background:var(--iris-50)}
+.row-act .ic{width:12px;height:12px}
+.row-act.primary{background:var(--iris-50);color:var(--iris-700);border-color:var(--iris-200)}
+.row-act.primary:hover{background:var(--iris-500);color:#fff;border-color:transparent}
+.row-act.amber{background:rgba(245,158,11,.08);color:#92400e;border-color:rgba(245,158,11,.2)}
+.row-act.amber:hover{background:var(--amber);color:#fff;border-color:transparent}
+.row-act.ghost{background:transparent;border-color:transparent;color:var(--t-mute);padding:6px 8px}
+.row-act.ghost:hover{background:rgba(99,102,241,.06);color:var(--iris-600)}
+
+/* card (reused) */
+.card{background:rgba(255,255,255,.7);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.85);border-radius:var(--r-lg);padding:24px;box-shadow:var(--sh-1)}
+.card-head{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.card-title{font-size:15px;font-weight:600;color:var(--t1);letter-spacing:-.005em}
+.card-tag{font-size:11px;color:var(--iris-700);background:var(--iris-100);padding:3px 10px;border-radius:99px;font-weight:600}
+.card-action{margin-left:auto;display:flex;align-items:center;gap:8px}
+.pill{background:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.9);border-radius:var(--r-sm);padding:7px 13px;font-size:12px;color:var(--t2);cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;transition:all .15s;box-shadow:var(--sh-1)}
+.pill:hover{background:#fff;color:var(--iris-600);border-color:var(--iris-200)}
+.pill.primary{background:var(--grad-iris);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(99,102,241,.32)}
+.pill.primary:hover{box-shadow:0 6px 18px rgba(99,102,241,.4)}
+.card-link{font-size:12.5px;color:var(--iris-600);cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-weight:600}
+.card-link:hover{color:var(--iris-700)}
+
+/* hero (KPI) - kept for done/admin */
+.hero{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.kpi{background:rgba(255,255,255,.7);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.85);border-radius:var(--r-lg);padding:20px 22px;position:relative;overflow:hidden;transition:all .25s;cursor:pointer;box-shadow:var(--sh-1)}
+.kpi::before{content:'';position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle at top right,var(--iris-100),transparent 70%);pointer-events:none;opacity:.6}
+.kpi:hover{transform:translateY(-3px);box-shadow:var(--sh-3);border-color:var(--iris-200)}
+.kpi-meta{font-size:12px;color:var(--t3);font-weight:500;margin-bottom:14px;display:flex;align-items:center;gap:8px;position:relative}
+.kpi-meta .ic{width:14px;height:14px;color:var(--iris-600)}
+.kpi-val{font-size:32px;font-weight:700;color:var(--t1);letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:6px;position:relative;background:linear-gradient(135deg,var(--t1),var(--iris-600));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.kpi-val .u{font-size:13px;color:var(--t3);font-weight:500;letter-spacing:0;-webkit-text-fill-color:var(--t3)}
+.kpi-trend{margin-top:12px;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--green);position:relative}
+.kpi-trend.down{color:var(--rose)}
+.kpi-bar{margin-top:12px;height:5px;border-radius:99px;background:rgba(99,102,241,.08);overflow:hidden;position:relative}
+.kpi-bar-fill{height:100%;background:var(--grad-iris);border-radius:99px;animation:grow 1s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
+.kpi-bar-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:shimmer 2s infinite}
+@keyframes grow{from{width:0}}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+
+/* ─── TASK SCREENS (hero/wizard/exec/review/done) ─── */
+.task-hero{background:linear-gradient(135deg,rgba(238,242,255,.7),rgba(255,255,255,.5));backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.85);border-radius:var(--r-lg);padding:26px 30px;margin-bottom:14px;position:relative;overflow:hidden;box-shadow:var(--sh-1)}
+.task-hero::before{content:'';position:absolute;top:-40%;right:-10%;width:500px;height:500px;background:radial-gradient(circle,rgba(99,102,241,.15),transparent 65%);pointer-events:none}
+.task-hero::after{content:'';position:absolute;bottom:-30%;left:-5%;width:300px;height:300px;background:radial-gradient(circle,rgba(103,232,249,.18),transparent 65%);pointer-events:none}
+.th-top{display:flex;align-items:flex-start;gap:18px;position:relative;z-index:1}
+.th-ico{width:60px;height:60px;border-radius:18px;background:linear-gradient(135deg,#fff,#f0f3ff);border:1px solid var(--iris-200);display:flex;align-items:center;justify-content:center;color:var(--iris-700);flex-shrink:0;box-shadow:0 10px 30px rgba(99,102,241,.18)}
+.th-ico .ic{width:28px;height:28px;stroke-width:1.8}
+.th-text{flex:1}
+.th-cat{font-size:11px;color:var(--iris-700);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.th-name{font-size:22px;font-weight:700;color:var(--t1);letter-spacing:-.015em;margin-bottom:8px}
+.th-desc{font-size:13.5px;color:var(--t2);line-height:1.6;max-width:760px}
+.th-actions{display:flex;gap:8px;flex-shrink:0}
+
+.btn{padding:10px 20px;border-radius:var(--r-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;border:none;transition:all .2s;display:inline-flex;align-items:center;gap:7px}
+.btn-ghost{background:rgba(255,255,255,.6);color:var(--t2);border:1px solid rgba(255,255,255,.9);box-shadow:var(--sh-1)}
+.btn-ghost:hover{background:#fff;color:var(--iris-600);box-shadow:var(--sh-2)}
+.btn-primary{background:var(--t1);color:#fff;box-shadow:0 6px 18px rgba(30,27,75,.24)}
+.btn-primary:hover{background:#2e2b65;box-shadow:0 10px 28px rgba(30,27,75,.32);transform:translateY(-1px)}
+.btn-accent{background:var(--grad-iris);color:#fff;box-shadow:0 6px 18px rgba(99,102,241,.32);position:relative;overflow:hidden}
+.btn-accent::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transition:left .5s}
+.btn-accent:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(99,102,241,.4)}
+.btn-accent:hover::before{left:100%}
+
+/* wizard */
+.wizard-stepper{display:flex;align-items:center;margin-bottom:26px}
+.ws-step{display:flex;align-items:center;gap:11px;color:var(--t3);font-size:13px;font-weight:500}
+.ws-num{width:32px;height:32px;border-radius:50%;background:rgba(99,102,241,.08);color:var(--t3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:2px solid #fff;flex-shrink:0;transition:all .3s}
+.ws-step.done .ws-num{background:var(--grad-iris);color:#fff;box-shadow:0 4px 12px rgba(99,102,241,.3)}
+.ws-step.done .ws-num .ic{width:14px;height:14px;stroke-width:3}
+.ws-step.active{color:var(--t1)}
+.ws-step.active .ws-num{background:var(--grad-iris);color:#fff;box-shadow:0 0 0 5px var(--iris-100),0 4px 12px rgba(99,102,241,.3)}
+.ws-line{flex:1;height:2px;background:rgba(99,102,241,.1);margin:0 14px;border-radius:2px;overflow:hidden;position:relative}
+.ws-line.done::before{content:'';position:absolute;inset:0;background:var(--grad-iris);animation:fillLine .5s ease forwards}
+@keyframes fillLine{from{transform:scaleX(0);transform-origin:left}}
+
+.section{margin-bottom:24px}
+.section-head{display:flex;align-items:center;margin-bottom:14px;gap:10px}
+.section-title{font-size:13px;font-weight:700;color:var(--t1);letter-spacing:.005em}
+.section-sub{font-size:11.5px;color:var(--t3);margin-left:6px}
+
+.skill-summary{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,rgba(238,242,255,.6),rgba(255,255,255,.4));border:1px solid var(--iris-200);padding:16px 20px;border-radius:var(--r-lg);margin-bottom:20px;cursor:pointer;transition:all .2s;backdrop-filter:blur(10px)}
+.skill-summary:hover{box-shadow:var(--sh-2);transform:translateY(-1px)}
+.skill-summary .cell-ico{width:46px;height:46px;background:#fff;border:1px solid var(--iris-200);box-shadow:var(--sh-1)}
+.skill-summary .cell-ico .ic{width:22px;height:22px}
+.ss-info{flex:1}
+.ss-cat{font-size:10.5px;color:var(--iris-700);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.ss-name{font-size:14.5px;font-weight:600;color:var(--t1);margin-bottom:3px}
+.ss-desc{font-size:12.5px;color:var(--t2)}
+
+.banner-info{background:linear-gradient(135deg,rgba(238,242,255,.7),rgba(255,255,255,.5));border:1px solid var(--iris-100);border-radius:var(--r-sm);padding:12px 16px;font-size:12.5px;color:var(--iris-700);display:flex;align-items:center;gap:9px;margin-bottom:18px;backdrop-filter:blur(10px)}
+.banner-info .ic{color:var(--iris-600);width:16px;height:16px}
+
+.wsp{background:#fff;border:1px solid var(--hairline-2);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-1)}
+.wsp-head{padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--hairline-2);background:rgba(99,102,241,.03)}
+.wsp-tabs{display:flex;background:#fff;border-radius:var(--r-sm);padding:3px;border:1px solid var(--hairline-2);box-shadow:var(--sh-1)}
+.wsp-tab{padding:7px 14px;border-radius:9px;font-size:12px;color:var(--t2);cursor:pointer;font-weight:500;transition:all .2s;position:relative}
+.wsp-tab.active{background:var(--grad-iris);color:#fff;box-shadow:0 4px 12px rgba(99,102,241,.3)}
+.wsp-tab:hover:not(.active){color:var(--t1)}
+.wsp-search{display:flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--hairline-2);border-radius:var(--r-sm);padding:6px 12px;margin-left:auto;width:240px}
+.wsp-search input{flex:1;border:none;outline:none;font-size:12.5px;font-family:inherit;background:transparent}
+.wsp-search .ic{color:var(--t-mute);width:14px;height:14px}
+.wsp-crumb{padding:11px 18px;font-size:12px;color:var(--t3);border-bottom:1px solid var(--hairline-2);display:flex;align-items:center;gap:6px}
+.wsp-crumb b{color:var(--t1);font-weight:600}
+.wsp-crumb .ic{width:12px;height:12px;color:var(--t-mute)}
+
+.wsp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:14px;max-height:360px;overflow-y:auto}
+.wsp-grid::-webkit-scrollbar{width:5px}
+.wsp-grid::-webkit-scrollbar-thumb{background:var(--iris-200);border-radius:99px}
+
+.wsp-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid var(--hairline-2);border-radius:var(--r-sm);cursor:pointer;transition:all .2s;background:#fff;position:relative}
+.wsp-card:hover{border-color:var(--iris-200);box-shadow:var(--sh-1);transform:translateY(-1px)}
+.wsp-card.checked{border-color:var(--iris-500);background:linear-gradient(135deg,var(--iris-50),#fff);box-shadow:var(--sh-1)}
+.wsp-check{width:20px;height:20px;border-radius:6px;border:2px solid var(--hairline-2);background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.wsp-card:hover .wsp-check{border-color:var(--iris-400)}
+.wsp-check.on{background:var(--grad-iris);border-color:transparent;box-shadow:0 2px 6px rgba(99,102,241,.32)}
+.wsp-check.on::after{content:'';width:10px;height:5px;border:2px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px);display:block}
+.wsp-fic{width:34px;height:34px;border-radius:10px;background:var(--iris-50);color:var(--iris-700);display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700;flex-shrink:0;border:1px solid var(--iris-100)}
+.wsp-fic.t-pdf{background:rgba(244,63,94,.1);color:#be123c;border-color:rgba(244,63,94,.18)}
+.wsp-fic.t-doc{background:rgba(56,189,248,.1);color:#0369a1;border-color:rgba(56,189,248,.2)}
+.wsp-fic.t-csv{background:rgba(245,158,11,.1);color:#b45309;border-color:rgba(245,158,11,.2)}
+.wsp-info{flex:1;min-width:0}
+.wsp-fname{font-size:12.8px;color:var(--t1);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.wsp-fmeta{font-size:11px;color:var(--t3);font-variant-numeric:tabular-nums}
+.wsp-fmeta b{font-weight:500;color:var(--t2)}
+.wsp-tagout{font-size:9.5px;padding:2px 6px;border-radius:5px;background:rgba(16,185,129,.12);color:#065f46;font-weight:600;margin-left:6px;letter-spacing:.02em}
+
+.wsp-foot{padding:14px 18px;background:rgba(99,102,241,.03);border-top:1px solid var(--hairline-2);display:flex;align-items:center;gap:12px;font-size:12.5px;color:var(--t2)}
+.wsp-foot b{color:var(--iris-700);font-weight:700;font-variant-numeric:tabular-nums}
+.wsp-foot .upl{margin-left:auto;color:var(--iris-600);cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:5px}
+.wsp-foot .upl:hover{color:var(--iris-700)}
+
+.sel-files{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+.sf{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--iris-50),#fff);border:1px solid var(--iris-200);border-radius:99px;padding:7px 14px 7px 8px;animation:fadeUp .25s ease}
+.sf .wsp-fic{width:26px;height:26px;font-size:8.5px}
+.sf-n{font-size:12px;color:var(--t1);font-weight:600;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sf-m{font-size:10.5px;color:var(--t3)}
+.sf-x{color:var(--t-mute);cursor:pointer;padding:4px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center}
+.sf-x:hover{background:rgba(244,63,94,.1);color:var(--rose)}
+
+.nlc{background:linear-gradient(135deg,rgba(238,242,255,.5),rgba(255,255,255,.3));border:1px solid var(--hairline-2);border-radius:var(--r-lg);padding:20px;margin-top:6px;backdrop-filter:blur(10px)}
+.nl-msg{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start}
+.nl-msg.you{flex-direction:row-reverse}
+.nl-av{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
+.nl-av.ai{background:var(--grad-iris);box-shadow:0 4px 12px rgba(99,102,241,.32)}
+.nl-av.ai .ic{width:18px;height:18px;stroke-width:2}
+.nl-av.you{background:linear-gradient(135deg,#cbd5e1,#64748b)}
+.nl-av.you .ic{width:17px;height:17px}
+.nl-text{flex:1;font-size:13px;color:var(--t1);line-height:1.7;background:#fff;border-radius:16px;padding:13px 16px;border:1px solid var(--hairline-2);max-width:88%;box-shadow:var(--sh-1)}
+.nl-msg.ai .nl-text{border-bottom-left-radius:4px}
+.nl-msg.you .nl-text{background:var(--grad-iris);color:#fff;border:none;border-bottom-right-radius:4px;box-shadow:0 4px 14px rgba(99,102,241,.3)}
+.nl-input{display:flex;gap:8px;align-items:flex-end;background:#fff;border:1.5px solid var(--hairline-2);border-radius:var(--r);padding:11px 14px;transition:all .2s;box-shadow:var(--sh-1)}
+.nl-input:focus-within{border-color:var(--iris-500);box-shadow:var(--sh-glow)}
+.nl-input textarea{flex:1;border:none;outline:none;font-size:13px;color:var(--t1);font-family:inherit;background:transparent;resize:none;min-height:22px;max-height:80px;line-height:1.6}
+.nl-input textarea::placeholder{color:var(--t-mute)}
+.nl-send{width:36px;height:36px;border-radius:11px;background:var(--grad-iris);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;box-shadow:0 4px 14px rgba(99,102,241,.32)}
+.nl-send:hover{transform:translateY(-1px) scale(1.05);box-shadow:0 8px 22px rgba(99,102,241,.45)}
+
+.wiz-foot{display:flex;justify-content:space-between;margin-top:26px;gap:10px}
+
+/* execution */
+.exec-grid{display:grid;grid-template-columns:1fr 360px;gap:14px;align-items:start}
+.exec-main{display:flex;flex-direction:column;gap:14px}
+.progress-card{background:linear-gradient(135deg,rgba(238,242,255,.7),rgba(255,255,255,.5));backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.85);border-radius:var(--r-lg);padding:26px;position:relative;overflow:hidden;box-shadow:var(--sh-1)}
+.progress-card::before{content:'';position:absolute;top:-40%;right:-15%;width:450px;height:450px;background:radial-gradient(circle,rgba(99,102,241,.2),transparent 65%);pointer-events:none}
+.pc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;position:relative}
+.pc-title{font-size:15px;font-weight:600;color:var(--t1);display:flex;align-items:center;gap:11px}
+.pc-title .ic{color:var(--iris-600);width:22px;height:22px}
+.pc-pct{font-size:40px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1;background:var(--grad-iris);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pc-pct .u{font-size:15px;color:var(--t3);font-weight:500;margin-left:3px;-webkit-text-fill-color:var(--t3)}
+.pc-bar{height:12px;background:rgba(255,255,255,.7);border-radius:99px;overflow:hidden;margin-bottom:24px;position:relative;border:1px solid rgba(255,255,255,.9);box-shadow:inset 0 1px 3px rgba(99,102,241,.08)}
+.pc-bar-fill{height:100%;border-radius:99px;background:var(--grad-iris);position:relative;overflow:hidden;transition:width .6s cubic-bezier(.4,0,.2,1);box-shadow:0 0 12px rgba(99,102,241,.4)}
+.pc-bar-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);animation:shimmer 2s infinite}
+.pc-steps{position:relative}
+.pc-step{display:flex;align-items:center;gap:14px;padding:11px 0;font-size:13px;position:relative}
+.pc-step:not(:last-child)::before{content:'';position:absolute;left:15px;top:36px;bottom:-7px;width:2px;background:rgba(99,102,241,.12)}
+.pc-step.done:not(:last-child)::before{background:var(--green)}
+.pc-step.active:not(:last-child)::before{background:linear-gradient(180deg,var(--iris-500),rgba(99,102,241,.12))}
+.pcs-ic{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:700;background:#fff;border:1px solid var(--hairline-2);position:relative;z-index:1;box-shadow:var(--sh-1)}
+.pcs-ic.done{background:var(--green);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(16,185,129,.32)}
+.pcs-ic.done .ic{width:14px;height:14px;stroke-width:3}
+.pcs-ic.active{background:var(--grad-iris);color:#fff;border-color:transparent;box-shadow:0 0 0 5px var(--iris-100),0 4px 12px rgba(99,102,241,.32)}
+.pcs-ic.active .ic{width:14px;height:14px;animation:spin 1.5s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pcs-ic.pending{color:var(--t3)}
+.pcs-text{flex:1;color:var(--t1)}
+.pc-step.pending .pcs-text{color:var(--t3)}
+.pcs-time{font-size:11px;color:var(--t3);font-variant-numeric:tabular-nums}
+.pc-step.active .pcs-time{color:var(--iris-600);font-weight:600}
+
+.logs{display:flex;flex-direction:column;gap:11px;font-size:12.5px;color:var(--t2)}
+.log{display:flex;align-items:flex-start;gap:12px;padding:8px 12px;border-radius:var(--r-sm);transition:background .15s}
+.log:hover{background:rgba(99,102,241,.03)}
+.log-time{color:var(--t3);font-variant-numeric:tabular-nums;font-size:11.5px;padding-top:1px;min-width:62px;font-weight:500}
+.log-text{flex:1;color:var(--t1);line-height:1.6}
+.log-text b{color:var(--iris-700);font-weight:700;font-variant-numeric:tabular-nums}
+
+.exec-side{background:rgba(255,255,255,.75);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.85);border-radius:var(--r-lg);display:flex;flex-direction:column;overflow:hidden;position:sticky;top:0;max-height:calc(100vh - 130px);box-shadow:var(--sh-1)}
+.es-tabs{display:flex;border-bottom:1px solid var(--hairline-2);padding:8px 10px 0;align-items:center;background:rgba(99,102,241,.02)}
+.es-tab{padding:11px 16px;font-size:12.5px;color:var(--t2);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:7px;font-weight:500;transition:all .15s}
+.es-tab.active{color:var(--iris-700);border-bottom-color:var(--iris-500);font-weight:700}
+.es-collapse{margin-left:auto;width:32px;height:32px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t3);margin-bottom:8px;border:1px solid var(--hairline-2)}
+.es-body{flex:1;overflow-y:auto;padding:16px}
+.es-body::-webkit-scrollbar{width:4px}
+.es-body::-webkit-scrollbar-thumb{background:var(--iris-200);border-radius:99px}
+.es-files-group{font-size:10.5px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin:10px 0 8px}
+.es-file{display:flex;align-items:center;gap:11px;padding:11px 13px;background:#fff;border:1px solid var(--hairline-2);border-radius:var(--r-sm);cursor:pointer;transition:all .2s;margin-bottom:7px;box-shadow:var(--sh-1)}
+.es-file:hover{border-color:var(--iris-200);transform:translateY(-1px);box-shadow:var(--sh-2)}
+.es-fn{flex:1;min-width:0}
+.es-fn-name{font-size:12.5px;color:var(--t1);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.es-fn-m{font-size:10.5px;color:var(--t3);font-variant-numeric:tabular-nums;margin-top:1px}
+.es-chat-msg{margin-bottom:14px}
+.es-chat-meta{font-size:10px;color:var(--t3);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.es-bubble{font-size:12.5px;line-height:1.7;padding:12px 14px;border-radius:14px}
+.es-bubble.ai{background:#fff;color:var(--t1);border:1px solid var(--hairline-2);border-bottom-left-radius:4px;box-shadow:var(--sh-1)}
+.es-bubble.user{background:var(--grad-iris);color:#fff;border-bottom-right-radius:4px;box-shadow:0 4px 14px rgba(99,102,241,.3)}
+.es-chat-msg.user{display:flex;flex-direction:column;align-items:flex-end}
+.es-chat-msg.user .es-chat-meta{text-align:right}
+.es-chat-msg.user .es-bubble{max-width:88%}
+.es-input-wrap{padding:12px;border-top:1px solid var(--hairline-2);background:rgba(99,102,241,.02)}
+
+/* review */
+.review-toolbar{background:rgba(255,255,255,.7);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.85);border-radius:var(--r-lg);padding:14px 20px;display:flex;align-items:center;gap:12px;margin-bottom:14px;box-shadow:var(--sh-1)}
+.flag-ic{width:22px;height:22px;border-radius:7px;background:rgba(245,158,11,.15);color:#92400e;display:flex;align-items:center;justify-content:center;border:1px solid rgba(245,158,11,.3);flex-shrink:0}
+.flag-ic .ic{width:12px;height:12px;stroke-width:2.5}
+.confirm-btn{font-size:11.5px;padding:7px 14px;border-radius:9px;cursor:pointer;background:#fff;border:1px solid var(--hairline-2);color:var(--t2);font-family:inherit;display:inline-flex;align-items:center;gap:5px;transition:all .2s;font-weight:500;box-shadow:var(--sh-1)}
+.confirm-btn:hover{border-color:var(--green);color:#065f46;background:rgba(16,185,129,.06)}
+.confirm-btn.done{background:rgba(16,185,129,.12);border-color:var(--green);color:#065f46;font-weight:700}
+
+/* market */
+.market-head{display:flex;align-items:center;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.chip{background:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.9);border-radius:99px;padding:8px 18px;font-size:12.5px;color:var(--t2);cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;transition:all .2s;font-weight:500;box-shadow:var(--sh-1)}
+.chip:hover{background:#fff;color:var(--iris-600);transform:translateY(-1px);box-shadow:var(--sh-2)}
+.chip.active{background:var(--grad-iris);color:#fff;border-color:transparent;box-shadow:0 6px 18px rgba(99,102,241,.32)}
+
+.skill-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.skill-card{background:rgba(255,255,255,.75);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.85);border-radius:var(--r-lg);padding:24px;position:relative;cursor:pointer;transition:all .3s;overflow:hidden;box-shadow:var(--sh-1)}
+.skill-card::before{content:'';position:absolute;top:0;right:0;width:150px;height:150px;background:radial-gradient(circle at top right,var(--iris-100),transparent 70%);pointer-events:none;opacity:0;transition:opacity .3s}
+.skill-card:hover{transform:translateY(-4px);box-shadow:var(--sh-3);border-color:var(--iris-200)}
+.skill-card:hover::before{opacity:.7}
+.sk-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;position:relative}
+.sk-ico{width:54px;height:54px;border-radius:16px;background:var(--grad-iris-soft);color:var(--iris-700);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(99,102,241,.15);box-shadow:0 6px 18px rgba(99,102,241,.15)}
+.sk-ico .ic{width:26px;height:26px}
+.sk-name{font-size:14.5px;font-weight:700;color:var(--t1);margin-bottom:4px}
+.sk-cat{font-size:11px;color:var(--t3)}
+.sk-desc{font-size:12.5px;color:var(--t2);line-height:1.65;min-height:44px;margin-bottom:18px;position:relative}
+.sk-foot{display:flex;align-items:center;gap:14px;position:relative}
+.sk-stat{font-size:11px;color:var(--t3);display:inline-flex;align-items:center;gap:4px;font-variant-numeric:tabular-nums;font-weight:600}
+.sk-stat .ic{width:13px;height:13px;color:var(--iris-500)}
+.sk-btn{margin-left:auto;padding:8px 18px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:5px}
+.sk-btn-use{background:var(--grad-iris);color:#fff;box-shadow:0 4px 12px rgba(99,102,241,.32)}
+.sk-btn-use:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(99,102,241,.45)}
+.sk-btn-apply{background:var(--iris-50);color:var(--iris-700);border:1px solid var(--iris-200)}
+.sk-btn-apply:hover{background:var(--iris-500);color:#fff;border-color:transparent}
+.sk-btn-pend{background:rgba(245,158,11,.12);color:#92400e;cursor:default;border:1px solid rgba(245,158,11,.2)}
+.sk-corner{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(16,185,129,.4);z-index:1}
+.sk-corner .ic{width:14px;height:14px;stroke-width:3}
+
+/* skill detail */
+.skd-back{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--t3);cursor:pointer;margin-bottom:16px;font-weight:500;padding:6px 12px;border-radius:8px;transition:all .15s}
+.skd-back:hover{color:var(--iris-600);background:var(--iris-50)}
+.skd-hero{background:linear-gradient(135deg,rgba(238,242,255,.7),rgba(255,255,255,.5));backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.85);border-radius:var(--r-lg);padding:32px 36px;margin-bottom:18px;display:flex;gap:28px;align-items:flex-start;position:relative;overflow:hidden;box-shadow:var(--sh-1)}
+.skd-hero::before{content:'';position:absolute;top:-40%;right:-15%;width:600px;height:600px;background:radial-gradient(circle,rgba(99,102,241,.18),transparent 65%);pointer-events:none}
+.skd-hero::after{content:'';position:absolute;bottom:-50%;left:30%;width:400px;height:400px;background:radial-gradient(circle,rgba(103,232,249,.2),transparent 65%);pointer-events:none}
+.skd-ico{width:88px;height:88px;border-radius:22px;background:linear-gradient(135deg,#fff,#f0f3ff);border:1px solid var(--iris-200);display:flex;align-items:center;justify-content:center;color:var(--iris-700);flex-shrink:0;box-shadow:0 12px 36px rgba(99,102,241,.25);position:relative;z-index:1}
+.skd-ico .ic{width:44px;height:44px;stroke-width:1.5}
+.skd-meta{flex:1;position:relative;z-index:1}
+.skd-cat{font-size:11px;color:var(--iris-700);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.skd-name{font-size:28px;font-weight:700;color:var(--t1);letter-spacing:-.02em;margin-bottom:10px;background:linear-gradient(135deg,var(--t1),var(--iris-700));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.skd-desc{font-size:14px;color:var(--t2);line-height:1.7;margin-bottom:18px;max-width:680px}
+.skd-stats{display:flex;gap:30px}
+.skd-stat{display:flex;flex-direction:column;gap:3px}
+.skd-stat-v{font-size:20px;font-weight:700;color:var(--t1);font-variant-numeric:tabular-nums;letter-spacing:-.015em}
+.skd-stat-l{font-size:11px;color:var(--t3);font-weight:500}
+.skd-actions{position:relative;z-index:1;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
+
+.skd-body{display:grid;grid-template-columns:1fr 340px;gap:18px}
+.skd-section{background:rgba(255,255,255,.7);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.85);border-radius:var(--r-lg);padding:24px 26px;margin-bottom:14px;box-shadow:var(--sh-1)}
+.skd-section h3{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:14px;display:flex;align-items:center;gap:8px;letter-spacing:-.005em}
+.skd-section h3 .ic{color:var(--iris-600);width:18px;height:18px}
+.skd-section p,.skd-section li{font-size:13px;color:var(--t2);line-height:1.75}
+.skd-section ul{padding-left:6px;list-style:none}
+.skd-section ul li{padding-left:24px;position:relative;margin-bottom:8px}
+.skd-section ul li::before{content:'';position:absolute;left:6px;top:11px;width:6px;height:6px;border-radius:50%;background:var(--grad-iris);box-shadow:0 0 8px rgba(99,102,241,.4)}
+
+.spec-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--hairline-2);font-size:13px}
+.spec-row:last-child{border-bottom:none}
+.spec-k{color:var(--t3)}
+.spec-v{color:var(--t1);font-weight:600;font-variant-numeric:tabular-nums}
+
+.history-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--hairline-2);font-size:12.5px}
+.history-row:last-child{border-bottom:none}
+.history-time{font-size:11px;color:var(--t3);font-variant-numeric:tabular-nums;min-width:60px;font-weight:500}
+.history-user{color:var(--t1);font-weight:600}
+.history-action{color:var(--t2)}
+
+.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.team-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r-sm);background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.8);cursor:pointer;transition:all .15s}
+.team-card:hover{background:#fff;box-shadow:var(--sh-2);transform:translateY(-1px)}
+.team-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600;flex-shrink:0;border:2px solid #fff;box-shadow:var(--sh-1)}
+.team-av.g1{background:linear-gradient(135deg,#818cf8,#4338ca)}
+.team-av.g2{background:linear-gradient(135deg,#a5b4fc,#6366f1)}
+.team-av.g3{background:linear-gradient(135deg,#67e8f9,#0891b2)}
+.team-av.g4{background:linear-gradient(135deg,#fcd34d,#d97706)}
+.team-info{flex:1;min-width:0}
+.team-n{font-size:12.5px;color:var(--t1);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.team-m{font-size:10.5px;color:var(--t3)}
+
+/* files */
+.files-storage{background:linear-gradient(135deg,rgba(238,242,255,.7),rgba(255,255,255,.5));backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.85);border-radius:var(--r-lg);padding:24px 26px;margin-bottom:14px;position:relative;overflow:hidden;box-shadow:var(--sh-1)}
+.files-storage::before{content:'';position:absolute;top:-30%;right:-5%;width:380px;height:380px;background:radial-gradient(circle,rgba(99,102,241,.12),transparent 65%);pointer-events:none}
+.fs-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;position:relative;gap:18px}
+.fs-title{font-size:15px;font-weight:700;color:var(--t1);display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.fs-title .ic{color:var(--iris-600);width:18px;height:18px}
+.fs-sub{font-size:12px;color:var(--t3)}
+.fs-meter-wrap{position:relative;flex:1;max-width:520px}
+.fs-meter{height:14px;background:rgba(255,255,255,.7);border-radius:99px;overflow:hidden;border:1px solid rgba(255,255,255,.9);box-shadow:inset 0 1px 3px rgba(99,102,241,.08);display:flex}
+.fs-meter-seg{height:100%;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.fs-meter-seg.s1{background:var(--grad-iris)}
+.fs-meter-seg.s2{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+.fs-meter-seg.s3{background:linear-gradient(90deg,#10b981,#34d399)}
+.fs-meter-labels{display:flex;margin-top:10px;gap:18px;font-size:11px;color:var(--t3);flex-wrap:wrap}
+.fs-mlb{display:inline-flex;align-items:center;gap:6px}
+.fs-mlb .d{width:8px;height:8px;border-radius:50%}
+.fs-mlb .d.s1{background:var(--iris-500)}
+.fs-mlb .d.s2{background:var(--amber)}
+.fs-mlb .d.s3{background:var(--green)}
+.fs-mlb b{color:var(--t1);font-weight:700;font-variant-numeric:tabular-nums;font-size:11.5px}
+.fs-big{font-size:32px;font-weight:700;color:var(--t1);letter-spacing:-.02em;line-height:1;background:linear-gradient(135deg,var(--t1),var(--iris-600));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-variant-numeric:tabular-nums}
+.fs-big .u{font-size:14px;color:var(--t3);font-weight:500;-webkit-text-fill-color:var(--t3)}
+.fs-actions{display:flex;gap:8px;align-items:center;position:relative;z-index:1}
+
+.files-quick{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+.qfolder{background:rgba(255,255,255,.7);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.85);border-radius:var(--r-lg);padding:22px;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:16px;box-shadow:var(--sh-1)}
+.qfolder:hover{transform:translateY(-3px);box-shadow:var(--sh-3);border-color:var(--iris-200)}
+.qf-ic{width:52px;height:52px;border-radius:16px;background:var(--grad-iris-soft);color:var(--iris-700);display:flex;align-items:center;justify-content:center;border:1px solid rgba(99,102,241,.15);box-shadow:0 4px 14px rgba(99,102,241,.18)}
+.qf-ic .ic{width:26px;height:26px}
+.qf-info{flex:1}
+.qf-n{font-size:14.5px;font-weight:700;color:var(--t1);margin-bottom:3px}
+.qf-m{font-size:12px;color:var(--t3);font-variant-numeric:tabular-nums}
+
+/* admin */
+.admin-tabs{display:flex;gap:4px;background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border-radius:var(--r);padding:5px;margin-bottom:18px;max-width:fit-content;border:1px solid rgba(255,255,255,.9);box-shadow:var(--sh-1)}
+.admin-tab{padding:9px 18px;border-radius:10px;font-size:12.5px;color:var(--t2);cursor:pointer;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.admin-tab.active{background:var(--grad-iris);color:#fff;box-shadow:0 4px 12px rgba(99,102,241,.32)}
+.red-dot{background:var(--rose);color:#fff;font-size:10px;padding:1px 7px;border-radius:99px;font-weight:700}
+.mini-bar{flex:1;height:6px;background:rgba(99,102,241,.08);border-radius:99px;overflow:hidden;max-width:120px}
+.mini-bar-f{height:100%;background:var(--grad-iris);border-radius:99px;transition:width .4s;box-shadow:0 0 6px rgba(99,102,241,.4)}
+
+/* row layout */
+.row{display:grid;grid-template-columns:1fr 360px;gap:14px;margin-bottom:14px}
+
+/* toast */
+.toast{position:fixed;bottom:24px;right:24px;background:rgba(30,27,75,.95);backdrop-filter:blur(20px);color:#fff;border-radius:var(--r);padding:13px 20px;font-size:13px;z-index:300;display:flex;align-items:center;gap:8px;box-shadow:0 12px 36px rgba(30,27,75,.5);animation:slideUp .35s ease;border:1px solid rgba(255,255,255,.1)}
+@keyframes slideUp{from{transform:translateY(20px) scale(.95);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+
+.hidden{display:none!important}
+
+/* overlay for closing menus */
+.menu-overlay{position:fixed;inset:0;z-index:70;display:none}
+.menu-overlay.show{display:block}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-quantum" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.5"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+<symbol id="i-cube" viewBox="0 0 24 24"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5"/><path d="M12 12v10"/></symbol>
+<symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3.5-7.1"/><polyline points="21 4 21 9 16 9"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.41 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+<symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+<symbol id="i-up" viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></symbol>
+<symbol id="i-arrow-right" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+<symbol id="i-arrow-left" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></symbol>
+<symbol id="i-chev-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
+<symbol id="i-chev-right" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
+<symbol id="i-chev-up-down" viewBox="0 0 24 24"><polyline points="7 15 12 20 17 15"/><polyline points="17 9 12 4 7 9"/></symbol>
+<symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></symbol>
+<symbol id="i-clip" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="3" y1="20" x2="21" y2="20"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+<symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 2v6L4 19a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3l-5-11V2"/><line x1="8" y1="2" x2="16" y2="2"/><line x1="7" y1="14" x2="17" y2="14"/></symbol>
+<symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+<symbol id="i-message" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+<symbol id="i-pulse" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+<symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></symbol>
+<symbol id="i-filter" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+<symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"/><path d="M19 14l.7 2.1L22 17l-2.3.9L19 20l-.7-2.1L16 17l2.3-.9L19 14z"/></symbol>
+<symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
+<symbol id="i-tag" viewBox="0 0 24 24"><path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></symbol>
+<symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+<symbol id="i-building" viewBox="0 0 24 24"><path d="M3 21V7l9-5 9 5v14"/><path d="M9 21V12h6v9"/><line x1="9" y1="9" x2="9" y2="9.01"/><line x1="15" y1="9" x2="15" y2="9.01"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="5"/><path d="M12.5 11.5 21 3"/><path d="m17 7 3 3"/><path d="m14 10 3 3"/></symbol>
+</svg>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="org-bar" onclick="toggleOrgSwitcher(event)">
+      <div class="org-mark"><svg><use href="#i-quantum"/></svg></div>
+      <div class="org-info">
+        <div class="org-name">华西临床医学中心</div>
+        <div class="org-meta"><span class="dot"></span>42 成员 · 已绑定企微</div>
+      </div>
+      <svg class="ic ic-sm org-chev"><use href="#i-chev-up-down"/></svg>
+      <div class="org-switcher" id="orgSwitcher" onclick="event.stopPropagation()">
+        <div class="org-sw-row active">
+          <div class="org-sw-mark"><svg class="ic ic-sm"><use href="#i-quantum"/></svg></div>
+          <div class="org-sw-info"><div class="org-sw-n">华西临床医学中心</div><div class="org-sw-m">42 成员 · 管理员</div></div>
+          <svg class="ic ic-sm org-sw-check"><use href="#i-check"/></svg>
+        </div>
+        <div class="org-sw-row" onclick="toast('已切换至 上海仁济医学组')">
+          <div class="org-sw-mark g2"><svg class="ic ic-sm"><use href="#i-building"/></svg></div>
+          <div class="org-sw-info"><div class="org-sw-n">上海仁济医学组</div><div class="org-sw-m">28 成员 · 协作员</div></div>
+        </div>
+        <div class="org-sw-row" onclick="toast('已切换至 协和数据科学')">
+          <div class="org-sw-mark g3"><svg class="ic ic-sm"><use href="#i-flask"/></svg></div>
+          <div class="org-sw-info"><div class="org-sw-n">协和数据科学</div><div class="org-sw-m">15 成员 · 受邀</div></div>
+        </div>
+        <div class="org-sw-sep"></div>
+        <div class="org-sw-add" onclick="toast('创建/加入组织')"><svg class="ic ic-sm"><use href="#i-plus"/></svg>创建或加入组织</div>
+      </div>
+    </div>
+
+    <button class="new-btn" onclick="newChat()">
+      <svg class="ic ic-sm"><use href="#i-sparkles"/></svg>
+      <span>新建对话</span>
+      <span class="new-btn-kbd">⌘ N</span>
+    </button>
+
+    <div class="side-search">
+      <svg class="ic ic-sm"><use href="#i-search"/></svg>
+      <input placeholder="搜索任务、技能..."/>
+      <kbd>⌘K</kbd>
+    </div>
+
+    <div class="side-label">工作台</div>
+    <div class="nav active" data-route="dashboard"><svg class="ic"><use href="#i-grid"/></svg>任务中心</div>
+    <div class="nav" data-route="market"><svg class="ic"><use href="#i-cube"/></svg>技能市场</div>
+    <div class="nav" data-route="files"><svg class="ic"><use href="#i-folder"/></svg>工作区文件</div>
+
+    <div class="tasks-section">
+      <div class="side-label">我的任务<span class="count">6</span></div>
+
+      <div class="task-item" data-task="ae" onclick="openTask('ae')">
+        <span class="task-dot running"></span>
+        <div class="task-text">
+          <div class="task-name">疫苗V-203不良反应汇总</div>
+          <div class="task-meta">执行中 · <span class="task-progress">68%</span></div>
+        </div>
+      </div>
+      <div class="task-item" data-task="crf" onclick="openTask('crf')">
+        <span class="task-dot review"></span>
+        <div class="task-text">
+          <div class="task-name">中心01 vs 中心02 CRF比对</div>
+          <div class="task-meta">待审核 · 3 项待确认</div>
+        </div>
+      </div>
+      <div class="task-item" data-task="sae" onclick="openTask('sae')">
+        <span class="task-dot done"></span>
+        <div class="task-text">
+          <div class="task-name">SAE 周报草稿 · 第14周</div>
+          <div class="task-meta">已完成 · 昨天 16:48</div>
+        </div>
+      </div>
+      <div class="task-item" data-task="lab" onclick="openTask('lab')">
+        <span class="task-dot done"></span>
+        <div class="task-text">
+          <div class="task-name">实验室异常复核 W12</div>
+          <div class="task-meta">已完成 · 3 天前</div>
+        </div>
+      </div>
+      <div class="task-item" data-task="dsmb" onclick="openTask('dsmb')">
+        <span class="task-dot queue"></span>
+        <div class="task-text">
+          <div class="task-name">DSMB 月度安全报告</div>
+          <div class="task-meta">排队中 · 5 分钟前</div>
+        </div>
+      </div>
+      <div class="task-item" data-task="ic" onclick="openTask('ic')">
+        <span class="task-dot draft"></span>
+        <div class="task-text">
+          <div class="task-name">知情同意文件审查</div>
+          <div class="task-meta">草稿 · 等待选择文件</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="user-card" onclick="toggleUserMenu(event)">
+      <div class="user-av">王</div>
+      <div class="user-info">
+        <div class="user-name">王思远</div>
+        <div class="user-role">管理员 · <span class="wechat">企微</span></div>
+      </div>
+      <div class="user-more"><svg class="ic ic-sm"><use href="#i-chev-up-down"/></svg></div>
+      <div class="user-menu" id="userMenu" onclick="event.stopPropagation()">
+        <div class="user-menu-head">
+          <div class="user-av">王</div>
+          <div class="umh-info">
+            <div class="umh-n">王思远</div>
+            <div class="umh-m">wang.siyuan@wchclin.cn</div>
+          </div>
+        </div>
+        <div class="user-menu-row" onclick="toast('个人资料')"><svg class="ic"><use href="#i-user"/></svg>个人资料</div>
+        <div class="user-menu-row" onclick="toast('偏好设置')"><svg class="ic"><use href="#i-gear"/></svg>偏好设置<span class="um-tail">⌘,</span></div>
+        <div class="user-menu-sep"></div>
+        <div class="user-menu-row" onclick="goAndCloseMenu('admin')"><svg class="ic"><use href="#i-building"/></svg>组织管理<span class="um-pill">管理员</span></div>
+        <div class="user-menu-row" onclick="toast('企微绑定管理')"><svg class="ic"><use href="#i-message"/></svg>企业微信绑定<span class="um-tail" style="color:#07c160;font-weight:600">已绑定</span></div>
+        <div class="user-menu-row" onclick="toast('技能授权')"><svg class="ic"><use href="#i-key"/></svg>我的技能授权<span class="um-pill">12</span></div>
+        <div class="user-menu-row" onclick="toast('登录设备')"><svg class="ic"><use href="#i-clock"/></svg>登录设备</div>
+        <div class="user-menu-sep"></div>
+        <div class="user-menu-row" onclick="toast('帮助文档')"><svg class="ic"><use href="#i-info"/></svg>帮助与文档</div>
+        <div class="user-menu-row" style="color:var(--rose)" onclick="toast('已退出登录')"><svg class="ic"><use href="#i-logout"/></svg>退出登录</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-title">
+        <div class="topbar-crumb" id="crumb"><b>任务中心</b></div>
+        <span class="topbar-status hidden" id="topStatus"></span>
+      </div>
+      <div class="topbar-actions">
+        <div class="icon-btn" onclick="toggleNotif(event)" title="通知中心">
+          <svg class="ic"><use href="#i-bell"/></svg>
+          <div class="icon-dot"></div>
+        </div>
+      </div>
+      <div class="notif-pop" id="notifPop" onclick="event.stopPropagation()">
+        <div class="notif-pop-head"><b>通知中心</b><span class="link" onclick="toast('已全部标为已读')">全部已读</span></div>
+        <div class="notif-list">
+          <div class="notif-item unread" onclick="openTask('crf')"><div class="notif-ic ok"><svg class="ic ic-sm"><use href="#i-check"/></svg></div><div class="notif-body"><div class="notif-t">CRF比对任务完成</div><div class="notif-d">12 处差异 · 3 项需确认</div><div class="notif-time">5 分钟前</div></div></div>
+          <div class="notif-item unread" onclick="go('market')"><div class="notif-ic"><svg class="ic ic-sm"><use href="#i-cube"/></svg></div><div class="notif-body"><div class="notif-t">技能授权已批准</div><div class="notif-d">"实验室异常复核" · 90 天</div><div class="notif-time">25 分钟前</div></div></div>
+          <div class="notif-item unread" onclick="go('files')"><div class="notif-ic"><svg class="ic ic-sm"><use href="#i-share"/></svg></div><div class="notif-body"><div class="notif-t">收到文件分享</div><div class="notif-d">陈泽明 → 受试者基线数据_V203.xlsx</div><div class="notif-time">1 小时前</div></div></div>
+          <div class="notif-item unread" onclick="go('files')"><div class="notif-ic warn"><svg class="ic ic-sm"><use href="#i-alert"/></svg></div><div class="notif-body"><div class="notif-t">工作区使用 92%</div><div class="notif-d">46.2 / 50 GB</div><div class="notif-time">今天 09:12</div></div></div>
+          <div class="notif-item" onclick="openTask('sae')"><div class="notif-ic ok"><svg class="ic ic-sm"><use href="#i-check"/></svg></div><div class="notif-body"><div class="notif-t">SAE 周报已完成</div><div class="notif-d">已保存至任务输出</div><div class="notif-time">昨天</div></div></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="screen-wrap">
+      <!-- ─── 任务中心（新仪表盘） ─── -->
+      <section class="screen active" id="screen-dashboard">
+        <div class="tc-greet">
+          <div>
+            <div class="tc-greet-t">下午好，思远 👋</div>
+            <div class="tc-greet-d">任务中心 · 共 24 项任务，其中 2 项执行中，3 项等待您的确认</div>
+          </div>
+          <div class="tc-greet-r">
+            <span class="tc-stat-chip"><svg class="ic ic-sm"><use href="#i-pulse"/></svg>本周完成 <b>24</b>/28</span>
+            <span class="tc-stat-chip"><svg class="ic ic-sm"><use href="#i-clock"/></svg>平均 <b>3.4</b> 分钟</span>
+          </div>
+        </div>
+
+        <!-- 快速开始 -->
+        <div class="qs-card">
+          <div class="qs-head">
+            <div class="qs-title"><svg class="ic"><use href="#i-bolt"/></svg>快速开始<span class="qs-sub">· 已授权 12 个技能，点击即可立即执行</span></div>
+            <div class="qs-action">
+              <button class="pill" onclick="go('market')"><svg class="ic ic-sm"><use href="#i-cube"/></svg>浏览技能市场</button>
+            </div>
+          </div>
+          <div class="qs-grid">
+            <div class="qs-skill" onclick="openTask('ic')">
+              <div class="qs-skill-top">
+                <div class="qs-skill-ic"><svg class="ic"><use href="#i-clip"/></svg></div>
+                <div class="qs-skill-info">
+                  <div class="qs-skill-cat">数据核查</div>
+                  <div class="qs-skill-name">CRF 数据比对</div>
+                </div>
+              </div>
+              <div class="qs-skill-desc">比对两个中心的病例报告表，标注差异字段</div>
+              <div class="qs-skill-foot">
+                <span class="qs-skill-meta"><svg class="ic"><use href="#i-bolt"/></svg>1.2k 次</span>
+                <span class="qs-skill-meta"><svg class="ic"><use href="#i-clock"/></svg>~3 分钟</span>
+                <button class="qs-skill-go" onclick="event.stopPropagation();openTask('ic')"><svg class="ic"><use href="#i-play"/></svg>开始</button>
+              </div>
+            </div>
+
+            <div class="qs-skill" onclick="openTask('ic')">
+              <div class="qs-skill-top">
+                <div class="qs-skill-ic g2"><svg class="ic"><use href="#i-chart"/></svg></div>
+                <div class="qs-skill-info">
+                  <div class="qs-skill-cat">报告生成</div>
+                  <div class="qs-skill-name">SAE 周报生成</div>
+                </div>
+              </div>
+              <div class="qs-skill-desc">根据不良事件记录自动生成标准格式周报</div>
+              <div class="qs-skill-foot">
+                <span class="qs-skill-meta"><svg class="ic"><use href="#i-bolt"/></svg>840 次</span>
+                <span class="qs-skill-meta"><svg class="ic"><use href="#i-clock"/></svg>~4 分钟</span>
+                <button class="qs-skill-go" onclick="event.stopPropagation();openTask('ic')"><svg class="ic"><use href="#i-play"/></svg>开始</button>
+              </div>
+            </div>
+
+            <div class="qs-skill" onclick="openTask('ic')">
+              <div class="qs-skill-top">
+                <div class="qs-skill-ic g3"><svg class="ic"><use href="#i-alert"/></svg></div>
+                <div class="qs-skill-info">
+                  <div class="qs-skill-cat">安全监查</div>
+                  <div class="qs-skill-name">不良反应汇总</div>
+                </div>
+              </div>
+              <div class="qs-skill-desc">汇总归类所有 AE/SAE 记录，生成频率分布表</div>
+              <div class="qs-skill-foot">
+                <span class="qs-skill-meta"><svg class="ic"><use href="#i-bolt"/></svg>620 次</span>
+                <span class="qs-skill-meta"><svg class="ic"><use href="#i-clock"/></svg>~5 分钟</span>
+                <button class="qs-skill-go" onclick="event.stopPropagation();openTask('ic')"><svg class="ic"><use href="#i-play"/></svg>开始</button>
+              </div>
+            </div>
+
+            <div class="qs-skill" onclick="openTask('ic')">
+              <div class="qs-skill-top">
+                <div class="qs-skill-ic g4"><svg class="ic"><use href="#i-users"/></svg></div>
+                <div class="qs-skill-info">
+                  <div class="qs-skill-cat">数据核查</div>
+                  <div class="qs-skill-name">入组数据核查</div>
+                </div>
+              </div>
+              <div class="qs-skill-desc">验证受试者入组标准符合性，标注异常记录</div>
+              <div class="qs-skill-foot">
+                <span class="qs-skill-meta"><svg class="ic"><use href="#i-bolt"/></svg>418 次</span>
+                <span class="qs-skill-meta"><svg class="ic"><use href="#i-clock"/></svg>~6 分钟</span>
+                <button class="qs-skill-go" onclick="event.stopPropagation();openTask('ic')"><svg class="ic"><use href="#i-play"/></svg>开始</button>
+              </div>
+            </div>
+
+            <div class="qs-skill" onclick="openTask('ic')">
+              <div class="qs-skill-top">
+                <div class="qs-skill-ic g5"><svg class="ic"><use href="#i-flask"/></svg></div>
+                <div class="qs-skill-info">
+                  <div class="qs-skill-cat">数据核查</div>
+                  <div class="qs-skill-name">实验室异常复核</div>
+                </div>
+              </div>
+              <div class="qs-skill-desc">自动识别超出参考范围的实验室检查值</div>
+              <div class="qs-skill-foot">
+                <span class="qs-skill-meta"><svg class="ic"><use href="#i-bolt"/></svg>410 次</span>
+                <span class="qs-skill-meta"><svg class="ic"><use href="#i-clock"/></svg>~12 分钟</span>
+                <button class="qs-skill-go" onclick="event.stopPropagation();openTask('ic')"><svg class="ic"><use href="#i-play"/></svg>开始</button>
+              </div>
+            </div>
+
+            <div class="qs-more" onclick="go('market')">
+              <svg class="ic"><use href="#i-plus"/></svg>
+              <b>查看全部技能</b>
+              <span>已授权 12 · 可申请 6</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 任务列表 -->
+        <div class="tc-card">
+          <div class="tc-toolbar">
+            <div class="tc-toolbar-l">我的任务<span class="sub">· 共 24 项任务</span></div>
+            <div class="tc-toolbar-r">
+              <button class="pill primary" onclick="newChat()"><svg class="ic ic-sm"><use href="#i-plus"/></svg>新建任务</button>
+            </div>
+          </div>
+          <div class="tc-tabs" id="tcTabs">
+            <button class="tc-tab active" data-status="all" onclick="filterTasks(this,'all')">全部<span class="tcc">24</span></button>
+            <button class="tc-tab" data-status="running" onclick="filterTasks(this,'running')">执行中<span class="tcc">2</span></button>
+            <button class="tc-tab" data-status="review" onclick="filterTasks(this,'review')">待审核<span class="tcc">3</span></button>
+            <button class="tc-tab" data-status="done" onclick="filterTasks(this,'done')">已完成<span class="tcc">18</span></button>
+            <button class="tc-tab" data-status="draft" onclick="filterTasks(this,'draft')">草稿<span class="tcc">1</span></button>
+            <button class="tc-tab" data-status="fail" onclick="filterTasks(this,'fail')">失败<span class="tcc">0</span></button>
+          </div>
+          <div class="tc-filter-bar">
+            <div class="tc-search"><svg class="ic ic-sm"><use href="#i-search"/></svg><input placeholder="搜索任务、技能、文件..."/></div>
+            <button class="tc-filter-btn"><svg class="ic ic-sm"><use href="#i-filter"/></svg>筛选</button>
+            <button class="tc-date-chip"><svg class="ic ic-sm"><use href="#i-calendar"/></svg>最近 30 天<svg class="ic ic-sm"><use href="#i-chev-down"/></svg></button>
+          </div>
+          <table class="tbl" id="tcTbl">
+            <thead><tr><th>任务名称</th><th>使用技能</th><th>状态</th><th>进度</th><th>创建时间</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr data-status="running" onclick="openTask('ae')">
+                <td><div class="cell-name"><div class="cell-ico"><svg class="ic"><use href="#i-alert"/></svg></div><div class="cell-name-text"><div class="cell-name-t">疫苗V-203不良反应汇总</div><div class="cell-name-m">3 个输入文件 · 启动于 14:23</div></div></div></td>
+                <td>AE/SAE 汇总</td>
+                <td><span class="pill-status ps-running"><span class="psd"></span>执行中</span></td>
+                <td><div class="prog-orb" style="--p:68%"><span>68%</span></div></td>
+                <td>2 小时前</td>
+                <td><button class="row-act primary" onclick="event.stopPropagation();openTask('ae')"><svg class="ic"><use href="#i-eye"/></svg>查看</button></td>
+              </tr>
+              <tr data-status="review" onclick="openTask('crf')">
+                <td><div class="cell-name"><div class="cell-ico v2"><svg class="ic"><use href="#i-clip"/></svg></div><div class="cell-name-text"><div class="cell-name-t">中心01 vs 中心02 CRF比对</div><div class="cell-name-m">12 处差异 · 3 项需确认</div></div></div></td>
+                <td>CRF 数据比对</td>
+                <td><span class="pill-status ps-review"><span class="psd"></span>待审核</span></td>
+                <td><div class="prog-orb done"><span>✓</span></div></td>
+                <td>今天 11:20</td>
+                <td><button class="row-act amber" onclick="event.stopPropagation();openTask('crf')"><svg class="ic"><use href="#i-check"/></svg>审核</button></td>
+              </tr>
+              <tr data-status="done" onclick="openTask('sae')">
+                <td><div class="cell-name"><div class="cell-ico v3"><svg class="ic"><use href="#i-chart"/></svg></div><div class="cell-name-text"><div class="cell-name-t">SAE 周报草稿 · 第14周</div><div class="cell-name-m">12 页 PDF · 已归档</div></div></div></td>
+                <td>SAE 周报生成</td>
+                <td><span class="pill-status ps-done"><span class="psd"></span>已完成</span></td>
+                <td><div class="prog-orb done"><span>✓</span></div></td>
+                <td>昨天 16:48</td>
+                <td><button class="row-act" onclick="event.stopPropagation();toast('开始下载报告')"><svg class="ic"><use href="#i-download"/></svg>下载</button></td>
+              </tr>
+              <tr data-status="done" onclick="openTask('lab')">
+                <td><div class="cell-name"><div class="cell-ico v5"><svg class="ic"><use href="#i-flask"/></svg></div><div class="cell-name-text"><div class="cell-name-t">实验室异常复核 W12</div><div class="cell-name-m">识别 8 处异常值</div></div></div></td>
+                <td>实验室异常</td>
+                <td><span class="pill-status ps-done"><span class="psd"></span>已完成</span></td>
+                <td><div class="prog-orb done"><span>✓</span></div></td>
+                <td>3 天前</td>
+                <td><button class="row-act" onclick="event.stopPropagation();toast('开始下载报告')"><svg class="ic"><use href="#i-download"/></svg>下载</button></td>
+              </tr>
+              <tr data-status="running" onclick="openTask('dsmb')">
+                <td><div class="cell-name"><div class="cell-ico v4"><svg class="ic"><use href="#i-shield"/></svg></div><div class="cell-name-text"><div class="cell-name-t">DSMB 月度安全报告</div><div class="cell-name-m">排队第 2 位 · 预计 5 分钟内开始</div></div></div></td>
+                <td>安全监查</td>
+                <td><span class="pill-status ps-queue"><span class="psd"></span>排队中</span></td>
+                <td><div class="prog-orb empty"><span>—</span></div></td>
+                <td>5 分钟前</td>
+                <td><button class="row-act ghost" onclick="event.stopPropagation();toast('已取消该任务')"><svg class="ic"><use href="#i-x"/></svg>取消</button></td>
+              </tr>
+              <tr data-status="draft" onclick="openTask('ic')">
+                <td><div class="cell-name"><div class="cell-ico v6"><svg class="ic"><use href="#i-doc"/></svg></div><div class="cell-name-text"><div class="cell-name-t">知情同意文件审查</div><div class="cell-name-m">草稿 · 等待选择文件</div></div></div></td>
+                <td>文档审查</td>
+                <td><span class="pill-status ps-draft"><span class="psd"></span>草稿</span></td>
+                <td><div class="prog-orb empty"><span>—</span></div></td>
+                <td>—</td>
+                <td><button class="row-act primary" onclick="event.stopPropagation();openTask('ic')"><svg class="ic"><use href="#i-arrow-right"/></svg>继续</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TASK DRAFT (wizard) -->
+      <section class="screen" id="screen-task-draft">
+        <div class="task-hero">
+          <div class="th-top">
+            <div class="th-ico"><svg class="ic"><use href="#i-doc"/></svg></div>
+            <div class="th-text">
+              <div class="th-cat">文档审查 · 草稿</div>
+              <div class="th-name">知情同意文件审查</div>
+              <div class="th-desc">使用 "知情同意审查" 技能 · 自动核对签字、日期与文件完整性。完成后自动生成审查报告并归档。</div>
+            </div>
+            <div class="th-actions"><button class="btn btn-ghost"><svg class="ic ic-sm"><use href="#i-more"/></svg></button></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="wizard-stepper">
+            <div class="ws-step done"><div class="ws-num"><svg class="ic"><use href="#i-check"/></svg></div>选择技能</div>
+            <div class="ws-line done"></div>
+            <div class="ws-step active"><div class="ws-num">2</div>选择输入文件</div>
+            <div class="ws-line"></div>
+            <div class="ws-step"><div class="ws-num">3</div>补充指令</div>
+          </div>
+
+          <div class="skill-summary" onclick="openSkill()">
+            <div class="cell-ico"><svg class="ic"><use href="#i-clip"/></svg></div>
+            <div class="ss-info">
+              <div class="ss-cat">数据核查 · v2.3</div>
+              <div class="ss-name">CRF 数据比对</div>
+              <div class="ss-desc">比对多中心病例报告表数据，自动标注差异字段并生成核查报告</div>
+            </div>
+            <button class="pill" onclick="event.stopPropagation();openSkill()"><svg class="ic ic-sm"><use href="#i-info"/></svg>详情</button>
+            <button class="pill" onclick="event.stopPropagation();toast('打开技能列表')">更换</button>
+          </div>
+
+          <div class="banner-info"><svg class="ic"><use href="#i-info"/></svg>输入文件均来自工作区。需要添加新文件请先上传到工作区，再回到这里勾选。</div>
+
+          <div class="section">
+            <div class="section-head"><div class="section-title">从工作区选择输入文件</div><div class="section-sub" id="selSummary">已选 2 个文件 · 4.5 MB</div></div>
+            <div class="wsp">
+              <div class="wsp-head">
+                <div class="wsp-tabs">
+                  <div class="wsp-tab active" onclick="wsTab(this)">我的上传</div>
+                  <div class="wsp-tab" onclick="wsTab(this)">任务输入</div>
+                  <div class="wsp-tab" onclick="wsTab(this)">任务输出</div>
+                  <div class="wsp-tab" onclick="wsTab(this)">全部</div>
+                </div>
+                <div class="wsp-search"><svg class="ic ic-sm"><use href="#i-search"/></svg><input placeholder="搜索文件名..."/></div>
+              </div>
+              <div class="wsp-crumb"><svg class="ic"><use href="#i-folder"/></svg><b>工作区</b><svg class="ic"><use href="#i-chev-right"/></svg><span>我的上传</span><svg class="ic"><use href="#i-chev-right"/></svg><b>01_原始数据</b></div>
+              <div class="wsp-grid" id="wspGrid">
+                <div class="wsp-card checked" onclick="pick(this)"><div class="wsp-check on"></div><div class="wsp-fic">XLS</div><div class="wsp-info"><div class="wsp-fname">中心01_CRF_V203_W14.xlsx</div><div class="wsp-fmeta"><b>248 行</b> · 2.4 MB · 今天 14:23</div></div></div>
+                <div class="wsp-card checked" onclick="pick(this)"><div class="wsp-check on"></div><div class="wsp-fic">XLS</div><div class="wsp-info"><div class="wsp-fname">中心02_CRF_V203_W14.xlsx</div><div class="wsp-fmeta"><b>231 行</b> · 2.1 MB · 今天 14:23</div></div></div>
+                <div class="wsp-card" onclick="pick(this)"><div class="wsp-check"></div><div class="wsp-fic">XLS</div><div class="wsp-info"><div class="wsp-fname">中心03_CRF_V203_W14.xlsx</div><div class="wsp-fmeta"><b>198 行</b> · 1.9 MB · 昨天</div></div></div>
+                <div class="wsp-card" onclick="pick(this)"><div class="wsp-check"></div><div class="wsp-fic">XLS</div><div class="wsp-info"><div class="wsp-fname">受试者基线数据_V203.xlsx <span class="wsp-tagout">输出</span></div><div class="wsp-fmeta"><b>124 行</b> · 1.8 MB · 3 天前</div></div></div>
+                <div class="wsp-card" onclick="pick(this)"><div class="wsp-check"></div><div class="wsp-fic t-pdf">PDF</div><div class="wsp-info"><div class="wsp-fname">临床试验方案_V203_v3.1.pdf</div><div class="wsp-fmeta"><b>128 页</b> · 8.4 MB · 上周</div></div></div>
+                <div class="wsp-card" onclick="pick(this)"><div class="wsp-check"></div><div class="wsp-fic">XLS</div><div class="wsp-info"><div class="wsp-fname">CRF字段定义_v2.3.xlsx</div><div class="wsp-fmeta"><b>312 行</b> · 1.2 MB · 2 月前</div></div></div>
+                <div class="wsp-card" onclick="pick(this)"><div class="wsp-check"></div><div class="wsp-fic t-pdf">PDF</div><div class="wsp-info"><div class="wsp-fname">编码手册_V203_v1.0.pdf</div><div class="wsp-fmeta"><b>45 页</b> · 2.3 MB · 2 月前</div></div></div>
+                <div class="wsp-card" onclick="pick(this)"><div class="wsp-check"></div><div class="wsp-fic t-csv">CSV</div><div class="wsp-info"><div class="wsp-fname">受试者入组记录.csv</div><div class="wsp-fmeta"><b>124 行</b> · 0.8 MB · 上周</div></div></div>
+              </div>
+              <div class="wsp-foot">
+                <span>已选 <b id="selN">2</b> 个 · 共 <b id="selS">4.5</b> MB</span>
+                <span class="upl" onclick="toast('打开工作区上传')"><svg class="ic ic-sm"><use href="#i-up"/></svg>上传新文件到工作区</span>
+              </div>
+            </div>
+            <div class="sel-files" id="selPreview">
+              <div class="sf"><div class="wsp-fic">XLS</div><div class="sf-n">中心01_CRF_V203_W14.xlsx</div><div class="sf-m">2.4 MB</div><div class="sf-x"><svg class="ic ic-sm"><use href="#i-x"/></svg></div></div>
+              <div class="sf"><div class="wsp-fic">XLS</div><div class="sf-n">中心02_CRF_V203_W14.xlsx</div><div class="sf-m">2.1 MB</div><div class="sf-x"><svg class="ic ic-sm"><use href="#i-x"/></svg></div></div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-head"><div class="section-title">补充指令</div><div class="section-sub">自然语言对话，AI 会理解并整合</div></div>
+            <div class="nlc">
+              <div class="nl-msg ai"><div class="nl-av ai"><svg class="ic"><use href="#i-quantum"/></svg></div><div class="nl-text">已识别 2 份多中心 CRF 数据表。告诉我您的具体要求 — 哪些字段需要重点核对？空值如何处理？输出格式偏好？</div></div>
+              <div class="nl-msg you"><div class="nl-av you"><svg class="ic"><use href="#i-user"/></svg></div><div class="nl-text">重点比对知情同意日期、不良事件记录与生命体征三类字段。空值视为差异并标红，输出 Excel 报告，按受试者编号排序。</div></div>
+              <div class="nl-msg ai"><div class="nl-av ai"><svg class="ic"><use href="#i-quantum"/></svg></div><div class="nl-text">已理解。执行计划：① 锁定上述三类共 18 个字段进行比对；② 空值标红并归入"缺失值"差异类型；③ 输出按受试者编号升序排列的 Excel 报告。准备开始？</div></div>
+              <div class="nl-input">
+                <textarea placeholder="继续补充指令..."></textarea>
+                <button class="nl-send" onclick="toast('已发送')"><svg class="ic ic-sm"><use href="#i-up"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="wiz-foot">
+            <button class="btn btn-ghost" onclick="go('dashboard')"><svg class="ic ic-sm"><use href="#i-arrow-left"/></svg>上一步</button>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-ghost" onclick="toast('已保存为草稿')">保存为草稿</button>
+              <button class="btn btn-accent" onclick="openTask('ae')">开始执行<svg class="ic ic-sm"><use href="#i-arrow-right"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TASK RUNNING -->
+      <section class="screen" id="screen-task-running">
+        <div class="task-hero">
+          <div class="th-top">
+            <div class="th-ico"><svg class="ic"><use href="#i-alert"/></svg></div>
+            <div class="th-text">
+              <div class="th-cat">安全监查 · 进行中</div>
+              <div class="th-name">疫苗V-203不良反应汇总</div>
+              <div class="th-desc">使用 "AE/SAE 汇总" 技能 · 3 个输入文件 · 启动于 14:23</div>
+            </div>
+            <div class="th-actions"><button class="btn btn-ghost" onclick="toast('已取消任务')">取消任务</button></div>
+          </div>
+        </div>
+
+        <div class="exec-grid">
+          <div class="exec-main">
+            <div class="progress-card">
+              <div class="pc-head">
+                <div class="pc-title"><svg class="ic"><use href="#i-bolt"/></svg>实时执行进度</div>
+                <div class="pc-pct">68<span class="u">%</span></div>
+              </div>
+              <div class="pc-bar"><div class="pc-bar-fill" style="width:68%"></div></div>
+              <div class="pc-steps">
+                <div class="pc-step done"><div class="pcs-ic done"><svg class="ic"><use href="#i-check"/></svg></div><div class="pcs-text">解析输入文件（3 份）</div><div class="pcs-time">14:23 · 4 秒</div></div>
+                <div class="pc-step done"><div class="pcs-ic done"><svg class="ic"><use href="#i-check"/></svg></div><div class="pcs-text">提取不良反应记录（892 条）</div><div class="pcs-time">14:24 · 38 秒</div></div>
+                <div class="pc-step done"><div class="pcs-ic done"><svg class="ic"><use href="#i-check"/></svg></div><div class="pcs-text">按 MedDRA v26 标准分类</div><div class="pcs-time">14:25 · 1 分 12 秒</div></div>
+                <div class="pc-step active"><div class="pcs-ic active"><svg class="ic"><use href="#i-refresh"/></svg></div><div class="pcs-text">生成频率分布表与可视化</div><div class="pcs-time">进行中…</div></div>
+                <div class="pc-step pending"><div class="pcs-ic pending">5</div><div class="pcs-text">导出报告与归档</div><div class="pcs-time">等待</div></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head"><div class="card-title">实时活动日志</div><span class="pill-status ps-running"><span class="psd"></span>实时</span></div>
+              <div class="logs">
+                <div class="log"><span class="log-time">14:26:18</span><span class="log-text">检测到 <b>V203-001-089</b> 缺失合并用药字段，已标记</span></div>
+                <div class="log"><span class="log-time">14:26:02</span><span class="log-text">完成中心03数据合并 · <b>312</b> 条记录</span></div>
+                <div class="log"><span class="log-time">14:25:47</span><span class="log-text">MedDRA 编码完成 · 识别到 <b>12</b> 个 PT 术语</span></div>
+                <div class="log"><span class="log-time">14:25:12</span><span class="log-text">开始按系统器官分类（SOC）汇总</span></div>
+                <div class="log"><span class="log-time">14:24:38</span><span class="log-text">完成 <b>892</b> 条不良反应记录提取</span></div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="exec-side">
+            <div class="es-tabs">
+              <div class="es-tab active" onclick="esTab(this,'chat')"><svg class="ic ic-sm"><use href="#i-message"/></svg>对话</div>
+              <div class="es-tab" onclick="esTab(this,'files')"><svg class="ic ic-sm"><use href="#i-folder"/></svg>文件</div>
+              <div class="es-collapse" onclick="toast('已折叠')"><svg class="ic ic-sm"><use href="#i-arrow-right"/></svg></div>
+            </div>
+            <div class="es-body" id="esChat">
+              <div class="es-chat-msg"><div class="es-chat-meta">量子链 · AI</div><div class="es-bubble ai">已完成 3/5 步骤。正在按 MedDRA 标准对 892 条不良反应记录进行编码归类。</div></div>
+              <div class="es-chat-msg user"><div class="es-chat-meta">您</div><div class="es-bubble user">注射部位反应也要单独统计吗？</div></div>
+              <div class="es-chat-msg"><div class="es-chat-meta">量子链 · AI</div><div class="es-bubble ai">是的，根据 SOC 分类规则，"局部注射反应"会作为独立 SOC 单独统计。当前已识别 47 条相关记录。</div></div>
+              <div class="es-chat-msg user"><div class="es-chat-meta">您</div><div class="es-bubble user">把严重不良反应单独导出一份</div></div>
+              <div class="es-chat-msg"><div class="es-chat-meta">量子链 · AI</div><div class="es-bubble ai">好的，已加入任务清单。完成主报告后会生成 "SAE_单独清单.xlsx" 并保存至 任务输出。</div></div>
+            </div>
+            <div class="es-body hidden" id="esFiles">
+              <div class="es-files-group">输入文件 (3)</div>
+              <div class="es-file"><div class="wsp-fic">XLS</div><div class="es-fn"><div class="es-fn-name">中心01_AE数据.xlsx</div><div class="es-fn-m">2.4 MB</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-download"/></svg></div>
+              <div class="es-file"><div class="wsp-fic">XLS</div><div class="es-fn"><div class="es-fn-name">中心02_AE数据.xlsx</div><div class="es-fn-m">2.1 MB</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-download"/></svg></div>
+              <div class="es-file"><div class="wsp-fic">XLS</div><div class="es-fn"><div class="es-fn-name">中心03_AE数据.xlsx</div><div class="es-fn-m">1.8 MB</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-download"/></svg></div>
+              <div class="es-files-group">输出文件 (生成中)</div>
+              <div class="es-file" style="opacity:.7"><div class="wsp-fic" style="background:var(--iris-50);color:var(--t3);border-color:var(--hairline-2)">···</div><div class="es-fn"><div class="es-fn-name">AE_频率分布表.xlsx</div><div class="es-fn-m" style="color:var(--iris-700);font-weight:700">生成中 68%</div></div></div>
+            </div>
+            <div class="es-input-wrap">
+              <div class="nl-input" style="padding:8px 12px"><input style="flex:1;border:none;outline:none;background:transparent;font-size:12.5px;padding:0;font-family:inherit;color:var(--t1)" placeholder="向 AI 提问..."/><button class="nl-send" style="width:32px;height:32px;border-radius:9px" onclick="toast('已发送')"><svg class="ic ic-sm"><use href="#i-up"/></svg></button></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- TASK REVIEW -->
+      <section class="screen" id="screen-task-review">
+        <div class="task-hero">
+          <div class="th-top">
+            <div class="th-ico" style="color:#92400e;background:linear-gradient(135deg,#fff,#fff7ed);border-color:#fde68a"><svg class="ic"><use href="#i-clip"/></svg></div>
+            <div class="th-text">
+              <div class="th-cat" style="color:#92400e">数据核查 · 待审核</div>
+              <div class="th-name">中心01 vs 中心02 CRF 比对</div>
+              <div class="th-desc">V-203 第14周 · 共比对 231 行，发现 12 处差异，其中 3 项需要您人工确认</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="review-toolbar">
+          <span style="font-size:13px;color:var(--t2);font-weight:500">需要确认</span>
+          <span class="pill-status ps-review"><span class="psd"></span>3 项</span>
+          <div style="width:1px;height:18px;background:var(--hairline-2);margin:0 6px"></div>
+          <button class="confirm-btn"><svg class="ic ic-sm"><use href="#i-filter"/></svg>仅显示待确认</button>
+          <button class="confirm-btn" onclick="toast('开始下载报告')"><svg class="ic ic-sm"><use href="#i-download"/></svg>导出报告</button>
+          <button class="btn btn-accent" style="margin-left:auto" onclick="toast('已全部确认 · 已归档')"><svg class="ic ic-sm"><use href="#i-check"/></svg>全部确认并归档</button>
+        </div>
+
+        <div class="card" style="padding:0;overflow:hidden">
+          <table class="tbl">
+            <thead><tr><th>受试者编号</th><th>字段</th><th>中心01</th><th>中心02</th><th>差异类型</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td style="color:var(--t1);font-weight:500">V203-001-023</td><td>访视日期</td><td>2026-03-12</td><td>2026-03-14</td><td><span class="pill-status ps-queue"><span class="psd"></span>已标注</span></td><td style="font-size:12px;color:var(--t3)">系统处理</td></tr>
+              <tr style="background:linear-gradient(90deg,rgba(245,158,11,.05),transparent)"><td style="color:var(--t1);font-weight:600">V203-001-047</td><td><span style="display:inline-flex;align-items:center;gap:8px"><span class="flag-ic"><svg class="ic"><use href="#i-alert"/></svg></span>体重 (kg)</span></td><td style="color:var(--amber);font-weight:700">68.5</td><td style="color:var(--rose);font-weight:700">—</td><td><span class="pill-status ps-fail"><span class="psd"></span>缺失值</span></td><td><button class="confirm-btn" onclick="this.classList.add('done');this.innerHTML='已确认'">确认</button></td></tr>
+              <tr><td style="color:var(--t1);font-weight:500">V203-001-052</td><td>收缩压</td><td>118</td><td>120</td><td><span class="pill-status ps-queue"><span class="psd"></span>已标注</span></td><td style="font-size:12px;color:var(--t3)">系统处理</td></tr>
+              <tr style="background:linear-gradient(90deg,rgba(245,158,11,.05),transparent)"><td style="color:var(--t1);font-weight:600">V203-001-061</td><td><span style="display:inline-flex;align-items:center;gap:8px"><span class="flag-ic"><svg class="ic"><use href="#i-alert"/></svg></span>知情同意日期</span></td><td style="color:var(--amber);font-weight:700">2026-01-08</td><td style="color:var(--amber);font-weight:700">2026-01-15</td><td><span class="pill-status ps-review"><span class="psd"></span>日期差异</span></td><td><button class="confirm-btn" onclick="this.classList.add('done');this.innerHTML='已确认'">确认</button></td></tr>
+              <tr><td style="color:var(--t1);font-weight:500">V203-001-074</td><td>AE是否发生</td><td>否</td><td>否</td><td><span class="pill-status ps-done"><span class="psd"></span>一致</span></td><td style="font-size:12px;color:var(--t3)">无需处理</td></tr>
+              <tr style="background:linear-gradient(90deg,rgba(245,158,11,.05),transparent)"><td style="color:var(--t1);font-weight:600">V203-001-089</td><td><span style="display:inline-flex;align-items:center;gap:8px"><span class="flag-ic"><svg class="ic"><use href="#i-alert"/></svg></span>合并用药</span></td><td style="color:var(--amber);font-weight:700">布洛芬 200mg</td><td style="color:var(--rose);font-weight:700">—</td><td><span class="pill-status ps-fail"><span class="psd"></span>缺失值</span></td><td><button class="confirm-btn" onclick="this.classList.add('done');this.innerHTML='已确认'">确认</button></td></tr>
+              <tr><td style="color:var(--t1);font-weight:500">V203-001-103</td><td>实验室编号</td><td>LAB-0231</td><td>LAB-0231</td><td><span class="pill-status ps-done"><span class="psd"></span>一致</span></td><td style="font-size:12px;color:var(--t3)">无需处理</td></tr>
+              <tr><td style="color:var(--t1);font-weight:500">V203-001-118</td><td>体温 (°C)</td><td>36.7</td><td>36.5</td><td><span class="pill-status ps-done"><span class="psd"></span>一致</span></td><td style="font-size:12px;color:var(--t3)">无需处理</td></tr>
+              <tr><td style="color:var(--t1);font-weight:500">V203-001-134</td><td>血红蛋白</td><td>132 g/L</td><td>135 g/L</td><td><span class="pill-status ps-queue"><span class="psd"></span>已标注</span></td><td style="font-size:12px;color:var(--t3)">系统处理</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TASK DONE -->
+      <section class="screen" id="screen-task-done">
+        <div class="task-hero">
+          <div class="th-top">
+            <div class="th-ico" style="color:#065f46;background:linear-gradient(135deg,#fff,#ecfdf5);border-color:#a7f3d0"><svg class="ic"><use href="#i-chart"/></svg></div>
+            <div class="th-text">
+              <div class="th-cat" style="color:#065f46">报告生成 · 已完成</div>
+              <div class="th-name">SAE 周报草稿 · 第14周</div>
+              <div class="th-desc">使用 "SAE 周报生成" 技能 · 已生成 12 页 PDF · 已保存至 任务输出</div>
+            </div>
+            <div class="th-actions">
+              <button class="btn btn-ghost" onclick="toast('重新执行')"><svg class="ic ic-sm"><use href="#i-refresh"/></svg>重新执行</button>
+              <button class="btn btn-accent" onclick="toast('开始下载')"><svg class="ic ic-sm"><use href="#i-download"/></svg>下载报告</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero">
+          <div class="kpi"><div class="kpi-meta">AE 总数</div><div class="kpi-val">8<span class="u">例</span></div></div>
+          <div class="kpi"><div class="kpi-meta">SAE 总数</div><div class="kpi-val">2<span class="u">例</span></div></div>
+          <div class="kpi"><div class="kpi-meta">死亡事件</div><div class="kpi-val">0<span class="u">例</span></div></div>
+          <div class="kpi"><div class="kpi-meta">报告页数</div><div class="kpi-val">12<span class="u">页</span></div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-title">输出文件</div><div class="card-tag">3 个</div></div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="es-file" style="margin:0"><div class="wsp-fic t-doc">DOC</div><div class="es-fn"><div class="es-fn-name">SAE周报_第14周_草稿.docx</div><div class="es-fn-m">0.8 MB · 12 页 · 昨天 16:48</div></div><button class="confirm-btn" onclick="toast('开始下载')"><svg class="ic ic-sm"><use href="#i-download"/></svg>下载</button><button class="confirm-btn" onclick="toast('已复制分享链接')"><svg class="ic ic-sm"><use href="#i-share"/></svg>分享</button></div>
+            <div class="es-file" style="margin:0"><div class="wsp-fic">XLS</div><div class="es-fn"><div class="es-fn-name">SAE_单独清单.xlsx</div><div class="es-fn-m">0.3 MB · 8 行 · 昨天 16:48</div></div><button class="confirm-btn" onclick="toast('开始下载')"><svg class="ic ic-sm"><use href="#i-download"/></svg>下载</button><button class="confirm-btn" onclick="toast('已复制分享链接')"><svg class="ic ic-sm"><use href="#i-share"/></svg>分享</button></div>
+            <div class="es-file" style="margin:0"><div class="wsp-fic t-pdf">PDF</div><div class="es-fn"><div class="es-fn-name">AE_频率分布图_W14.pdf</div><div class="es-fn-m">1.2 MB · 6 页 · 昨天 16:48</div></div><button class="confirm-btn" onclick="toast('开始下载')"><svg class="ic ic-sm"><use href="#i-download"/></svg>下载</button><button class="confirm-btn" onclick="toast('已复制分享链接')"><svg class="ic ic-sm"><use href="#i-share"/></svg>分享</button></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MARKET -->
+      <section class="screen" id="screen-market">
+        <div class="market-head">
+          <button class="chip active">全部</button>
+          <button class="chip">已授权 12</button>
+          <button class="chip">未授权 6</button>
+          <button class="chip">审批中 2</button>
+          <div style="margin-left:auto;display:flex;gap:6px">
+            <button class="chip">数据核查</button>
+            <button class="chip">报告生成</button>
+            <button class="chip">安全监查</button>
+            <button class="chip">文档审查</button>
+          </div>
+        </div>
+        <div class="skill-grid">
+          <div class="skill-card" onclick="openSkill()">
+            <div class="sk-corner"><svg class="ic"><use href="#i-check"/></svg></div>
+            <div class="sk-head"><div class="sk-ico"><svg class="ic"><use href="#i-clip"/></svg></div><div><div class="sk-name">CRF 数据比对</div><div class="sk-cat">数据核查 · v2.3</div></div></div>
+            <div class="sk-desc">比对多中心病例报告表数据，自动标注差异字段并生成核查报告。</div>
+            <div class="sk-foot"><span class="sk-stat"><svg class="ic"><use href="#i-bolt"/></svg>1.2k</span><span class="sk-stat"><svg class="ic"><use href="#i-star"/></svg>4.8</span><button class="sk-btn sk-btn-use" onclick="event.stopPropagation();openTask('ic')">使用</button></div>
+          </div>
+          <div class="skill-card" onclick="openSkill()">
+            <div class="sk-corner"><svg class="ic"><use href="#i-check"/></svg></div>
+            <div class="sk-head"><div class="sk-ico" style="background:linear-gradient(135deg,#d1fae5,#a7f3d0);color:#065f46;border-color:rgba(16,185,129,.25)"><svg class="ic"><use href="#i-chart"/></svg></div><div><div class="sk-name">SAE 周报生成</div><div class="sk-cat">报告生成 · v1.8</div></div></div>
+            <div class="sk-desc">基于不良事件记录自动生成符合 CIOMS 标准的周报文档。</div>
+            <div class="sk-foot"><span class="sk-stat"><svg class="ic"><use href="#i-bolt"/></svg>840</span><span class="sk-stat"><svg class="ic"><use href="#i-star"/></svg>4.9</span><button class="sk-btn sk-btn-use" onclick="event.stopPropagation();openTask('ic')">使用</button></div>
+          </div>
+          <div class="skill-card" onclick="openSkill()">
+            <div class="sk-corner"><svg class="ic"><use href="#i-check"/></svg></div>
+            <div class="sk-head"><div class="sk-ico" style="background:linear-gradient(135deg,#fce7f3,#fbcfe8);color:#9d174d;border-color:rgba(236,72,153,.25)"><svg class="ic"><use href="#i-alert"/></svg></div><div><div class="sk-name">不良反应汇总</div><div class="sk-cat">安全监查 · v2.0</div></div></div>
+            <div class="sk-desc">汇总分类 AE/SAE 记录，按 MedDRA 标准生成频率分布表。</div>
+            <div class="sk-foot"><span class="sk-stat"><svg class="ic"><use href="#i-bolt"/></svg>620</span><span class="sk-stat"><svg class="ic"><use href="#i-star"/></svg>4.7</span><button class="sk-btn sk-btn-use" onclick="event.stopPropagation();openTask('ic')">使用</button></div>
+          </div>
+          <div class="skill-card" onclick="openSkill()">
+            <div class="sk-head"><div class="sk-ico" style="background:linear-gradient(135deg,#cffafe,#a5f3fc);color:#0e7490;border-color:rgba(6,182,212,.25)"><svg class="ic"><use href="#i-flask"/></svg></div><div><div class="sk-name">实验室异常复核</div><div class="sk-cat">数据核查 · v1.5</div></div></div>
+            <div class="sk-desc">识别超出参考范围的实验室检查值，自动标注异常等级。</div>
+            <div class="sk-foot"><span class="sk-stat"><svg class="ic"><use href="#i-bolt"/></svg>410</span><span class="sk-stat"><svg class="ic"><use href="#i-star"/></svg>4.6</span><button class="sk-btn sk-btn-apply" onclick="event.stopPropagation();toast('申请已提交')">申请使用</button></div>
+          </div>
+          <div class="skill-card" onclick="openSkill()">
+            <div class="sk-head"><div class="sk-ico" style="background:linear-gradient(135deg,#fef3c7,#fde68a);color:#92400e;border-color:rgba(245,158,11,.25)"><svg class="ic"><use href="#i-shield"/></svg></div><div><div class="sk-name">DSMB 安全报告</div><div class="sk-cat">安全监查 · v1.2</div></div></div>
+            <div class="sk-desc">生成数据安全监查委员会月度报告，自动汇总安全性数据。</div>
+            <div class="sk-foot"><span class="sk-stat"><svg class="ic"><use href="#i-bolt"/></svg>180</span><span class="sk-stat"><svg class="ic"><use href="#i-star"/></svg>4.8</span><button class="sk-btn sk-btn-pend"><svg class="ic ic-sm"><use href="#i-clock"/></svg>审批中</button></div>
+          </div>
+          <div class="skill-card" onclick="openSkill()">
+            <div class="sk-head"><div class="sk-ico" style="background:linear-gradient(135deg,#f3e8ff,#e9d5ff);color:#6b21a8;border-color:rgba(168,85,247,.25)"><svg class="ic"><use href="#i-doc"/></svg></div><div><div class="sk-name">知情同意审查</div><div class="sk-cat">文档审查 · v1.0</div></div></div>
+            <div class="sk-desc">自动审查知情同意书完整性、签字与日期合规性。</div>
+            <div class="sk-foot"><span class="sk-stat"><svg class="ic"><use href="#i-bolt"/></svg>95</span><span class="sk-stat"><svg class="ic"><use href="#i-star"/></svg>4.5</span><button class="sk-btn sk-btn-apply" onclick="event.stopPropagation();toast('申请已提交')">申请使用</button></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SKILL DETAIL -->
+      <section class="screen" id="screen-skill">
+        <div class="skd-back" onclick="go('market')"><svg class="ic ic-sm"><use href="#i-arrow-left"/></svg>返回技能市场</div>
+        <div class="skd-hero">
+          <div class="skd-ico"><svg class="ic"><use href="#i-clip"/></svg></div>
+          <div class="skd-meta">
+            <div class="skd-cat">数据核查 · v2.3 · 已授权</div>
+            <div class="skd-name">CRF 数据比对</div>
+            <div class="skd-desc">智能比对多中心病例报告表（CRF）数据，自动识别字段差异、缺失值与日期偏差，按可疑级别分级输出可视化核查报告。支持 SDTM 与院内自定义字段标准。</div>
+            <div class="skd-stats">
+              <div class="skd-stat"><div class="skd-stat-v">1,243</div><div class="skd-stat-l">总执行次数</div></div>
+              <div class="skd-stat"><div class="skd-stat-v">4.8 / 5.0</div><div class="skd-stat-l">用户评分</div></div>
+              <div class="skd-stat"><div class="skd-stat-v">3.4 分钟</div><div class="skd-stat-l">平均耗时</div></div>
+              <div class="skd-stat"><div class="skd-stat-v">98.6%</div><div class="skd-stat-l">成功率</div></div>
+            </div>
+          </div>
+          <div class="skd-actions">
+            <button class="btn btn-accent" onclick="openTask('ic')"><svg class="ic ic-sm"><use href="#i-bolt"/></svg>立即使用</button>
+            <button class="btn btn-ghost" onclick="toast('已收藏')"><svg class="ic ic-sm"><use href="#i-bookmark"/></svg>收藏</button>
+          </div>
+        </div>
+
+        <div class="skd-body">
+          <div>
+            <div class="skd-section">
+              <h3><svg class="ic"><use href="#i-info"/></svg>能力详情</h3>
+              <p style="margin-bottom:12px">本技能基于经过临床数据训练的差异识别模型，可在数分钟内完成数千行 CRF 表的多中心比对。</p>
+              <ul>
+                <li>支持 PDF / Word / Excel / CSV 多格式 CRF 输入</li>
+                <li>按字段类型（日期、数值、文本）应用差异化容忍策略</li>
+                <li>自动识别缺失值、单位不一致、超出合理范围的数值</li>
+                <li>输出 Excel 报告含「差异类型」「严重程度」「建议处理方式」</li>
+                <li>所有比对结果可追溯到原始单元格位置</li>
+              </ul>
+            </div>
+            <div class="skd-section">
+              <h3><svg class="ic"><use href="#i-message"/></svg>典型使用场景</h3>
+              <ul>
+                <li>多中心临床试验数据核查</li>
+                <li>EDC 系统迁移前的数据一致性验证</li>
+                <li>稽查访视前的快速 QC</li>
+                <li>方案修订后字段定义对齐</li>
+              </ul>
+            </div>
+            <div class="skd-section">
+              <h3><svg class="ic"><use href="#i-clock"/></svg>使用记录</h3>
+              <div class="history-row"><span class="history-time">14:23</span><span class="history-user">王思远</span><span class="history-action">使用本技能比对 中心01 vs 中心02</span></div>
+              <div class="history-row"><span class="history-time">昨天</span><span class="history-user">陈泽明</span><span class="history-action">使用本技能比对 中心02 vs 中心03</span></div>
+              <div class="history-row"><span class="history-time">3天前</span><span class="history-user">林雅琪</span><span class="history-action">完成 W12 数据核查</span></div>
+              <div class="history-row"><span class="history-time">上周</span><span class="history-user">徐子涵</span><span class="history-action">完成基线数据校对</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="skd-section">
+              <h3><svg class="ic"><use href="#i-tag"/></svg>技能规格</h3>
+              <div class="spec-row"><span class="spec-k">版本</span><span class="spec-v">v2.3.1</span></div>
+              <div class="spec-row"><span class="spec-k">发布日期</span><span class="spec-v">2026-05-20</span></div>
+              <div class="spec-row"><span class="spec-k">维护团队</span><span class="spec-v">数据科学组</span></div>
+              <div class="spec-row"><span class="spec-k">输入格式</span><span class="spec-v">XLS / CSV / PDF</span></div>
+              <div class="spec-row"><span class="spec-k">输出格式</span><span class="spec-v">XLS / PDF</span></div>
+              <div class="spec-row"><span class="spec-k">最大文件</span><span class="spec-v">500 MB</span></div>
+              <div class="spec-row"><span class="spec-k">授权状态</span><span class="spec-v" style="color:var(--green)">已授权（永久）</span></div>
+            </div>
+            <div class="skd-section">
+              <h3><svg class="ic"><use href="#i-users"/></svg>授权用户</h3>
+              <div class="team-grid" style="grid-template-columns:1fr">
+                <div class="team-card"><div class="team-av g1">林</div><div class="team-info"><div class="team-n">林雅琪</div><div class="team-m">已用 28 次</div></div></div>
+                <div class="team-card"><div class="team-av g2">陈</div><div class="team-info"><div class="team-n">陈泽明</div><div class="team-m">已用 15 次</div></div></div>
+                <div class="team-card"><div class="team-av g3">徐</div><div class="team-info"><div class="team-n">徐子涵</div><div class="team-m">已用 9 次</div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FILES -->
+      <section class="screen" id="screen-files">
+        <div class="files-storage">
+          <div class="fs-head">
+            <div>
+              <div class="fs-title"><svg class="ic"><use href="#i-folder"/></svg>工作区空间</div>
+              <div class="fs-sub">已使用 <b style="color:var(--t1)">18.4 GB</b> / 共 50 GB · 还可使用 31.6 GB</div>
+            </div>
+            <div class="fs-actions">
+              <button class="pill"><svg class="ic ic-sm"><use href="#i-trash"/></svg>回收站 (12)</button>
+              <button class="pill"><svg class="ic ic-sm"><use href="#i-share"/></svg>共享给我 (6)</button>
+              <button class="pill primary" onclick="toast('打开上传')"><svg class="ic ic-sm"><use href="#i-up"/></svg>上传文件</button>
+            </div>
+          </div>
+          <div class="fs-meter-wrap">
+            <div class="fs-meter">
+              <div class="fs-meter-seg s1" style="width:24.8%"></div>
+              <div class="fs-meter-seg s2" style="width:6.4%"></div>
+              <div class="fs-meter-seg s3" style="width:5.6%"></div>
+            </div>
+            <div class="fs-meter-labels">
+              <span class="fs-mlb"><span class="d s1"></span>我的上传 <b>12.4 GB</b></span>
+              <span class="fs-mlb"><span class="d s2"></span>任务输入 <b>3.2 GB</b></span>
+              <span class="fs-mlb"><span class="d s3"></span>任务输出 <b>2.8 GB</b></span>
+              <span class="fs-mlb" style="margin-left:auto;color:var(--t-mute)">剩余 <b style="color:var(--t2)">31.6 GB</b></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="files-quick">
+          <div class="qfolder" onclick="toast('打开 我的上传')"><div class="qf-ic"><svg class="ic"><use href="#i-folder"/></svg></div><div class="qf-info"><div class="qf-n">我的上传</div><div class="qf-m">48 文件 · 12.4 GB</div></div></div>
+          <div class="qfolder" onclick="toast('打开 任务输入')"><div class="qf-ic" style="background:linear-gradient(135deg,#fef3c7,#fde68a);color:#92400e;border-color:rgba(245,158,11,.25)"><svg class="ic"><use href="#i-folder"/></svg></div><div class="qf-info"><div class="qf-n">任务输入</div><div class="qf-m">22 文件 · 3.2 GB</div></div></div>
+          <div class="qfolder" onclick="toast('打开 任务输出')"><div class="qf-ic" style="background:linear-gradient(135deg,#d1fae5,#a7f3d0);color:#065f46;border-color:rgba(16,185,129,.25)"><svg class="ic"><use href="#i-folder"/></svg></div><div class="qf-info"><div class="qf-n">任务输出</div><div class="qf-m">36 文件 · 2.8 GB</div></div></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">所有文件</div>
+            <div class="card-tag">106 个</div>
+            <div class="card-action">
+              <button class="pill"><svg class="ic ic-sm"><use href="#i-filter"/></svg>筛选</button>
+              <button class="pill"><svg class="ic ic-sm"><use href="#i-search"/></svg>搜索</button>
+            </div>
+          </div>
+          <table class="tbl">
+            <thead><tr><th style="width:36px"><input type="checkbox"/></th><th>文件名</th><th>大小</th><th>修改时间</th><th>来源</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="wsp-fic">XLS</div>中心01_CRF_V203_W14.xlsx</div></td><td>2.4 MB</td><td>今天 14:23</td><td><span class="wsp-tagout" style="background:rgba(99,102,241,.08);color:var(--iris-700)">手动上传</span></td><td><button class="row-act ghost" onclick="event.stopPropagation();toast('下载')"><svg class="ic"><use href="#i-download"/></svg></button></td></tr>
+              <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="wsp-fic">XLS</div>中心02_CRF_V203_W14.xlsx</div></td><td>2.1 MB</td><td>今天 14:23</td><td><span class="wsp-tagout" style="background:rgba(99,102,241,.08);color:var(--iris-700)">手动上传</span></td><td><button class="row-act ghost" onclick="event.stopPropagation();toast('下载')"><svg class="ic"><use href="#i-download"/></svg></button></td></tr>
+              <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="wsp-fic t-pdf">PDF</div>临床试验方案_V203_v3.1.pdf</div></td><td>8.4 MB</td><td>昨天</td><td><span class="wsp-tagout" style="background:rgba(56,189,248,.1);color:#0369a1">企微导入</span></td><td><button class="row-act ghost" onclick="event.stopPropagation();toast('下载')"><svg class="ic"><use href="#i-download"/></svg></button></td></tr>
+              <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="wsp-fic">XLS</div>不良反应_频率分布表.xlsx</div></td><td>1.6 MB</td><td>2 小时前</td><td><span class="wsp-tagout">任务输出</span></td><td><button class="row-act ghost" onclick="event.stopPropagation();toast('下载')"><svg class="ic"><use href="#i-download"/></svg></button></td></tr>
+              <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="wsp-fic t-doc">DOC</div>SAE周报_第14周_草稿.docx</div></td><td>0.8 MB</td><td>昨天</td><td><span class="wsp-tagout">任务输出</span></td><td><button class="row-act ghost" onclick="event.stopPropagation();toast('下载')"><svg class="ic"><use href="#i-download"/></svg></button></td></tr>
+              <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="wsp-fic t-pdf">PDF</div>DSMB安全报告_2026年5月.pdf</div></td><td>2.1 MB</td><td>上周</td><td><span class="wsp-tagout">任务输出</span></td><td><button class="row-act ghost" onclick="event.stopPropagation();toast('下载')"><svg class="ic"><use href="#i-download"/></svg></button></td></tr>
+              <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="wsp-fic t-csv">CSV</div>受试者入组记录.csv</div></td><td>0.8 MB</td><td>3 天前</td><td><span class="wsp-tagout" style="background:rgba(99,102,241,.08);color:var(--iris-700)">手动上传</span></td><td><button class="row-act ghost" onclick="event.stopPropagation();toast('下载')"><svg class="ic"><use href="#i-download"/></svg></button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ADMIN -->
+      <section class="screen" id="screen-admin">
+        <div class="admin-tabs">
+          <div class="admin-tab active"><svg class="ic ic-sm"><use href="#i-grid"/></svg>概览</div>
+          <div class="admin-tab"><svg class="ic ic-sm"><use href="#i-users"/></svg>成员管理</div>
+          <div class="admin-tab"><svg class="ic ic-sm"><use href="#i-cube"/></svg>技能管理</div>
+          <div class="admin-tab"><svg class="ic ic-sm"><use href="#i-check"/></svg>授权审批 <span class="red-dot">5</span></div>
+          <div class="admin-tab"><svg class="ic ic-sm"><use href="#i-gear"/></svg>组织设置</div>
+          <div class="admin-tab"><svg class="ic ic-sm"><use href="#i-clock"/></svg>审计日志</div>
+        </div>
+
+        <div class="hero">
+          <div class="kpi"><div class="kpi-meta"><svg class="ic"><use href="#i-users"/></svg>组织成员</div><div class="kpi-val">42<span class="u">人</span></div><div class="kpi-trend"><svg class="ic ic-sm"><use href="#i-up"/></svg>本周 +3</div></div>
+          <div class="kpi"><div class="kpi-meta"><svg class="ic"><use href="#i-cube"/></svg>已上架技能</div><div class="kpi-val">18<span class="u">个</span></div><div class="kpi-trend"><svg class="ic ic-sm"><use href="#i-up"/></svg>本周 +1</div></div>
+          <div class="kpi"><div class="kpi-meta"><svg class="ic"><use href="#i-refresh"/></svg>本周任务</div><div class="kpi-val">186<span class="u">次</span></div><div class="kpi-trend"><svg class="ic ic-sm"><use href="#i-up"/></svg>+22%</div></div>
+          <div class="kpi"><div class="kpi-meta"><svg class="ic"><use href="#i-check"/></svg>授权待审批</div><div class="kpi-val">5<span class="u">项</span></div></div>
+        </div>
+
+        <div class="row">
+          <div class="card">
+            <div class="card-head"><div class="card-title">待处理事项</div><div class="card-tag" style="background:rgba(244,63,94,.12);color:#9f1239">5 项</div></div>
+            <div class="team-grid" style="grid-template-columns:1fr;gap:10px">
+              <div class="team-card" style="gap:14px"><div class="cell-ico v2"><svg class="ic"><use href="#i-cube"/></svg></div><div class="team-info"><div class="team-n">张瑞 申请使用 "实验室异常复核"</div><div class="team-m">理由：W12 实验室数据复核 · 2 小时前</div></div><button class="btn btn-ghost" style="padding:6px 12px;font-size:12px" onclick="toast('已拒绝')">拒绝</button><button class="btn btn-primary" style="padding:6px 12px;font-size:12px" onclick="toast('已批准')">批准</button></div>
+              <div class="team-card" style="gap:14px"><div class="cell-ico v2"><svg class="ic"><use href="#i-cube"/></svg></div><div class="team-info"><div class="team-n">刘宇航 申请使用 "DSMB 安全报告"</div><div class="team-m">理由：3 月度 DSMB 报告 · 4 小时前</div></div><button class="btn btn-ghost" style="padding:6px 12px;font-size:12px" onclick="toast('已拒绝')">拒绝</button><button class="btn btn-primary" style="padding:6px 12px;font-size:12px" onclick="toast('已批准')">批准</button></div>
+              <div class="team-card" style="gap:14px"><div class="cell-ico"><svg class="ic"><use href="#i-user"/></svg></div><div class="team-info"><div class="team-n">新成员邀请待发送</div><div class="team-m">3 位通讯录成员待邀请</div></div><button class="btn btn-primary" style="padding:6px 12px;font-size:12px" onclick="toast('查看详情')">查看</button></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div class="card-title">企业微信</div></div>
+            <div style="display:flex;align-items:center;gap:14px;padding:6px 0">
+              <div style="width:54px;height:54px;border-radius:16px;background:linear-gradient(135deg,#34d399,#07c160);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(7,193,96,.32)"><svg class="ic ic-lg"><use href="#i-check"/></svg></div>
+              <div><div style="font-size:14px;color:var(--t1);font-weight:700">已绑定</div><div style="font-size:11px;color:var(--t3)">ww1234···7890</div></div>
+              <button class="btn btn-ghost" style="margin-left:auto;padding:7px 14px" onclick="toast('管理绑定')">管理</button>
+            </div>
+            <div style="border-top:1px solid var(--hairline-2);margin-top:14px;padding-top:14px;display:flex;justify-content:space-between;font-size:12px;color:var(--t2)"><span>同步成员</span><span style="color:var(--t1);font-weight:600">42 / 42</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);padding-top:8px"><span>最后同步</span><span style="color:var(--t1);font-weight:600">10 分钟前</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-title">技能使用频率</div><div class="card-tag">最近 30 天</div></div>
+          <div class="team-grid" style="grid-template-columns:1fr;gap:10px">
+            <div class="team-card" style="gap:14px"><div class="cell-ico"><svg class="ic"><use href="#i-clip"/></svg></div><div class="team-info"><div class="team-n">CRF 数据比对</div><div class="team-m">62 次 · 8 位用户</div></div><div class="mini-bar"><div class="mini-bar-f" style="width:88%"></div></div></div>
+            <div class="team-card" style="gap:14px"><div class="cell-ico v3"><svg class="ic"><use href="#i-chart"/></svg></div><div class="team-info"><div class="team-n">SAE 周报生成</div><div class="team-m">48 次 · 6 位用户</div></div><div class="mini-bar"><div class="mini-bar-f" style="width:68%"></div></div></div>
+            <div class="team-card" style="gap:14px"><div class="cell-ico v4"><svg class="ic"><use href="#i-alert"/></svg></div><div class="team-info"><div class="team-n">不良反应汇总</div><div class="team-m">32 次 · 5 位用户</div></div><div class="mini-bar"><div class="mini-bar-f" style="width:46%"></div></div></div>
+            <div class="team-card" style="gap:14px"><div class="cell-ico v5"><svg class="ic"><use href="#i-flask"/></svg></div><div class="team-info"><div class="team-n">实验室异常复核</div><div class="team-m">22 次 · 4 位用户</div></div><div class="mini-bar"><div class="mini-bar-f" style="width:32%"></div></div></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script>
+const TASKS={
+  ae:{name:'疫苗V-203不良反应汇总',status:'running',screen:'task-running',crumb:['任务中心','疫苗V-203不良反应汇总']},
+  crf:{name:'中心01 vs 中心02 CRF比对',status:'review',screen:'task-review',crumb:['任务中心','中心01 vs 中心02 CRF比对']},
+  sae:{name:'SAE 周报草稿 · 第14周',status:'done',screen:'task-done',crumb:['任务中心','SAE 周报草稿']},
+  lab:{name:'实验室异常复核 W12',status:'done',screen:'task-done',crumb:['任务中心','实验室异常复核 W12']},
+  dsmb:{name:'DSMB 月度安全报告',status:'queue',screen:'task-running',crumb:['任务中心','DSMB 月度安全报告']},
+  ic:{name:'知情同意文件审查',status:'draft',screen:'task-draft',crumb:['任务中心','知情同意文件审查']},
+};
+
+function closeAllPops(){
+  document.getElementById('notifPop')?.classList.remove('show');
+  document.getElementById('userMenu')?.classList.remove('show');
+  document.getElementById('orgSwitcher')?.classList.remove('show');
+}
+
+function go(route){
+  closeAllPops();
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+route)?.classList.add('active');
+  document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.task-item').forEach(t=>t.classList.remove('active'));
+  document.querySelector(`.nav[data-route="${route}"]`)?.classList.add('active');
+  const crumbMap={
+    dashboard:['任务中心'],
+    market:['任务中心','技能市场'],
+    files:['任务中心','工作区文件'],
+    admin:['任务中心','组织管理'],
+    skill:['任务中心','技能市场','CRF 数据比对']
+  };
+  setCrumb(crumbMap[route]||['任务中心']);
+  document.getElementById('topStatus').classList.add('hidden');
+  document.querySelector('.screen-wrap').scrollTop=0;
+}
+function goAndCloseMenu(route){closeAllPops();go(route)}
+
+function setCrumb(arr){
+  document.getElementById('crumb').innerHTML=arr.map((x,i)=>i===arr.length-1?`<b>${x}</b>`:`<span>${x}</span><svg class="ic ic-sm"><use href="#i-chev-right"/></svg>`).join('');
+}
+
+function openTask(id){
+  closeAllPops();
+  const t=TASKS[id];if(!t)return;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+t.screen)?.classList.add('active');
+  document.querySelectorAll('.task-item').forEach(x=>x.classList.remove('active'));
+  document.querySelector(`.task-item[data-task="${id}"]`)?.classList.add('active');
+  document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));
+  setCrumb(t.crumb);
+  const st=document.getElementById('topStatus');
+  if(t.status==='running'){st.textContent='● 执行中';st.className='topbar-status sp-running';st.classList.remove('hidden')}
+  else if(t.status==='review'){st.textContent='● 待审核';st.className='topbar-status sp-running';st.style.background='rgba(245,158,11,.15)';st.style.color='#92400e';st.classList.remove('hidden')}
+  else if(t.status==='done'){st.textContent='● 已完成';st.className='topbar-status sp-running';st.style.background='rgba(16,185,129,.15)';st.style.color='#065f46';st.classList.remove('hidden')}
+  else st.classList.add('hidden');
+  document.querySelector('.screen-wrap').scrollTop=0;
+}
+
+function openSkill(){closeAllPops();go('skill')}
+function newChat(){closeAllPops();openTask('ic')}
+
+document.querySelectorAll('.nav[data-route]').forEach(el=>el.onclick=()=>go(el.dataset.route));
+
+function toggleNotif(e){e.stopPropagation();const p=document.getElementById('notifPop');const wasOpen=p.classList.contains('show');closeAllPops();if(!wasOpen)p.classList.add('show')}
+function toggleUserMenu(e){e.stopPropagation();const m=document.getElementById('userMenu');const wasOpen=m.classList.contains('show');closeAllPops();if(!wasOpen)m.classList.add('show')}
+function toggleOrgSwitcher(e){e.stopPropagation();const s=document.getElementById('orgSwitcher');const wasOpen=s.classList.contains('show');closeAllPops();if(!wasOpen)s.classList.add('show')}
+document.addEventListener('click',closeAllPops);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAllPops()});
+
+function esTab(el,which){el.parentElement.querySelectorAll('.es-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');document.getElementById('esChat').classList.toggle('hidden',which!=='chat');document.getElementById('esFiles').classList.toggle('hidden',which!=='files')}
+function wsTab(el){el.parentElement.querySelectorAll('.wsp-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active')}
+
+function pick(card){const c=card.querySelector('.wsp-check');const on=c.classList.toggle('on');card.classList.toggle('checked',on);recalc()}
+function recalc(){
+  const rows=document.querySelectorAll('#wspGrid .wsp-card.checked');
+  let total=0;rows.forEach(r=>{const m=r.querySelector('.wsp-fmeta').textContent.match(/(\d+\.?\d*)\s*MB/);if(m)total+=parseFloat(m[1])});
+  document.getElementById('selN').textContent=rows.length;
+  document.getElementById('selS').textContent=total.toFixed(1);
+  document.getElementById('selSummary').textContent=`已选 ${rows.length} 个文件 · ${total.toFixed(1)} MB`;
+  const p=document.getElementById('selPreview');p.innerHTML='';
+  rows.forEach(r=>{
+    const fic=r.querySelector('.wsp-fic').cloneNode(true);
+    const name=r.querySelector('.wsp-fname').firstChild.textContent.trim();
+    const meta=r.querySelector('.wsp-fmeta').textContent.split('·').slice(1).join('·').trim().split('·')[0].trim();
+    const div=document.createElement('div');div.className='sf';
+    div.innerHTML=`${fic.outerHTML}<div class="sf-n">${name}</div><div class="sf-m">${meta}</div><div class="sf-x"><svg class="ic ic-sm"><use href="#i-x"/></svg></div>`;
+    div.querySelector('.sf-x').onclick=()=>{[...document.querySelectorAll('#wspGrid .wsp-card')].find(x=>x.querySelector('.wsp-fname').firstChild.textContent.trim()===name)?.click()};
+    p.appendChild(div);
+  });
+}
+
+function filterTasks(btn,status){
+  document.querySelectorAll('#tcTabs .tc-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#tcTbl tbody tr').forEach(tr=>{
+    tr.style.display=(status==='all'||tr.dataset.status===status)?'':'none';
+  });
+}
+
+function toast(msg){const t=document.createElement('div');t.className='toast';t.innerHTML='<svg class="ic ic-sm"><use href="#i-check"/></svg>'+msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2400)}
+</script>
+</body>
+</html>
