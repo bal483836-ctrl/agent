@@ -663,6 +663,113 @@ body::after{width:500px;height:500px;background:radial-gradient(circle,#67e8f9 0
 .fs-actions{display:flex;gap:8px;align-items:center;position:relative;z-index:1}
 
 .files-quick{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+
+/* workspace layout: tree + main */
+.files-layout{display:grid;grid-template-columns:240px 1fr;gap:14px;align-items:start}
+.files-tree{background:rgba(255,255,255,.7);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.85);border-radius:var(--r-lg);padding:14px 10px;box-shadow:var(--sh-1);position:sticky;top:0}
+.ft-actions{display:flex;flex-direction:column;gap:7px;padding:0 4px 12px;border-bottom:1px solid var(--hairline-2);margin-bottom:8px}
+.ft-act{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:11px;font-size:12.5px;color:#fff;background:var(--grad-iris);border:none;cursor:pointer;font-family:inherit;font-weight:600;box-shadow:0 4px 12px rgba(99,102,241,.3);transition:all .2s}
+.ft-act:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(99,102,241,.4)}
+.ft-act.ghost{background:rgba(255,255,255,.7);color:var(--t2);border:1px solid var(--hairline-2);box-shadow:var(--sh-1)}
+.ft-act.ghost:hover{color:var(--iris-600);border-color:var(--iris-200);background:#fff}
+.ft-act .ic{width:14px;height:14px}
+.ft-section{font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.14em;text-transform:uppercase;padding:10px 12px 6px;display:flex;align-items:center;gap:6px}
+.ft-section .ic{width:11px;height:11px;color:var(--t-mute)}
+.ft-row{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:10px;cursor:pointer;font-size:12.8px;color:var(--t2);margin-bottom:2px;transition:all .15s;position:relative}
+.ft-row:hover{background:rgba(255,255,255,.6);color:var(--t1)}
+.ft-row.active{background:var(--grad-iris-soft);color:var(--iris-700);font-weight:600;box-shadow:inset 0 0 0 1px rgba(99,102,241,.15)}
+.ft-row .ic{width:15px;height:15px;color:var(--t-mute);flex-shrink:0}
+.ft-row:hover .ic,.ft-row.active .ic{color:var(--iris-600)}
+.ft-row .count{margin-left:auto;font-size:10.5px;color:var(--t-mute);font-variant-numeric:tabular-nums;font-weight:500}
+.ft-row.active .count{color:var(--iris-600)}
+.ft-row.system .lock{margin-left:6px;width:10px;height:10px;color:var(--t-mute);opacity:.6}
+.ft-add{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:10px;cursor:pointer;font-size:12.5px;color:var(--iris-600);font-weight:600;border:1px dashed var(--iris-200);background:transparent;font-family:inherit;width:100%;margin-top:4px;transition:all .15s}
+.ft-add:hover{background:var(--iris-50);border-color:var(--iris-400)}
+.ft-add .ic{width:13px;height:13px}
+
+.files-main{background:rgba(255,255,255,.7);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.85);border-radius:var(--r-lg);box-shadow:var(--sh-1);overflow:hidden}
+.fm-bar{padding:14px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--hairline-2);background:rgba(99,102,241,.02)}
+.fm-bread{font-size:12.5px;color:var(--t3);display:flex;align-items:center;gap:7px;flex:1;min-width:0}
+.fm-bread b{color:var(--t1);font-weight:700;font-size:14px}
+.fm-bread .ic{width:13px;height:13px;color:var(--t-mute)}
+.fm-tag{font-size:10px;background:rgba(245,158,11,.12);color:#92400e;padding:2px 8px;border-radius:99px;font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.fm-tag .ic{width:10px;height:10px}
+.fm-bar-r{display:flex;align-items:center;gap:8px}
+.fm-search{display:flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--hairline-2);border-radius:10px;padding:6px 12px;width:240px}
+.fm-search input{flex:1;border:none;outline:none;font-size:12.5px;font-family:inherit;background:transparent;color:var(--t1)}
+.fm-search .ic{color:var(--t-mute);width:13px;height:13px}
+
+.fm-drop{margin:14px 20px;border:1.5px dashed var(--iris-200);border-radius:var(--r);padding:16px 20px;background:linear-gradient(135deg,rgba(238,242,255,.5),rgba(255,255,255,.3));display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .25s}
+.fm-drop:hover{border-color:var(--iris-400);background:linear-gradient(135deg,var(--iris-50),#fff);transform:translateY(-1px)}
+.fm-drop-ic{width:42px;height:42px;border-radius:12px;background:#fff;border:1px solid var(--iris-200);color:var(--iris-600);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:var(--sh-1)}
+.fm-drop-ic .ic{width:20px;height:20px}
+.fm-drop-info{flex:1}
+.fm-drop-t{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:2px}
+.fm-drop-d{font-size:11.5px;color:var(--t3)}
+.fm-drop-d b{color:var(--t2);font-weight:600}
+.fm-drop-actions{display:flex;gap:7px;align-items:center}
+
+.fm-bulk{padding:11px 20px;background:linear-gradient(90deg,var(--iris-50),rgba(238,242,255,.3));border-bottom:1px solid var(--hairline-2);display:none;align-items:center;gap:12px;font-size:12.5px;color:var(--iris-700)}
+.fm-bulk.show{display:flex;animation:fadeUp .2s ease}
+.fm-bulk b{font-weight:700;font-variant-numeric:tabular-nums}
+.fm-bulk-actions{margin-left:auto;display:flex;gap:6px}
+
+.fm-file-row{cursor:pointer}
+.fm-file-row .file-actions{display:inline-flex;gap:4px;opacity:0;transition:opacity .15s}
+.fm-file-row:hover .file-actions{opacity:1}
+
+.fm-action{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:transparent;border:1px solid transparent;color:var(--t-mute);cursor:pointer;transition:all .15s;font-family:inherit}
+.fm-action:hover{color:var(--iris-600);border-color:var(--iris-200);background:var(--iris-50)}
+.fm-action.danger:hover{color:var(--rose);border-color:rgba(244,63,94,.2);background:rgba(244,63,94,.06)}
+.fm-action .ic{width:14px;height:14px}
+
+.fm-empty{padding:40px 20px;text-align:center;color:var(--t3)}
+.fm-empty .ic{width:32px;height:32px;color:var(--t-mute);margin-bottom:10px}
+.fm-empty b{font-size:13px;color:var(--t1);font-weight:600;display:block;margin-bottom:4px}
+
+/* share dialog (modal) */
+.modal-mask{position:fixed;inset:0;background:rgba(30,27,75,.4);backdrop-filter:blur(6px);z-index:500;display:none;align-items:center;justify-content:center;animation:fadeIn .2s ease}
+.modal-mask.show{display:flex}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:#fff;border-radius:var(--r-lg);width:520px;max-width:calc(100vw - 40px);max-height:calc(100vh - 60px);box-shadow:0 30px 80px rgba(30,27,75,.3);overflow:hidden;display:flex;flex-direction:column;animation:fadeUp .25s ease}
+.modal-head{padding:18px 22px;border-bottom:1px solid var(--hairline-2);display:flex;align-items:center;gap:10px}
+.modal-head b{font-size:15px;color:var(--t1);font-weight:700;flex:1}
+.modal-head .x{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t3)}
+.modal-head .x:hover{background:var(--iris-50);color:var(--iris-600)}
+.modal-body{padding:20px 22px;overflow-y:auto;flex:1}
+.modal-card-preview{background:linear-gradient(135deg,#07c160,#34d399);color:#fff;border-radius:var(--r);padding:16px 18px;display:flex;align-items:center;gap:12px;margin-bottom:18px;box-shadow:0 6px 20px rgba(7,193,96,.3)}
+.mcp-ic{width:42px;height:42px;border-radius:11px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:700}
+.mcp-info{flex:1;min-width:0}
+.mcp-t{font-size:13.5px;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mcp-m{font-size:11px;opacity:.9}
+.mcp-dl{background:rgba(255,255,255,.25);border:none;color:#fff;border-radius:8px;padding:6px 12px;font-size:11.5px;font-weight:600;font-family:inherit;display:inline-flex;align-items:center;gap:4px;cursor:pointer}
+.modal-label{font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.modal-label .ic{width:12px;height:12px}
+.modal-search{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--hairline-2);border-radius:10px;padding:9px 13px;margin-bottom:12px}
+.modal-search input{flex:1;border:none;outline:none;font-size:13px;font-family:inherit;color:var(--t1);background:transparent}
+.modal-search .ic{color:var(--t-mute);width:14px;height:14px}
+.contact-list{display:flex;flex-direction:column;gap:4px;max-height:300px;overflow-y:auto;border:1px solid var(--hairline-2);border-radius:12px;padding:6px}
+.contact-list::-webkit-scrollbar{width:4px}
+.contact-list::-webkit-scrollbar-thumb{background:var(--iris-200);border-radius:99px}
+.contact{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;cursor:pointer;transition:background .15s}
+.contact:hover{background:var(--iris-50)}
+.contact.self{background:rgba(7,193,96,.06)}
+.contact .check{width:18px;height:18px;border-radius:5px;border:2px solid var(--hairline-2);background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.contact.checked .check{background:var(--grad-iris);border-color:transparent}
+.contact.checked .check::after{content:'';width:9px;height:4px;border:2px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.contact-av{width:34px;height:34px;border-radius:11px;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12.5px;flex-shrink:0;border:2px solid #fff;box-shadow:var(--sh-1);background:linear-gradient(135deg,#818cf8,#4338ca)}
+.contact-av.g2{background:linear-gradient(135deg,#a5b4fc,#6366f1)}
+.contact-av.g3{background:linear-gradient(135deg,#67e8f9,#0891b2)}
+.contact-av.g4{background:linear-gradient(135deg,#fcd34d,#d97706)}
+.contact-av.g5{background:linear-gradient(135deg,#34d399,#07c160)}
+.contact-info{flex:1;min-width:0}
+.contact-n{font-size:13px;color:var(--t1);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px}
+.contact-n .me{font-size:10px;color:#07c160;background:rgba(7,193,96,.12);padding:1px 6px;border-radius:99px;font-weight:700}
+.contact-m{font-size:11px;color:var(--t3)}
+.modal-foot{padding:14px 22px;border-top:1px solid var(--hairline-2);display:flex;align-items:center;gap:10px;background:rgba(99,102,241,.03)}
+.modal-foot .sel{font-size:12px;color:var(--t2)}
+.modal-foot .sel b{color:var(--iris-700);font-weight:700;font-variant-numeric:tabular-nums}
+.modal-foot .actions{margin-left:auto;display:flex;gap:8px}
 .qfolder{background:rgba(255,255,255,.7);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.85);border-radius:var(--r-lg);padding:22px;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:16px;box-shadow:var(--sh-1)}
 .qfolder:hover{transform:translateY(-3px);box-shadow:var(--sh-3);border-color:var(--iris-200)}
 .qf-ic{width:52px;height:52px;border-radius:16px;background:var(--grad-iris-soft);color:var(--iris-700);display:flex;align-items:center;justify-content:center;border:1px solid rgba(99,102,241,.15);box-shadow:0 4px 14px rgba(99,102,241,.18)}
@@ -1091,6 +1198,8 @@ body::after{width:500px;height:500px;background:radial-gradient(circle,#67e8f9 0
           </div>
         </div>
 
+        <div class="exec-grid">
+          <div class="exec-main">
         <div class="card">
           <div class="wizard-stepper">
             <div class="ws-step done"><div class="ws-num"><svg class="ic"><use href="#i-check"/></svg></div>选择技能</div>
@@ -1168,6 +1277,33 @@ body::after{width:500px;height:500px;background:radial-gradient(circle,#67e8f9 0
             </div>
           </div>
         </div>
+          </div>
+
+          <aside class="exec-side">
+            <div class="es-tabs">
+              <div class="es-tab active" onclick="esTab(this,'chat')"><svg class="ic ic-sm"><use href="#i-message"/></svg>对话</div>
+              <div class="es-tab" onclick="esTab(this,'files')"><svg class="ic ic-sm"><use href="#i-folder"/></svg>文件</div>
+              <div class="es-collapse" onclick="toast('已折叠')"><svg class="ic ic-sm"><use href="#i-arrow-right"/></svg></div>
+            </div>
+            <div class="es-body es-chat">
+              <div class="es-chat-msg"><div class="es-chat-meta">量子链 · AI</div><div class="es-bubble ai">您好，我会引导您完成本次"知情同意文件审查"。请先在左侧勾选要审查的同意书 PDF。</div></div>
+              <div class="es-chat-msg"><div class="es-chat-meta">量子链 · AI</div><div class="es-bubble ai">建议先用 CRF 比对锁定字段差异，再进入审查。需要的话我可以一并准备。</div></div>
+              <div class="es-chat-msg user"><div class="es-chat-meta">您</div><div class="es-bubble user">这次只做 CRF 比对，输出 Excel 即可。</div></div>
+              <div class="es-chat-msg"><div class="es-chat-meta">量子链 · AI</div><div class="es-bubble ai">明白。我将以"差异类型 + 受试者编号"两个维度排序。点击下方"开始执行"即可启动。</div></div>
+            </div>
+            <div class="es-body es-files hidden">
+              <div class="es-files-group">已选输入文件 (2)</div>
+              <div class="es-file"><div class="wsp-fic">XLS</div><div class="es-fn"><div class="es-fn-name">中心01_CRF_V203_W14.xlsx</div><div class="es-fn-m">2.4 MB · 248 行</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-eye"/></svg></div>
+              <div class="es-file"><div class="wsp-fic">XLS</div><div class="es-fn"><div class="es-fn-name">中心02_CRF_V203_W14.xlsx</div><div class="es-fn-m">2.1 MB · 231 行</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-eye"/></svg></div>
+              <div class="es-files-group">参考资料</div>
+              <div class="es-file"><div class="wsp-fic">XLS</div><div class="es-fn"><div class="es-fn-name">CRF字段定义_v2.3.xlsx</div><div class="es-fn-m">1.2 MB · 312 行</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-eye"/></svg></div>
+              <div class="es-file"><div class="wsp-fic t-pdf">PDF</div><div class="es-fn"><div class="es-fn-name">临床试验方案_V203_v3.1.pdf</div><div class="es-fn-m">8.4 MB · 128 页</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-eye"/></svg></div>
+            </div>
+            <div class="es-input-wrap">
+              <div class="nl-input" style="padding:8px 12px"><input style="flex:1;border:none;outline:none;background:transparent;font-size:12.5px;padding:0;font-family:inherit;color:var(--t1)" placeholder="向 AI 提问..."/><button class="nl-send" style="width:32px;height:32px;border-radius:9px" onclick="toast('已发送')"><svg class="ic ic-sm"><use href="#i-up"/></svg></button></div>
+            </div>
+          </aside>
+        </div>
       </section>
 
       <!-- TASK RUNNING -->
@@ -1219,14 +1355,14 @@ body::after{width:500px;height:500px;background:radial-gradient(circle,#67e8f9 0
               <div class="es-tab" onclick="esTab(this,'files')"><svg class="ic ic-sm"><use href="#i-folder"/></svg>文件</div>
               <div class="es-collapse" onclick="toast('已折叠')"><svg class="ic ic-sm"><use href="#i-arrow-right"/></svg></div>
             </div>
-            <div class="es-body" id="esChat">
+            <div class="es-body es-chat">
               <div class="es-chat-msg"><div class="es-chat-meta">量子链 · AI</div><div class="es-bubble ai">已完成 3/5 步骤。正在按 MedDRA 标准对 892 条不良反应记录进行编码归类。</div></div>
               <div class="es-chat-msg user"><div class="es-chat-meta">您</div><div class="es-bubble user">注射部位反应也要单独统计吗？</div></div>
               <div class="es-chat-msg"><div class="es-chat-meta">量子链 · AI</div><div class="es-bubble ai">是的，根据 SOC 分类规则，"局部注射反应"会作为独立 SOC 单独统计。当前已识别 47 条相关记录。</div></div>
               <div class="es-chat-msg user"><div class="es-chat-meta">您</div><div class="es-bubble user">把严重不良反应单独导出一份</div></div>
               <div class="es-chat-msg"><div class="es-chat-meta">量子链 · AI</div><div class="es-bubble ai">好的，已加入任务清单。完成主报告后会生成 "SAE_单独清单.xlsx" 并保存至 任务输出。</div></div>
             </div>
-            <div class="es-body hidden" id="esFiles">
+            <div class="es-body es-files hidden">
               <div class="es-files-group">输入文件 (3)</div>
               <div class="es-file"><div class="wsp-fic">XLS</div><div class="es-fn"><div class="es-fn-name">中心01_AE数据.xlsx</div><div class="es-fn-m">2.4 MB</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-download"/></svg></div>
               <div class="es-file"><div class="wsp-fic">XLS</div><div class="es-fn"><div class="es-fn-name">中心02_AE数据.xlsx</div><div class="es-fn-m">2.1 MB</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-download"/></svg></div>
@@ -1254,6 +1390,8 @@ body::after{width:500px;height:500px;background:radial-gradient(circle,#67e8f9 0
           </div>
         </div>
 
+        <div class="exec-grid">
+          <div class="exec-main">
         <div class="review-toolbar">
           <span style="font-size:13px;color:var(--t2);font-weight:500">需要确认</span>
           <span class="pill-status ps-review"><span class="psd"></span>3 项</span>
@@ -1279,6 +1417,33 @@ body::after{width:500px;height:500px;background:radial-gradient(circle,#67e8f9 0
             </tbody>
           </table>
         </div>
+          </div>
+
+          <aside class="exec-side">
+            <div class="es-tabs">
+              <div class="es-tab active" onclick="esTab(this,'chat')"><svg class="ic ic-sm"><use href="#i-message"/></svg>对话</div>
+              <div class="es-tab" onclick="esTab(this,'files')"><svg class="ic ic-sm"><use href="#i-folder"/></svg>文件</div>
+              <div class="es-collapse" onclick="toast('已折叠')"><svg class="ic ic-sm"><use href="#i-arrow-right"/></svg></div>
+            </div>
+            <div class="es-body es-chat">
+              <div class="es-chat-msg"><div class="es-chat-meta">量子链 · AI</div><div class="es-bubble ai">本次共比对 <b>231 行</b>，识别到 <b>12 处差异</b>，其中 <b>3 处</b>属于"缺失值"，需要您人工判定如何处理。</div></div>
+              <div class="es-chat-msg user"><div class="es-chat-meta">您</div><div class="es-bubble user">缺失值默认按什么策略处理？</div></div>
+              <div class="es-chat-msg"><div class="es-chat-meta">量子链 · AI</div><div class="es-bubble ai">如未指定，缺失值会被标记为"待补录"并保留原始单元格指针；点击"确认"则会写入差异报告。</div></div>
+              <div class="es-chat-msg user"><div class="es-chat-meta">您</div><div class="es-bubble user">把 3 项缺失值统一标为"待补录"</div></div>
+              <div class="es-chat-msg"><div class="es-chat-meta">量子链 · AI</div><div class="es-bubble ai">已批量标记。您可继续核对其余 9 处差异，或直接"全部确认并归档"。</div></div>
+            </div>
+            <div class="es-body es-files hidden">
+              <div class="es-files-group">输入文件 (2)</div>
+              <div class="es-file"><div class="wsp-fic">XLS</div><div class="es-fn"><div class="es-fn-name">中心01_CRF_V203_W14.xlsx</div><div class="es-fn-m">2.4 MB · 248 行</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-eye"/></svg></div>
+              <div class="es-file"><div class="wsp-fic">XLS</div><div class="es-fn"><div class="es-fn-name">中心02_CRF_V203_W14.xlsx</div><div class="es-fn-m">2.1 MB · 231 行</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-eye"/></svg></div>
+              <div class="es-files-group">输出文件 (1)</div>
+              <div class="es-file"><div class="wsp-fic">XLS</div><div class="es-fn"><div class="es-fn-name">CRF比对差异_W14_v1.xlsx</div><div class="es-fn-m">0.5 MB · 12 行 · 待审核</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-download"/></svg></div>
+            </div>
+            <div class="es-input-wrap">
+              <div class="nl-input" style="padding:8px 12px"><input style="flex:1;border:none;outline:none;background:transparent;font-size:12.5px;padding:0;font-family:inherit;color:var(--t1)" placeholder="向 AI 提问..."/><button class="nl-send" style="width:32px;height:32px;border-radius:9px" onclick="toast('已发送')"><svg class="ic ic-sm"><use href="#i-up"/></svg></button></div>
+            </div>
+          </aside>
+        </div>
       </section>
 
       <!-- TASK DONE -->
@@ -1298,6 +1463,8 @@ body::after{width:500px;height:500px;background:radial-gradient(circle,#67e8f9 0
           </div>
         </div>
 
+        <div class="exec-grid">
+          <div class="exec-main">
         <div class="hero">
           <div class="kpi"><div class="kpi-meta">AE 总数</div><div class="kpi-val">8<span class="u">例</span></div></div>
           <div class="kpi"><div class="kpi-meta">SAE 总数</div><div class="kpi-val">2<span class="u">例</span></div></div>
@@ -1312,6 +1479,35 @@ body::after{width:500px;height:500px;background:radial-gradient(circle,#67e8f9 0
             <div class="es-file" style="margin:0"><div class="wsp-fic">XLS</div><div class="es-fn"><div class="es-fn-name">SAE_单独清单.xlsx</div><div class="es-fn-m">0.3 MB · 8 行 · 昨天 16:48</div></div><button class="confirm-btn" onclick="toast('开始下载')"><svg class="ic ic-sm"><use href="#i-download"/></svg>下载</button><button class="confirm-btn" onclick="toast('已复制分享链接')"><svg class="ic ic-sm"><use href="#i-share"/></svg>分享</button></div>
             <div class="es-file" style="margin:0"><div class="wsp-fic t-pdf">PDF</div><div class="es-fn"><div class="es-fn-name">AE_频率分布图_W14.pdf</div><div class="es-fn-m">1.2 MB · 6 页 · 昨天 16:48</div></div><button class="confirm-btn" onclick="toast('开始下载')"><svg class="ic ic-sm"><use href="#i-download"/></svg>下载</button><button class="confirm-btn" onclick="toast('已复制分享链接')"><svg class="ic ic-sm"><use href="#i-share"/></svg>分享</button></div>
           </div>
+        </div>
+          </div>
+
+          <aside class="exec-side">
+            <div class="es-tabs">
+              <div class="es-tab active" onclick="esTab(this,'chat')"><svg class="ic ic-sm"><use href="#i-message"/></svg>对话</div>
+              <div class="es-tab" onclick="esTab(this,'files')"><svg class="ic ic-sm"><use href="#i-folder"/></svg>文件</div>
+              <div class="es-collapse" onclick="toast('已折叠')"><svg class="ic ic-sm"><use href="#i-arrow-right"/></svg></div>
+            </div>
+            <div class="es-body es-chat">
+              <div class="es-chat-msg"><div class="es-chat-meta">量子链 · AI</div><div class="es-bubble ai">本次任务已完成 · 共 12 页 PDF。核心结论：<b>8 例 AE</b>、<b>2 例 SAE</b>、<b>0 例死亡</b>。</div></div>
+              <div class="es-chat-msg"><div class="es-chat-meta">量子链 · AI</div><div class="es-bubble ai">建议将"SAE_单独清单.xlsx"分享给 DSMB 成员，方便后续月度评审。</div></div>
+              <div class="es-chat-msg user"><div class="es-chat-meta">您</div><div class="es-bubble user">把周报转给林雅琪</div></div>
+              <div class="es-chat-msg"><div class="es-chat-meta">量子链 · AI</div><div class="es-bubble ai">已通过企业微信向 <b>林雅琪</b> 发送文件卡片：SAE周报_第14周_草稿.docx（0.8 MB）。</div></div>
+            </div>
+            <div class="es-body es-files hidden">
+              <div class="es-files-group">输出文件 (3)</div>
+              <div class="es-file"><div class="wsp-fic t-doc">DOC</div><div class="es-fn"><div class="es-fn-name">SAE周报_第14周_草稿.docx</div><div class="es-fn-m">0.8 MB · 12 页</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-download"/></svg></div>
+              <div class="es-file"><div class="wsp-fic">XLS</div><div class="es-fn"><div class="es-fn-name">SAE_单独清单.xlsx</div><div class="es-fn-m">0.3 MB · 8 行</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-download"/></svg></div>
+              <div class="es-file"><div class="wsp-fic t-pdf">PDF</div><div class="es-fn"><div class="es-fn-name">AE_频率分布图_W14.pdf</div><div class="es-fn-m">1.2 MB · 6 页</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-download"/></svg></div>
+              <div class="es-files-group">输入文件 (3)</div>
+              <div class="es-file" style="opacity:.85"><div class="wsp-fic">XLS</div><div class="es-fn"><div class="es-fn-name">中心01_AE数据.xlsx</div><div class="es-fn-m">2.4 MB</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-eye"/></svg></div>
+              <div class="es-file" style="opacity:.85"><div class="wsp-fic">XLS</div><div class="es-fn"><div class="es-fn-name">中心02_AE数据.xlsx</div><div class="es-fn-m">2.1 MB</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-eye"/></svg></div>
+              <div class="es-file" style="opacity:.85"><div class="wsp-fic">XLS</div><div class="es-fn"><div class="es-fn-name">中心03_AE数据.xlsx</div><div class="es-fn-m">1.8 MB</div></div><svg class="ic ic-sm" style="color:var(--t3)"><use href="#i-eye"/></svg></div>
+            </div>
+            <div class="es-input-wrap">
+              <div class="nl-input" style="padding:8px 12px"><input style="flex:1;border:none;outline:none;background:transparent;font-size:12.5px;padding:0;font-family:inherit;color:var(--t1)" placeholder="向 AI 提问..."/><button class="nl-send" style="width:32px;height:32px;border-radius:9px" onclick="toast('已发送')"><svg class="ic ic-sm"><use href="#i-up"/></svg></button></div>
+            </div>
+          </aside>
         </div>
       </section>
 
@@ -1470,27 +1666,76 @@ body::after{width:500px;height:500px;background:radial-gradient(circle,#67e8f9 0
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-head">
-            <div class="card-title">所有文件</div>
-            <div class="card-tag">106 个</div>
-            <div class="card-action">
-              <button class="pill"><svg class="ic ic-sm"><use href="#i-filter"/></svg>筛选</button>
-              <button class="pill"><svg class="ic ic-sm"><use href="#i-search"/></svg>搜索</button>
+        <div class="files-layout">
+          <aside class="files-tree">
+            <div class="ft-actions">
+              <button class="ft-act" onclick="toast('已打开上传对话框 · 支持拖拽与断点续传')"><svg class="ic"><use href="#i-up"/></svg>上传文件</button>
+              <button class="ft-act ghost" onclick="toast('已创建新文件夹')"><svg class="ic"><use href="#i-plus"/></svg>新建文件夹</button>
             </div>
+            <div class="ft-section"><svg class="ic"><use href="#i-shield"/></svg>系统文件夹</div>
+            <div class="ft-row system active" onclick="selectFolder(this,'我的上传','my-upload')"><svg class="ic"><use href="#i-folder"/></svg>我的上传<span class="count">48</span></div>
+            <div class="ft-row system" onclick="selectFolder(this,'任务输入','task-input')"><svg class="ic"><use href="#i-folder"/></svg>任务输入<span class="count">22</span></div>
+            <div class="ft-row system" onclick="selectFolder(this,'任务输出','task-output')"><svg class="ic"><use href="#i-folder"/></svg>任务输出<span class="count">36</span></div>
+            <div class="ft-section">我的文件夹</div>
+            <div class="ft-row" onclick="selectFolder(this,'临床数据','clinical')"><svg class="ic"><use href="#i-folder"/></svg>临床数据<span class="count">28</span></div>
+            <div class="ft-row" onclick="selectFolder(this,'报告归档','reports')"><svg class="ic"><use href="#i-folder"/></svg>报告归档<span class="count">12</span></div>
+            <div class="ft-row" onclick="selectFolder(this,'V-203 项目','v203')"><svg class="ic"><use href="#i-folder"/></svg>V-203 项目<span class="count">9</span></div>
+            <button class="ft-add" onclick="toast('已创建新文件夹')"><svg class="ic"><use href="#i-plus"/></svg>新建文件夹</button>
+            <div class="ft-section">其他</div>
+            <div class="ft-row" onclick="selectFolder(this,'共享给我','shared')"><svg class="ic"><use href="#i-share"/></svg>共享给我<span class="count">6</span></div>
+            <div class="ft-row" onclick="selectFolder(this,'回收站','trash')"><svg class="ic"><use href="#i-trash"/></svg>回收站<span class="count">12</span></div>
+          </aside>
+
+          <div class="files-main">
+            <div class="fm-bar">
+              <div class="fm-bread">
+                <svg class="ic"><use href="#i-folder"/></svg>
+                <span>工作区</span>
+                <svg class="ic"><use href="#i-chev-right"/></svg>
+                <b id="fmBreadFolder">我的上传</b>
+                <span class="fm-tag"><svg class="ic"><use href="#i-shield"/></svg>系统文件夹</span>
+              </div>
+              <div class="fm-bar-r">
+                <div class="fm-search"><svg class="ic ic-sm"><use href="#i-search"/></svg><input placeholder="在此文件夹搜索..."/></div>
+                <button class="pill"><svg class="ic ic-sm"><use href="#i-filter"/></svg>筛选</button>
+              </div>
+            </div>
+
+            <div class="fm-drop" onclick="toast('已打开上传对话框 · 支持断点续传 · 单文件 ≤ 500 MB')">
+              <div class="fm-drop-ic"><svg class="ic"><use href="#i-up"/></svg></div>
+              <div class="fm-drop-info">
+                <div class="fm-drop-t">拖拽文件到此或点击上传</div>
+                <div class="fm-drop-d">单文件最大 <b>500 MB</b> · 支持断点续传 · 也可从企业微信转发给平台机器人自动入库</div>
+              </div>
+              <div class="fm-drop-actions">
+                <button class="pill" onclick="event.stopPropagation();toast('企业微信导入指引已发送')"><svg class="ic ic-sm"><use href="#i-message"/></svg>从企微导入</button>
+              </div>
+            </div>
+
+            <div class="fm-bulk" id="fmBulk">
+              <span>已选 <b id="fmBulkN">0</b> 个文件 · 共 <b id="fmBulkS">0</b> MB</span>
+              <div class="fm-bulk-actions">
+                <button class="pill" onclick="toast('已打包为 ZIP 下载')"><svg class="ic ic-sm"><use href="#i-download"/></svg>打包下载</button>
+                <button class="pill" onclick="openShare()"><svg class="ic ic-sm"><use href="#i-share"/></svg>分享</button>
+                <button class="pill" onclick="toast('已移动 · 选择目标文件夹')"><svg class="ic ic-sm"><use href="#i-folder"/></svg>移动</button>
+                <button class="pill" onclick="toast('已删除至回收站 · 30 天可恢复');clearSel()" style="color:var(--rose)"><svg class="ic ic-sm"><use href="#i-trash"/></svg>删除</button>
+                <button class="pill" onclick="clearSel()"><svg class="ic ic-sm"><use href="#i-x"/></svg>取消</button>
+              </div>
+            </div>
+
+            <table class="tbl" id="fmTbl">
+              <thead><tr><th style="width:36px"><input type="checkbox" onchange="toggleAll(this)"/></th><th>文件名</th><th>大小</th><th>修改时间</th><th>来源</th><th style="width:160px">操作</th></tr></thead>
+              <tbody>
+                <tr class="fm-file-row" onclick="filePreview('中心01_CRF_V203_W14.xlsx')"><td><input type="checkbox" class="rowChk" data-size="2.4" onclick="event.stopPropagation();updBulk()"/></td><td><div class="cell-name"><div class="wsp-fic">XLS</div>中心01_CRF_V203_W14.xlsx</div></td><td>2.4 MB</td><td>今天 14:23</td><td><span class="wsp-tagout" style="background:rgba(99,102,241,.08);color:var(--iris-700)">手动上传</span></td><td><div class="file-actions"><button class="fm-action" onclick="event.stopPropagation();filePreview('中心01_CRF_V203_W14.xlsx')" title="预览"><svg class="ic"><use href="#i-eye"/></svg></button><button class="fm-action" onclick="event.stopPropagation();toast('开始下载')" title="下载"><svg class="ic"><use href="#i-download"/></svg></button><button class="fm-action" onclick="event.stopPropagation();openShare()" title="分享"><svg class="ic"><use href="#i-share"/></svg></button><button class="fm-action" onclick="event.stopPropagation();toast('请输入新名称')" title="重命名"><svg class="ic"><use href="#i-clip"/></svg></button><button class="fm-action danger" onclick="event.stopPropagation();toast('已删除至回收站')" title="删除"><svg class="ic"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr class="fm-file-row" onclick="filePreview('中心02_CRF_V203_W14.xlsx')"><td><input type="checkbox" class="rowChk" data-size="2.1" onclick="event.stopPropagation();updBulk()"/></td><td><div class="cell-name"><div class="wsp-fic">XLS</div>中心02_CRF_V203_W14.xlsx</div></td><td>2.1 MB</td><td>今天 14:23</td><td><span class="wsp-tagout" style="background:rgba(99,102,241,.08);color:var(--iris-700)">手动上传</span></td><td><div class="file-actions"><button class="fm-action" onclick="event.stopPropagation();filePreview('中心02_CRF_V203_W14.xlsx')" title="预览"><svg class="ic"><use href="#i-eye"/></svg></button><button class="fm-action" onclick="event.stopPropagation();toast('开始下载')" title="下载"><svg class="ic"><use href="#i-download"/></svg></button><button class="fm-action" onclick="event.stopPropagation();openShare()" title="分享"><svg class="ic"><use href="#i-share"/></svg></button><button class="fm-action" onclick="event.stopPropagation();toast('请输入新名称')" title="重命名"><svg class="ic"><use href="#i-clip"/></svg></button><button class="fm-action danger" onclick="event.stopPropagation();toast('已删除至回收站')" title="删除"><svg class="ic"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr class="fm-file-row" onclick="filePreview('临床试验方案_V203_v3.1.pdf')"><td><input type="checkbox" class="rowChk" data-size="8.4" onclick="event.stopPropagation();updBulk()"/></td><td><div class="cell-name"><div class="wsp-fic t-pdf">PDF</div>临床试验方案_V203_v3.1.pdf</div></td><td>8.4 MB</td><td>昨天</td><td><span class="wsp-tagout" style="background:rgba(56,189,248,.1);color:#0369a1">企微导入</span></td><td><div class="file-actions"><button class="fm-action" onclick="event.stopPropagation();filePreview('临床试验方案_V203_v3.1.pdf')" title="预览"><svg class="ic"><use href="#i-eye"/></svg></button><button class="fm-action" onclick="event.stopPropagation();toast('开始下载')" title="下载"><svg class="ic"><use href="#i-download"/></svg></button><button class="fm-action" onclick="event.stopPropagation();openShare()" title="分享"><svg class="ic"><use href="#i-share"/></svg></button><button class="fm-action" onclick="event.stopPropagation();toast('请输入新名称')" title="重命名"><svg class="ic"><use href="#i-clip"/></svg></button><button class="fm-action danger" onclick="event.stopPropagation();toast('已删除至回收站')" title="删除"><svg class="ic"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr class="fm-file-row" onclick="filePreview('受试者基线数据_V203.xlsx')"><td><input type="checkbox" class="rowChk" data-size="1.8" onclick="event.stopPropagation();updBulk()"/></td><td><div class="cell-name"><div class="wsp-fic">XLS</div>受试者基线数据_V203.xlsx</div></td><td>1.8 MB</td><td>3 天前</td><td><span class="wsp-tagout" style="background:rgba(99,102,241,.08);color:var(--iris-700)">手动上传</span></td><td><div class="file-actions"><button class="fm-action" onclick="event.stopPropagation();filePreview('受试者基线数据_V203.xlsx')" title="预览"><svg class="ic"><use href="#i-eye"/></svg></button><button class="fm-action" onclick="event.stopPropagation();toast('开始下载')" title="下载"><svg class="ic"><use href="#i-download"/></svg></button><button class="fm-action" onclick="event.stopPropagation();openShare()" title="分享"><svg class="ic"><use href="#i-share"/></svg></button><button class="fm-action" onclick="event.stopPropagation();toast('请输入新名称')" title="重命名"><svg class="ic"><use href="#i-clip"/></svg></button><button class="fm-action danger" onclick="event.stopPropagation();toast('已删除至回收站')" title="删除"><svg class="ic"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr class="fm-file-row" onclick="filePreview('CRF字段定义_v2.3.xlsx')"><td><input type="checkbox" class="rowChk" data-size="1.2" onclick="event.stopPropagation();updBulk()"/></td><td><div class="cell-name"><div class="wsp-fic">XLS</div>CRF字段定义_v2.3.xlsx</div></td><td>1.2 MB</td><td>2 月前</td><td><span class="wsp-tagout" style="background:rgba(99,102,241,.08);color:var(--iris-700)">手动上传</span></td><td><div class="file-actions"><button class="fm-action" onclick="event.stopPropagation();filePreview('CRF字段定义_v2.3.xlsx')" title="预览"><svg class="ic"><use href="#i-eye"/></svg></button><button class="fm-action" onclick="event.stopPropagation();toast('开始下载')" title="下载"><svg class="ic"><use href="#i-download"/></svg></button><button class="fm-action" onclick="event.stopPropagation();openShare()" title="分享"><svg class="ic"><use href="#i-share"/></svg></button><button class="fm-action" onclick="event.stopPropagation();toast('请输入新名称')" title="重命名"><svg class="ic"><use href="#i-clip"/></svg></button><button class="fm-action danger" onclick="event.stopPropagation();toast('已删除至回收站')" title="删除"><svg class="ic"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr class="fm-file-row" onclick="filePreview('受试者入组记录.csv')"><td><input type="checkbox" class="rowChk" data-size="0.8" onclick="event.stopPropagation();updBulk()"/></td><td><div class="cell-name"><div class="wsp-fic t-csv">CSV</div>受试者入组记录.csv</div></td><td>0.8 MB</td><td>3 天前</td><td><span class="wsp-tagout" style="background:rgba(99,102,241,.08);color:var(--iris-700)">手动上传</span></td><td><div class="file-actions"><button class="fm-action" onclick="event.stopPropagation();filePreview('受试者入组记录.csv')" title="预览"><svg class="ic"><use href="#i-eye"/></svg></button><button class="fm-action" onclick="event.stopPropagation();toast('开始下载')" title="下载"><svg class="ic"><use href="#i-download"/></svg></button><button class="fm-action" onclick="event.stopPropagation();openShare()" title="分享"><svg class="ic"><use href="#i-share"/></svg></button><button class="fm-action" onclick="event.stopPropagation();toast('请输入新名称')" title="重命名"><svg class="ic"><use href="#i-clip"/></svg></button><button class="fm-action danger" onclick="event.stopPropagation();toast('已删除至回收站')" title="删除"><svg class="ic"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr class="fm-file-row" onclick="filePreview('编码手册_V203_v1.0.pdf')"><td><input type="checkbox" class="rowChk" data-size="2.3" onclick="event.stopPropagation();updBulk()"/></td><td><div class="cell-name"><div class="wsp-fic t-pdf">PDF</div>编码手册_V203_v1.0.pdf</div></td><td>2.3 MB</td><td>2 月前</td><td><span class="wsp-tagout" style="background:rgba(99,102,241,.08);color:var(--iris-700)">手动上传</span></td><td><div class="file-actions"><button class="fm-action" onclick="event.stopPropagation();filePreview('编码手册_V203_v1.0.pdf')" title="预览"><svg class="ic"><use href="#i-eye"/></svg></button><button class="fm-action" onclick="event.stopPropagation();toast('开始下载')" title="下载"><svg class="ic"><use href="#i-download"/></svg></button><button class="fm-action" onclick="event.stopPropagation();openShare()" title="分享"><svg class="ic"><use href="#i-share"/></svg></button><button class="fm-action" onclick="event.stopPropagation();toast('请输入新名称')" title="重命名"><svg class="ic"><use href="#i-clip"/></svg></button><button class="fm-action danger" onclick="event.stopPropagation();toast('已删除至回收站')" title="删除"><svg class="ic"><use href="#i-trash"/></svg></button></div></td></tr>
+              </tbody>
+            </table>
           </div>
-          <table class="tbl">
-            <thead><tr><th style="width:36px"><input type="checkbox"/></th><th>文件名</th><th>大小</th><th>修改时间</th><th>来源</th><th>操作</th></tr></thead>
-            <tbody>
-              <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="wsp-fic">XLS</div>中心01_CRF_V203_W14.xlsx</div></td><td>2.4 MB</td><td>今天 14:23</td><td><span class="wsp-tagout" style="background:rgba(99,102,241,.08);color:var(--iris-700)">手动上传</span></td><td><button class="row-act ghost" onclick="event.stopPropagation();toast('下载')"><svg class="ic"><use href="#i-download"/></svg></button></td></tr>
-              <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="wsp-fic">XLS</div>中心02_CRF_V203_W14.xlsx</div></td><td>2.1 MB</td><td>今天 14:23</td><td><span class="wsp-tagout" style="background:rgba(99,102,241,.08);color:var(--iris-700)">手动上传</span></td><td><button class="row-act ghost" onclick="event.stopPropagation();toast('下载')"><svg class="ic"><use href="#i-download"/></svg></button></td></tr>
-              <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="wsp-fic t-pdf">PDF</div>临床试验方案_V203_v3.1.pdf</div></td><td>8.4 MB</td><td>昨天</td><td><span class="wsp-tagout" style="background:rgba(56,189,248,.1);color:#0369a1">企微导入</span></td><td><button class="row-act ghost" onclick="event.stopPropagation();toast('下载')"><svg class="ic"><use href="#i-download"/></svg></button></td></tr>
-              <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="wsp-fic">XLS</div>不良反应_频率分布表.xlsx</div></td><td>1.6 MB</td><td>2 小时前</td><td><span class="wsp-tagout">任务输出</span></td><td><button class="row-act ghost" onclick="event.stopPropagation();toast('下载')"><svg class="ic"><use href="#i-download"/></svg></button></td></tr>
-              <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="wsp-fic t-doc">DOC</div>SAE周报_第14周_草稿.docx</div></td><td>0.8 MB</td><td>昨天</td><td><span class="wsp-tagout">任务输出</span></td><td><button class="row-act ghost" onclick="event.stopPropagation();toast('下载')"><svg class="ic"><use href="#i-download"/></svg></button></td></tr>
-              <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="wsp-fic t-pdf">PDF</div>DSMB安全报告_2026年5月.pdf</div></td><td>2.1 MB</td><td>上周</td><td><span class="wsp-tagout">任务输出</span></td><td><button class="row-act ghost" onclick="event.stopPropagation();toast('下载')"><svg class="ic"><use href="#i-download"/></svg></button></td></tr>
-              <tr><td><input type="checkbox"/></td><td><div class="cell-name"><div class="wsp-fic t-csv">CSV</div>受试者入组记录.csv</div></td><td>0.8 MB</td><td>3 天前</td><td><span class="wsp-tagout" style="background:rgba(99,102,241,.08);color:var(--iris-700)">手动上传</span></td><td><button class="row-act ghost" onclick="event.stopPropagation();toast('下载')"><svg class="ic"><use href="#i-download"/></svg></button></td></tr>
-            </tbody>
-          </table>
         </div>
       </section>
 
@@ -1546,6 +1791,69 @@ body::after{width:500px;height:500px;background:radial-gradient(circle,#67e8f9 0
       </section>
     </div>
   </main>
+</div>
+
+<!-- 企业微信分享对话框 -->
+<div class="modal-mask" id="shareModal">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <b>分享到企业微信</b>
+      <div class="x" onclick="closeShare()"><svg class="ic ic-sm"><use href="#i-x"/></svg></div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-card-preview">
+        <div class="mcp-ic">XLS</div>
+        <div class="mcp-info">
+          <div class="mcp-t">中心01_CRF_V203_W14.xlsx</div>
+          <div class="mcp-m">2.4 MB · 由 王思远 分享</div>
+        </div>
+        <button class="mcp-dl"><svg class="ic ic-sm"><use href="#i-download"/></svg>下载</button>
+      </div>
+
+      <div class="modal-label">从企业微信通讯录选择好友<span style="font-weight:500;color:var(--t3);text-transform:none;letter-spacing:0">支持多选 · 也可发给自己</span></div>
+      <div class="modal-search"><svg class="ic ic-sm"><use href="#i-search"/></svg><input placeholder="搜索姓名 / 部门 / 工号..."/></div>
+      <div class="contact-list" id="contactList">
+        <div class="contact self checked" onclick="pickContact(this)"><div class="check"></div><div class="contact-av g5">王</div><div class="contact-info"><div class="contact-n">王思远 <span class="me">我自己</span></div><div class="contact-m">华西临床医学中心 · 管理员</div></div></div>
+        <div class="contact" onclick="pickContact(this)"><div class="check"></div><div class="contact-av g1">林</div><div class="contact-info"><div class="contact-n">林雅琪</div><div class="contact-m">华西临床医学中心 · 主任医师</div></div></div>
+        <div class="contact" onclick="pickContact(this)"><div class="check"></div><div class="contact-av g2">陈</div><div class="contact-info"><div class="contact-n">陈泽明</div><div class="contact-m">华西临床医学中心 · 研究协调员</div></div></div>
+        <div class="contact" onclick="pickContact(this)"><div class="check"></div><div class="contact-av g3">徐</div><div class="contact-info"><div class="contact-n">徐子涵</div><div class="contact-m">华西临床医学中心 · 数据管理员</div></div></div>
+        <div class="contact" onclick="pickContact(this)"><div class="check"></div><div class="contact-av g4">马</div><div class="contact-info"><div class="contact-n">马思源</div><div class="contact-m">华西临床医学中心 · 监查员</div></div></div>
+        <div class="contact" onclick="pickContact(this)"><div class="check"></div><div class="contact-av g1">张</div><div class="contact-info"><div class="contact-n">张瑞</div><div class="contact-m">华西临床医学中心 · 实验室专员</div></div></div>
+        <div class="contact" onclick="pickContact(this)"><div class="check"></div><div class="contact-av g2">刘</div><div class="contact-info"><div class="contact-n">刘宇航</div><div class="contact-m">华西临床医学中心 · 安全监查员</div></div></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span class="sel">已选 <b id="shareN">1</b> 位好友</span>
+      <div class="actions">
+        <button class="btn btn-ghost" onclick="closeShare()">取消</button>
+        <button class="btn btn-accent" onclick="confirmShare()"><svg class="ic ic-sm"><use href="#i-message"/></svg>发送文件卡片</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 文件预览对话框 -->
+<div class="modal-mask" id="previewModal">
+  <div class="modal" style="width:680px" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <b id="prevTitle">文件预览</b>
+      <div class="x" onclick="closePreview()"><svg class="ic ic-sm"><use href="#i-x"/></svg></div>
+    </div>
+    <div class="modal-body" style="background:#f8f9fc">
+      <div style="background:#fff;border:1px solid var(--hairline-2);border-radius:12px;padding:30px;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--t3)">
+        <div style="width:64px;height:64px;border-radius:16px;background:var(--grad-iris-soft);color:var(--iris-700);display:flex;align-items:center;justify-content:center"><svg class="ic" style="width:32px;height:32px"><use href="#i-eye"/></svg></div>
+        <div style="font-size:14px;color:var(--t1);font-weight:600">文件预览</div>
+        <div style="font-size:12px;text-align:center;max-width:380px;line-height:1.6">原型示意 · 实际产品支持 PDF / 图片 / Office 文档 / 表格 / 代码文件的在线预览，无需下载即可查看内容。</div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span class="sel">预览模式 · 不会下载至本地</span>
+      <div class="actions">
+        <button class="btn btn-ghost" onclick="closePreview()">关闭</button>
+        <button class="btn btn-accent" onclick="closePreview();toast('开始下载')"><svg class="ic ic-sm"><use href="#i-download"/></svg>下载</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -1614,9 +1922,9 @@ function toggleNotif(e){e.stopPropagation();const p=document.getElementById('not
 function toggleUserMenu(e){e.stopPropagation();const m=document.getElementById('userMenu');const wasOpen=m.classList.contains('show');closeAllPops();if(!wasOpen)m.classList.add('show')}
 function toggleOrgSwitcher(e){e.stopPropagation();const s=document.getElementById('orgSwitcher');const wasOpen=s.classList.contains('show');closeAllPops();if(!wasOpen)s.classList.add('show')}
 document.addEventListener('click',closeAllPops);
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAllPops()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAllPops();closeShare();closePreview()}});
 
-function esTab(el,which){el.parentElement.querySelectorAll('.es-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');document.getElementById('esChat').classList.toggle('hidden',which!=='chat');document.getElementById('esFiles').classList.toggle('hidden',which!=='files')}
+function esTab(el,which){const side=el.closest('.exec-side');side.querySelectorAll('.es-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');side.querySelectorAll('.es-body').forEach(b=>b.classList.add('hidden'));side.querySelector('.es-body.es-'+which)?.classList.remove('hidden')}
 function wsTab(el){el.parentElement.querySelectorAll('.wsp-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active')}
 
 function pick(card){const c=card.querySelector('.wsp-check');const on=c.classList.toggle('on');card.classList.toggle('checked',on);recalc()}
@@ -1647,6 +1955,39 @@ function filterTasks(btn,status){
 }
 
 function toast(msg){const t=document.createElement('div');t.className='toast';t.innerHTML='<svg class="ic ic-sm"><use href="#i-check"/></svg>'+msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2400)}
+
+/* ---- workspace ---- */
+function selectFolder(el,name,key){
+  document.querySelectorAll('.files-tree .ft-row').forEach(r=>r.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('fmBreadFolder').textContent=name;
+  const tag=document.querySelector('.fm-tag');
+  if(['my-upload','task-input','task-output'].includes(key)){tag.style.display='inline-flex';tag.innerHTML='<svg class="ic"><use href="#i-shield"/></svg>系统文件夹'}
+  else if(key==='trash'){tag.style.display='inline-flex';tag.style.background='rgba(244,63,94,.12)';tag.style.color='#9f1239';tag.innerHTML='<svg class="ic"><use href="#i-clock"/></svg>30 天内可恢复'}
+  else if(key==='shared'){tag.style.display='inline-flex';tag.style.background='rgba(56,189,248,.12)';tag.style.color='#0369a1';tag.innerHTML='<svg class="ic"><use href="#i-share"/></svg>他人分享'}
+  else{tag.style.display='none'}
+  clearSel();
+}
+function toggleAll(cb){document.querySelectorAll('#fmTbl .rowChk').forEach(c=>c.checked=cb.checked);updBulk()}
+function updBulk(){
+  const rows=document.querySelectorAll('#fmTbl .rowChk:checked');
+  let total=0;rows.forEach(r=>total+=parseFloat(r.dataset.size||'0'));
+  document.getElementById('fmBulkN').textContent=rows.length;
+  document.getElementById('fmBulkS').textContent=total.toFixed(1);
+  document.getElementById('fmBulk').classList.toggle('show',rows.length>0);
+}
+function clearSel(){document.querySelectorAll('#fmTbl .rowChk').forEach(c=>c.checked=false);updBulk()}
+function filePreview(name){document.getElementById('prevTitle').textContent=name;document.getElementById('previewModal').classList.add('show')}
+function closePreview(){document.getElementById('previewModal').classList.remove('show')}
+
+/* ---- share modal ---- */
+function openShare(){document.getElementById('shareModal').classList.add('show');updShareCount()}
+function closeShare(){document.getElementById('shareModal').classList.remove('show')}
+function pickContact(el){el.classList.toggle('checked');updShareCount()}
+function updShareCount(){document.getElementById('shareN').textContent=document.querySelectorAll('#contactList .contact.checked').length}
+function confirmShare(){const n=document.querySelectorAll('#contactList .contact.checked').length;closeShare();toast(`已通过企业微信向 ${n} 位好友发送文件卡片`)}
+document.getElementById('shareModal')?.addEventListener('click',e=>{if(e.target.id==='shareModal')closeShare()});
+document.getElementById('previewModal')?.addEventListener('click',e=>{if(e.target.id==='previewModal')closePreview()});
 </script>
 </body>
 </html>
