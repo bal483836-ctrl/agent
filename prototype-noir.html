@@ -133,45 +133,80 @@ body::after{
 /* ─── Reusable: luminous card ─── */
 .lum{
   position:relative;
-  background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,.012));
+  background:
+    linear-gradient(180deg,rgba(22,26,48,.78) 0%,rgba(10,12,22,.86) 100%),
+    radial-gradient(140% 80% at 50% 0%,rgba(125,240,216,.05),transparent 60%);
   border:1px solid rgba(255,255,255,.06);
   border-radius:var(--r-lg);
-  backdrop-filter:blur(14px) saturate(140%);
-  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  backdrop-filter:blur(22px) saturate(155%);
+  -webkit-backdrop-filter:blur(22px) saturate(155%);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.06),
+    inset 0 1px 0 rgba(255,255,255,.1),
     inset 0 -1px 0 rgba(255,255,255,.02),
-    0 30px 60px rgba(0,0,0,.55),
-    0 4px 18px rgba(0,0,0,.35);
+    inset 0 0 0 1px rgba(255,255,255,.014),
+    0 30px 70px rgba(0,0,0,.65),
+    0 4px 18px rgba(0,0,0,.4);
 }
 .lum::before{
-  content:'';position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;
-  background:linear-gradient(140deg,rgba(255,255,255,.08),transparent 30%,transparent 70%,rgba(255,255,255,.04));
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.045) 0%,transparent 25%,transparent 88%,rgba(255,255,255,.02) 100%);
+}
+.lum::after{
+  content:'';position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;z-index:0;
+  background:linear-gradient(140deg,rgba(255,255,255,.12),transparent 28%,transparent 72%,rgba(255,255,255,.05));
   -webkit-mask:linear-gradient(#fff,#fff) content-box,linear-gradient(#fff,#fff);
   -webkit-mask-composite:xor;mask-composite:exclude;padding:1px;
 }
 
 /* glow border variant */
 .lum-glow-t{box-shadow:
-  inset 0 1px 0 rgba(255,255,255,.06),
-  0 0 0 1px rgba(62,224,194,.32),
-  0 0 32px rgba(62,224,194,.18),
-  0 30px 60px rgba(0,0,0,.55)}
+  inset 0 1px 0 rgba(255,255,255,.12),
+  0 0 0 1px rgba(62,224,194,.34),
+  0 0 32px rgba(62,224,194,.2),
+  0 0 80px rgba(62,224,194,.08),
+  0 36px 80px rgba(0,0,0,.6)}
 .lum-glow-p{box-shadow:
-  inset 0 1px 0 rgba(255,255,255,.06),
-  0 0 0 1px rgba(236,72,153,.32),
-  0 0 32px rgba(236,72,153,.18),
-  0 30px 60px rgba(0,0,0,.55)}
+  inset 0 1px 0 rgba(255,255,255,.1),
+  0 0 0 1px rgba(236,72,153,.34),
+  0 0 32px rgba(236,72,153,.2),
+  0 30px 60px rgba(0,0,0,.6)}
 
 /* ─── LOGIN ─── */
-.login-stage{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:24px;transition:opacity .7s ease,transform .7s ease}
-.login-stage.gone{opacity:0;transform:scale(1.03);pointer-events:none}
+.login-stage{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:24px;transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1)}
+.login-stage.gone{opacity:0;transform:scale(.96);pointer-events:none}
+.login-stage::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(380px 380px at var(--mx,50%) var(--my,50%),rgba(62,224,194,.18),transparent 65%);
+  transition:opacity .4s ease;
+  mix-blend-mode:screen;
+}
+.login-stage::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(280px 280px at var(--mx,50%) var(--my,50%),rgba(236,72,153,.12),transparent 65%);
+  mix-blend-mode:screen;
+  filter:blur(40px);
+}
 
-.login-card{width:min(960px,100%);display:grid;grid-template-columns:1.05fr 1fr;overflow:hidden;padding:0}
-.login-card{border-radius:var(--r-xl)}
+.login-card{width:min(820px,100%);display:grid;grid-template-columns:1.05fr 1fr;overflow:hidden;padding:0;border-radius:var(--r-xl);animation:cardIn 1s cubic-bezier(.22,1,.36,1) backwards}
+@keyframes cardIn{
+  0%{opacity:0;transform:translateY(30px) scale(.94) rotateX(8deg)}
+  100%{opacity:1;transform:translateY(0) scale(1) rotateX(0)}
+}
+
+/* sweep beam (animated) */
+.login-card .beam{
+  position:absolute;inset:0;border-radius:inherit;pointer-events:none;overflow:hidden;z-index:0;
+}
+.login-card .beam::before{
+  content:'';position:absolute;top:-100%;left:-50%;width:300%;height:200%;
+  background:conic-gradient(from 0deg,transparent 0deg,transparent 350deg,rgba(125,240,216,.55) 358deg,transparent 360deg);
+  animation:sweepBeam 6s linear infinite;
+}
+@keyframes sweepBeam{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 
 /* left brand */
-.brand-side{position:relative;padding:44px 46px 38px;display:flex;flex-direction:column;justify-content:space-between;gap:28px;border-right:1px solid rgba(255,255,255,.05);overflow:hidden;min-height:540px}
+.brand-side{position:relative;padding:34px 34px 28px;display:flex;flex-direction:column;justify-content:space-between;gap:20px;border-right:1px solid rgba(255,255,255,.05);overflow:hidden;min-height:480px;z-index:1}
 .brand-side::before{
   content:'';position:absolute;left:-30%;top:-25%;width:520px;height:520px;border-radius:50%;
   background:radial-gradient(circle at 30% 30%,rgba(62,224,194,.18),transparent 60%);
@@ -271,9 +306,9 @@ body::after{
 .brand-foot a:hover{color:var(--teal-2)}
 
 /* right form */
-.form-side{padding:44px 46px;position:relative;display:flex;flex-direction:column;gap:18px;justify-content:center}
-.form-side::before{content:'[';position:absolute;top:34px;right:46px;font-size:24px;color:var(--t-mute);font-weight:300;line-height:1;letter-spacing:-.05em}
-.form-side::after{content:']';position:absolute;bottom:34px;left:46px;font-size:24px;color:var(--t-mute);font-weight:300;line-height:1}
+.form-side{padding:34px 36px;position:relative;display:flex;flex-direction:column;gap:14px;justify-content:center;z-index:1}
+.form-side::before{content:'[';position:absolute;top:24px;right:36px;font-size:20px;color:var(--t-mute);font-weight:300;line-height:1;letter-spacing:-.05em;opacity:.7}
+.form-side::after{content:']';position:absolute;bottom:24px;left:36px;font-size:20px;color:var(--t-mute);font-weight:300;line-height:1;opacity:.7}
 
 .lf-section{font-size:9.5px;letter-spacing:.32em;color:var(--t-mute);text-transform:uppercase;display:flex;align-items:center;gap:8px}
 .lf-section::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--line-2),transparent)}
@@ -794,6 +829,64 @@ body::after{
 .wsp-fic.t-csv{background:rgba(251,191,36,.12);color:var(--amber);border-color:rgba(251,191,36,.28)}
 .wsp-tagout{font-size:9.5px;padding:2px 7px;border-radius:4px;background:var(--ink-2);color:var(--t2);font-weight:600;letter-spacing:.06em;border:1px solid var(--line)}
 
+/* ripple */
+.ripple{position:relative;overflow:hidden}
+.ripple-ink{position:absolute;border-radius:50%;background:rgba(255,255,255,.5);transform:scale(0);animation:rip .65s cubic-bezier(.22,1,.36,1);pointer-events:none}
+@keyframes rip{to{transform:scale(4);opacity:0}}
+
+/* sliding tab indicator */
+.lf-tabs{position:relative}
+.lf-tab-ind{position:absolute;top:3px;left:3px;height:calc(100% - 6px);background:var(--ink-3);border-radius:8px;box-shadow:inset 0 0 0 1px rgba(62,224,194,.22),0 0 16px rgba(62,224,194,.14);transition:left .42s cubic-bezier(.22,1,.36,1),width .42s cubic-bezier(.22,1,.36,1);z-index:0}
+.lf-tab{position:relative;z-index:1}
+.lf-tab.active{background:transparent!important;box-shadow:none!important}
+
+/* popovers (notification / user / org) */
+.pop{position:absolute;background:linear-gradient(180deg,rgba(22,26,48,.95),rgba(10,12,22,.95));border:1px solid rgba(255,255,255,.08);border-radius:14px;backdrop-filter:blur(24px) saturate(160%);box-shadow:0 0 0 1px rgba(62,224,194,.06),0 30px 70px rgba(0,0,0,.7),0 0 60px rgba(62,224,194,.05);z-index:200;display:none;overflow:hidden;animation:popIn .28s cubic-bezier(.22,1,.36,1)}
+@keyframes popIn{from{opacity:0;transform:translateY(-6px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.pop.show{display:block}
+
+.pop-notif{top:48px;right:0;width:380px}
+.pop-head{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;font-size:9.5px;color:var(--t-mute);font-weight:700;letter-spacing:.32em;text-transform:uppercase}
+.pop-head b{color:var(--t1);letter-spacing:.005em;text-transform:none;font-size:13.5px;font-weight:700}
+.pop-head .lk{margin-left:auto;color:var(--teal-2);font-size:11px;cursor:pointer;letter-spacing:.04em;text-transform:none;font-weight:600}
+.pop-head .lk:hover{color:var(--t1)}
+.pop-list{max-height:380px;overflow-y:auto}
+.pop-list::-webkit-scrollbar{width:3px}
+.pop-list::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:99px}
+.pop-item{padding:13px 18px;display:flex;gap:11px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .15s;position:relative}
+.pop-item:hover{background:rgba(62,224,194,.04)}
+.pop-item.unread::before{content:'';position:absolute;left:7px;top:50%;transform:translateY(-50%);width:5px;height:5px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px var(--teal)}
+.pop-ic{width:32px;height:32px;border-radius:9px;background:var(--teal-soft);color:var(--teal-2);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(62,224,194,.22)}
+.pop-ic.warn{background:rgba(251,191,36,.12);color:var(--amber);border-color:rgba(251,191,36,.25)}
+.pop-ic.pk{background:var(--pink-soft);color:var(--pink-2);border-color:rgba(236,72,153,.22)}
+.pop-ic .ic{width:14px;height:14px}
+.pop-body-info{flex:1;min-width:0}
+.pop-t{font-size:12.5px;color:var(--t1);font-weight:600;margin-bottom:2px;letter-spacing:.002em}
+.pop-d{font-size:11px;color:var(--t-mute);line-height:1.5;letter-spacing:.04em}
+.pop-time{font-size:10px;color:var(--t-mute);margin-top:3px;letter-spacing:.04em}
+
+.pop-user{bottom:calc(100% + 8px);left:0;right:0;width:auto;padding:6px}
+.pop-user-h{padding:10px 11px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);margin-bottom:5px}
+.pop-user-h .user-av{width:38px;height:38px;font-size:13px}
+.pop-user-h .nm{flex:1;min-width:0}
+.pop-user-h .nm b{display:block;font-size:13px;color:var(--t1);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.002em}
+.pop-user-h .nm span{font-size:10.5px;color:var(--t-mute);letter-spacing:.04em}
+.pop-row{padding:8px 11px;display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--t2);border-radius:8px;cursor:pointer;letter-spacing:.005em;transition:background .12s}
+.pop-row:hover{background:rgba(62,224,194,.06);color:var(--t1)}
+.pop-row:hover .ic{color:var(--teal-2)}
+.pop-row .ic{color:var(--t-mute);width:14px;height:14px}
+.pop-row .end{margin-left:auto;font-size:10.5px;color:var(--t-mute);letter-spacing:.04em}
+.pop-row .badge{margin-left:auto;font-size:10px;color:var(--teal-2);background:var(--teal-soft);padding:2px 8px;border-radius:99px;font-weight:600;border:1px solid rgba(62,224,194,.18)}
+.pop-row.danger{color:var(--rose)}
+.pop-row.danger:hover{background:rgba(251,113,133,.08);color:var(--rose)}
+.pop-row.danger:hover .ic{color:var(--rose)}
+.pop-sep{height:1px;background:var(--line);margin:5px 4px}
+
+.pop-org{top:calc(100% + 6px);left:0;right:0;width:auto;padding:6px}
+
+/* notif anchor positioning */
+.icon-btn{position:relative}
+
 /* toast */
 .toast{position:fixed;bottom:24px;right:24px;background:rgba(3,3,8,.95);color:var(--t1);border-radius:12px;padding:12px 18px;font-size:12.5px;z-index:300;display:flex;align-items:center;gap:8px;backdrop-filter:blur(20px);border:1px solid rgba(62,224,194,.25);box-shadow:0 0 0 1px rgba(62,224,194,.2),0 18px 40px rgba(0,0,0,.6),0 0 40px rgba(62,224,194,.12);animation:slideUp .35s cubic-bezier(.22,1,.36,1);letter-spacing:.005em}
 .toast .ic{color:var(--teal-2)}
@@ -858,7 +951,8 @@ body::after{
 
 <!-- ─── LOGIN ─── -->
 <div class="login-stage" id="loginStage">
-  <div class="login-card lum lum-glow-t">
+  <div class="login-card lum lum-glow-t" id="loginCard">
+    <div class="beam"></div>
     <div class="brand-side">
       <div class="brand-row">
         <div class="brand-mark"><svg><use href="#i-quantum"/></svg></div>
@@ -913,6 +1007,7 @@ body::after{
       <div class="lf-sub">使用企业微信扫码 / 邮箱密码 / SSO 任一方式</div>
 
       <div class="lf-tabs" role="tablist">
+        <div class="lf-tab-ind" id="lfTabInd"></div>
         <button class="lf-tab active" onclick="lfTab(this,'wecom')"><svg class="ic"><use href="#i-qr"/></svg>企业微信</button>
         <button class="lf-tab" onclick="lfTab(this,'email')"><svg class="ic"><use href="#i-mail"/></svg>邮箱密码</button>
         <button class="lf-tab" onclick="lfTab(this,'sso')"><svg class="ic"><use href="#i-shield"/></svg>SSO</button>
@@ -990,10 +1085,17 @@ body::after{
 <!-- ─── APP ─── -->
 <div class="app" id="app">
   <aside class="sidebar">
-    <div class="org-bar" onclick="toast('打开组织切换器')">
+    <div class="org-bar" onclick="togglePop(event,'orgPop')" style="position:relative">
       <div class="org-mark"><svg><use href="#i-quantum"/></svg></div>
       <div class="org-info"><div class="org-name">华西临床医学中心</div><div class="org-meta"><span class="dot"></span>42 成员</div></div>
       <svg class="ic ic-sm org-chev"><use href="#i-chev-down"/></svg>
+      <div class="pop pop-org" id="orgPop" onclick="event.stopPropagation()">
+        <div class="pop-row" style="background:rgba(62,224,194,.06)"><div class="org-mark" style="width:26px;height:26px;border-radius:7px"><svg style="width:14px;height:14px"><use href="#i-quantum"/></svg></div><span style="color:var(--t1);font-weight:600">华西临床医学中心</span><span class="badge">当前</span></div>
+        <div class="pop-row" onclick="toast('已切换至 上海仁济医学组')"><div style="width:26px;height:26px;border-radius:7px;background:radial-gradient(circle at 30% 28%,#fbcfe8,#ec4899 50%,#7d1b46);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:11px;font-weight:700">仁</div><span>上海仁济医学组</span><span class="end">28 成员</span></div>
+        <div class="pop-row" onclick="toast('已切换至 协和数据科学')"><div style="width:26px;height:26px;border-radius:7px;background:radial-gradient(circle at 30% 28%,#c4b5fd,#a78bfa 50%,#4c1d95);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:11px;font-weight:700">协</div><span>协和数据科学</span><span class="end">15 成员</span></div>
+        <div class="pop-sep"></div>
+        <div class="pop-row" style="color:var(--teal-2)" onclick="toast('创建或加入组织')"><svg class="ic" style="color:var(--teal-2)"><use href="#i-plus"/></svg>创建或加入组织</div>
+      </div>
     </div>
 
     <button class="new-btn" onclick="newChat()">
@@ -1015,17 +1117,28 @@ body::after{
 
     <div class="tasks-section">
       <div class="side-label">我的任务<span class="count">6</span></div>
-      <div class="task-item"><span class="task-dot running"></span><div class="task-text"><div class="task-name">疫苗V-203不良反应汇总</div><div class="task-meta">执行中 · <span class="task-progress">68%</span></div></div></div>
-      <div class="task-item"><span class="task-dot review"></span><div class="task-text"><div class="task-name">中心01 vs 中心02 CRF比对</div><div class="task-meta">待审核 · 3 项</div></div></div>
-      <div class="task-item"><span class="task-dot done"></span><div class="task-text"><div class="task-name">SAE 周报草稿 · 第14周</div><div class="task-meta">已完成 · 昨天</div></div></div>
-      <div class="task-item"><span class="task-dot done"></span><div class="task-text"><div class="task-name">实验室异常复核 W12</div><div class="task-meta">已完成 · 3 天前</div></div></div>
-      <div class="task-item"><span class="task-dot queue"></span><div class="task-text"><div class="task-name">DSMB 月度安全报告</div><div class="task-meta">排队中</div></div></div>
-      <div class="task-item"><span class="task-dot draft"></span><div class="task-text"><div class="task-name">知情同意文件审查</div><div class="task-meta">草稿</div></div></div>
+      <div class="task-item" data-task="ae" onclick="openTask('ae')"><span class="task-dot running"></span><div class="task-text"><div class="task-name">疫苗V-203不良反应汇总</div><div class="task-meta">执行中 · <span class="task-progress">68%</span></div></div></div>
+      <div class="task-item" data-task="crf" onclick="openTask('crf')"><span class="task-dot review"></span><div class="task-text"><div class="task-name">中心01 vs 中心02 CRF比对</div><div class="task-meta">待审核 · 3 项</div></div></div>
+      <div class="task-item" data-task="sae" onclick="openTask('sae')"><span class="task-dot done"></span><div class="task-text"><div class="task-name">SAE 周报草稿 · 第14周</div><div class="task-meta">已完成 · 昨天</div></div></div>
+      <div class="task-item" data-task="lab" onclick="openTask('lab')"><span class="task-dot done"></span><div class="task-text"><div class="task-name">实验室异常复核 W12</div><div class="task-meta">已完成 · 3 天前</div></div></div>
+      <div class="task-item" data-task="dsmb" onclick="openTask('dsmb')"><span class="task-dot queue"></span><div class="task-text"><div class="task-name">DSMB 月度安全报告</div><div class="task-meta">排队中</div></div></div>
+      <div class="task-item" data-task="ic" onclick="newChat()"><span class="task-dot draft"></span><div class="task-text"><div class="task-name">知情同意文件审查</div><div class="task-meta">草稿</div></div></div>
     </div>
 
-    <div class="user-card" onclick="toast('账户菜单')">
+    <div class="user-card" onclick="togglePop(event,'userPop')" style="position:relative">
       <div class="user-av">王</div>
       <div class="user-info"><div class="user-name">王思远</div><div class="user-role">管理员 · <span class="wechat">● 企微</span></div></div>
+      <div class="pop pop-user" id="userPop" onclick="event.stopPropagation()">
+        <div class="pop-user-h"><div class="user-av">王</div><div class="nm"><b>王思远</b><span>wang.siyuan@wchclin.cn</span></div></div>
+        <div class="pop-row" onclick="toast('个人资料')"><svg class="ic"><use href="#i-user"/></svg>个人资料</div>
+        <div class="pop-row" onclick="toast('偏好设置')"><svg class="ic"><use href="#i-quantum"/></svg>偏好设置<span class="end">⌘,</span></div>
+        <div class="pop-sep"></div>
+        <div class="pop-row" onclick="toast('组织管理')"><svg class="ic"><use href="#i-shield"/></svg>组织管理<span class="badge">管理员</span></div>
+        <div class="pop-row" onclick="toast('企微绑定管理')"><svg class="ic"><use href="#i-message"/></svg>企业微信绑定<span class="end" style="color:#5be1a1">已绑定</span></div>
+        <div class="pop-row" onclick="toast('登录设备')"><svg class="ic"><use href="#i-clock"/></svg>登录设备</div>
+        <div class="pop-sep"></div>
+        <div class="pop-row danger" onclick="logout()"><svg class="ic"><use href="#i-x"/></svg>退出登录</div>
+      </div>
     </div>
   </aside>
 
@@ -1034,7 +1147,17 @@ body::after{
       <div class="topbar-crumb" id="crumb"><b>任务中心</b></div>
       <span class="topbar-status hidden" id="topStatus"></span>
       <div class="topbar-actions">
-        <div class="icon-btn" onclick="toast('通知中心')"><svg class="ic"><use href="#i-bell"/></svg><div class="icon-dot"></div></div>
+        <div class="icon-btn" onclick="togglePop(event,'notifPop')"><svg class="ic"><use href="#i-bell"/></svg><div class="icon-dot"></div>
+          <div class="pop pop-notif" id="notifPop" onclick="event.stopPropagation()">
+            <div class="pop-head"><b>通知中心</b><span class="lk" onclick="toast('已全部标记为已读')">全部已读</span></div>
+            <div class="pop-list">
+              <div class="pop-item unread" onclick="openTask('crf')"><div class="pop-ic"><svg class="ic"><use href="#i-check"/></svg></div><div class="pop-body-info"><div class="pop-t">CRF 比对任务完成</div><div class="pop-d">12 处差异 · 3 项需确认</div><div class="pop-time">5 分钟前</div></div></div>
+              <div class="pop-item unread" onclick="go('market')"><div class="pop-ic pk"><svg class="ic"><use href="#i-cube"/></svg></div><div class="pop-body-info"><div class="pop-t">技能授权已批准</div><div class="pop-d">"实验室异常复核" · 90 天</div><div class="pop-time">25 分钟前</div></div></div>
+              <div class="pop-item unread" onclick="go('files')"><div class="pop-ic warn"><svg class="ic"><use href="#i-alert"/></svg></div><div class="pop-body-info"><div class="pop-t">工作区使用 92%</div><div class="pop-d">46.2 / 50 GB</div><div class="pop-time">今天 09:12</div></div></div>
+              <div class="pop-item" onclick="openTask('sae')"><div class="pop-ic"><svg class="ic"><use href="#i-check"/></svg></div><div class="pop-body-info"><div class="pop-t">SAE 周报已完成</div><div class="pop-d">已保存至 任务输出</div><div class="pop-time">昨天</div></div></div>
+            </div>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -1104,12 +1227,12 @@ body::after{
           <table class="tbl" id="tcTbl">
             <thead><tr><th>任务名称</th><th>使用技能</th><th>状态</th><th>进度</th><th>创建时间</th><th>操作</th></tr></thead>
             <tbody>
-              <tr data-status="running"><td><div class="cell-name"><div class="cell-ico"><svg class="ic"><use href="#i-alert"/></svg></div><div class="cell-name-text"><div class="cell-name-t">疫苗V-203不良反应汇总</div><div class="cell-name-m">3 个输入文件 · 启动 14:23</div></div></div></td><td>AE/SAE 汇总</td><td><span class="pill-status ps-running"><span class="psd"></span>执行中</span></td><td><div class="prog-orb" style="--p:68%"><span>68%</span></div></td><td>2 小时前</td><td><button class="row-act primary"><svg class="ic"><use href="#i-eye"/></svg>查看</button></td></tr>
-              <tr data-status="review"><td><div class="cell-name"><div class="cell-ico v2"><svg class="ic"><use href="#i-clip"/></svg></div><div class="cell-name-text"><div class="cell-name-t">中心01 vs 中心02 CRF比对</div><div class="cell-name-m">12 处差异 · 3 项需确认</div></div></div></td><td>CRF 数据比对</td><td><span class="pill-status ps-review"><span class="psd"></span>待审核</span></td><td><div class="prog-orb done"><span>✓</span></div></td><td>今天 11:20</td><td><button class="row-act amber"><svg class="ic"><use href="#i-check"/></svg>审核</button></td></tr>
-              <tr data-status="done"><td><div class="cell-name"><div class="cell-ico v3"><svg class="ic"><use href="#i-chart"/></svg></div><div class="cell-name-text"><div class="cell-name-t">SAE 周报草稿 · 第14周</div><div class="cell-name-m">12 页 PDF · 已归档</div></div></div></td><td>SAE 周报生成</td><td><span class="pill-status ps-done"><span class="psd"></span>已完成</span></td><td><div class="prog-orb done"><span>✓</span></div></td><td>昨天 16:48</td><td><button class="row-act"><svg class="ic"><use href="#i-download"/></svg>下载</button></td></tr>
-              <tr data-status="done"><td><div class="cell-name"><div class="cell-ico v5"><svg class="ic"><use href="#i-flask"/></svg></div><div class="cell-name-text"><div class="cell-name-t">实验室异常复核 W12</div><div class="cell-name-m">识别 8 处异常值</div></div></div></td><td>实验室异常</td><td><span class="pill-status ps-done"><span class="psd"></span>已完成</span></td><td><div class="prog-orb done"><span>✓</span></div></td><td>3 天前</td><td><button class="row-act"><svg class="ic"><use href="#i-download"/></svg>下载</button></td></tr>
-              <tr data-status="running"><td><div class="cell-name"><div class="cell-ico v4"><svg class="ic"><use href="#i-shield"/></svg></div><div class="cell-name-text"><div class="cell-name-t">DSMB 月度安全报告</div><div class="cell-name-m">排队第 2 位 · 5 分钟内开始</div></div></div></td><td>安全监查</td><td><span class="pill-status ps-queue"><span class="psd"></span>排队中</span></td><td><div class="prog-orb empty"><span>—</span></div></td><td>5 分钟前</td><td><button class="row-act ghost"><svg class="ic"><use href="#i-x"/></svg>取消</button></td></tr>
-              <tr data-status="draft"><td><div class="cell-name"><div class="cell-ico v6"><svg class="ic"><use href="#i-doc"/></svg></div><div class="cell-name-text"><div class="cell-name-t">知情同意文件审查</div><div class="cell-name-m">草稿 · 等待选择文件</div></div></div></td><td>文档审查</td><td><span class="pill-status ps-draft"><span class="psd"></span>草稿</span></td><td><div class="prog-orb empty"><span>—</span></div></td><td>—</td><td><button class="row-act primary" onclick="newChat()"><svg class="ic"><use href="#i-arrow-right"/></svg>继续</button></td></tr>
+              <tr data-status="running" onclick="openTask('ae')"><td><div class="cell-name"><div class="cell-ico"><svg class="ic"><use href="#i-alert"/></svg></div><div class="cell-name-text"><div class="cell-name-t">疫苗V-203不良反应汇总</div><div class="cell-name-m">3 个输入文件 · 启动 14:23</div></div></div></td><td>AE/SAE 汇总</td><td><span class="pill-status ps-running"><span class="psd"></span>执行中</span></td><td><div class="prog-orb" style="--p:68%"><span>68%</span></div></td><td>2 小时前</td><td><button class="row-act primary" onclick="event.stopPropagation();openTask('ae')"><svg class="ic"><use href="#i-eye"/></svg>查看</button></td></tr>
+              <tr data-status="review" onclick="openTask('crf')"><td><div class="cell-name"><div class="cell-ico v2"><svg class="ic"><use href="#i-clip"/></svg></div><div class="cell-name-text"><div class="cell-name-t">中心01 vs 中心02 CRF比对</div><div class="cell-name-m">12 处差异 · 3 项需确认</div></div></div></td><td>CRF 数据比对</td><td><span class="pill-status ps-review"><span class="psd"></span>待审核</span></td><td><div class="prog-orb done"><span>✓</span></div></td><td>今天 11:20</td><td><button class="row-act amber" onclick="event.stopPropagation();openTask('crf')"><svg class="ic"><use href="#i-check"/></svg>审核</button></td></tr>
+              <tr data-status="done" onclick="openTask('sae')"><td><div class="cell-name"><div class="cell-ico v3"><svg class="ic"><use href="#i-chart"/></svg></div><div class="cell-name-text"><div class="cell-name-t">SAE 周报草稿 · 第14周</div><div class="cell-name-m">12 页 PDF · 已归档</div></div></div></td><td>SAE 周报生成</td><td><span class="pill-status ps-done"><span class="psd"></span>已完成</span></td><td><div class="prog-orb done"><span>✓</span></div></td><td>昨天 16:48</td><td><button class="row-act" onclick="event.stopPropagation();toast('开始下载')"><svg class="ic"><use href="#i-download"/></svg>下载</button></td></tr>
+              <tr data-status="done" onclick="openTask('lab')"><td><div class="cell-name"><div class="cell-ico v5"><svg class="ic"><use href="#i-flask"/></svg></div><div class="cell-name-text"><div class="cell-name-t">实验室异常复核 W12</div><div class="cell-name-m">识别 8 处异常值</div></div></div></td><td>实验室异常</td><td><span class="pill-status ps-done"><span class="psd"></span>已完成</span></td><td><div class="prog-orb done"><span>✓</span></div></td><td>3 天前</td><td><button class="row-act" onclick="event.stopPropagation();toast('开始下载')"><svg class="ic"><use href="#i-download"/></svg>下载</button></td></tr>
+              <tr data-status="running" onclick="openTask('dsmb')"><td><div class="cell-name"><div class="cell-ico v4"><svg class="ic"><use href="#i-shield"/></svg></div><div class="cell-name-text"><div class="cell-name-t">DSMB 月度安全报告</div><div class="cell-name-m">排队第 2 位 · 5 分钟内开始</div></div></div></td><td>安全监查</td><td><span class="pill-status ps-queue"><span class="psd"></span>排队中</span></td><td><div class="prog-orb empty"><span>—</span></div></td><td>5 分钟前</td><td><button class="row-act ghost" onclick="event.stopPropagation();toast('已取消')"><svg class="ic"><use href="#i-x"/></svg>取消</button></td></tr>
+              <tr data-status="draft" onclick="newChat()"><td><div class="cell-name"><div class="cell-ico v6"><svg class="ic"><use href="#i-doc"/></svg></div><div class="cell-name-text"><div class="cell-name-t">知情同意文件审查</div><div class="cell-name-m">草稿 · 等待选择文件</div></div></div></td><td>文档审查</td><td><span class="pill-status ps-draft"><span class="psd"></span>草稿</span></td><td><div class="prog-orb empty"><span>—</span></div></td><td>—</td><td><button class="row-act primary" onclick="event.stopPropagation();newChat()"><svg class="ic"><use href="#i-arrow-right"/></svg>继续</button></td></tr>
             </tbody>
           </table>
         </div>
@@ -1188,6 +1311,69 @@ body::after{
               <button class="pill" onclick="toast('上传')"><svg class="ic ic-sm"><use href="#i-up"/></svg>上传</button>
               <button class="pill" onclick="toast('新建')"><svg class="ic ic-sm"><use href="#i-plus"/></svg>新建</button>
               <button class="pill" onclick="toast('刷新')"><svg class="ic ic-sm"><use href="#i-refresh"/></svg>刷新</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- TASK DETAIL (one screen, content swaps by state) -->
+      <section class="screen" id="screen-task-detail">
+        <div class="lum" style="padding:22px 26px;margin-bottom:14px;display:flex;align-items:flex-start;gap:16px;position:relative;overflow:hidden">
+          <div id="tdIco" class="cell-ico" style="width:54px;height:54px;border-radius:14px"><svg class="ic" style="width:24px;height:24px"><use href="#i-alert"/></svg></div>
+          <div style="flex:1;min-width:0">
+            <div id="tdCat" style="font-size:9.5px;color:var(--teal-2);font-weight:700;letter-spacing:.32em;text-transform:uppercase;margin-bottom:6px">[ ANALYSIS · RUNNING ]</div>
+            <div id="tdName" style="font-size:22px;font-weight:700;color:var(--t1);letter-spacing:-.018em;margin-bottom:6px">疫苗V-203不良反应汇总</div>
+            <div id="tdDesc" style="font-size:12.5px;color:var(--t-mute);line-height:1.6;letter-spacing:.04em">使用 "AE/SAE 汇总" · 3 个输入文件 · 启动于 14:23</div>
+          </div>
+          <div id="tdActions" style="display:flex;gap:8px;flex-shrink:0">
+            <button class="pill" onclick="toast('已取消任务')"><svg class="ic ic-sm"><use href="#i-x"/></svg>取消</button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 320px;gap:14px;align-items:start" id="tdGrid">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="lum" id="tdProg" style="padding:22px 24px;position:relative;overflow:hidden">
+              <div class="h-row" style="margin-bottom:14px"><div class="h-tag">EXECUTION</div><div class="h-sub">实时进度</div><div style="margin-left:auto;font-size:26px;font-weight:700;background:var(--g-teal);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1">68<span style="font-size:14px;color:var(--t-mute);-webkit-text-fill-color:var(--t-mute)">%</span></div></div>
+              <div style="height:8px;background:var(--ink);border-radius:99px;overflow:hidden;border:1px solid var(--line);margin-bottom:16px;position:relative">
+                <div style="height:100%;width:68%;background:linear-gradient(90deg,#3ee0c2,#22d3ee);border-radius:99px;box-shadow:0 0 14px rgba(62,224,194,.5);position:relative;overflow:hidden">
+                  <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:shimmer 2s infinite"></div>
+                </div>
+              </div>
+              <style>@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}</style>
+              <div style="display:flex;flex-direction:column;gap:9px;font-size:12.5px;color:var(--t2);letter-spacing:.005em">
+                <div style="display:flex;align-items:center;gap:10px;padding:6px 0"><div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#3ee0c2,#22d3ee);color:#030308;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 12px rgba(62,224,194,.4)"><svg class="ic" style="width:11px;height:11px;stroke-width:3"><use href="#i-check"/></svg></div><span style="flex:1;color:var(--t1)">解析输入文件（3 份）</span><span style="color:var(--t-mute);font-size:11px;font-variant-numeric:tabular-nums">14:23 · 4s</span></div>
+                <div style="display:flex;align-items:center;gap:10px;padding:6px 0"><div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#3ee0c2,#22d3ee);color:#030308;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg class="ic" style="width:11px;height:11px;stroke-width:3"><use href="#i-check"/></svg></div><span style="flex:1;color:var(--t1)">提取不良反应记录（892 条）</span><span style="color:var(--t-mute);font-size:11px;font-variant-numeric:tabular-nums">14:24 · 38s</span></div>
+                <div style="display:flex;align-items:center;gap:10px;padding:6px 0"><div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#3ee0c2,#22d3ee);color:#030308;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg class="ic" style="width:11px;height:11px;stroke-width:3"><use href="#i-check"/></svg></div><span style="flex:1;color:var(--t1)">MedDRA v26 分类</span><span style="color:var(--t-mute);font-size:11px;font-variant-numeric:tabular-nums">14:25 · 1m 12s</span></div>
+                <div style="display:flex;align-items:center;gap:10px;padding:6px 0"><div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#3ee0c2,#22d3ee);color:#030308;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 0 4px rgba(62,224,194,.15)"><svg class="ic" style="width:11px;height:11px;animation:spinx 1.4s linear infinite"><use href="#i-refresh"/></svg></div><span style="flex:1;color:var(--t1)">生成频率分布表与可视化</span><span style="color:var(--teal-2);font-size:11px;font-weight:600">进行中…</span></div>
+                <div style="display:flex;align-items:center;gap:10px;padding:6px 0;opacity:.5"><div style="width:22px;height:22px;border-radius:50%;background:var(--ink);border:1px solid var(--line-2);color:var(--t-mute);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:700">5</div><span style="flex:1">导出报告与归档</span><span style="color:var(--t-mute);font-size:11px">等待</span></div>
+              </div>
+              <style>@keyframes spinx{to{transform:rotate(360deg)}}</style>
+            </div>
+
+            <div class="lum" id="tdLogs" style="padding:18px 22px">
+              <div class="h-row"><div class="h-tag">ACTIVITY</div><div class="h-sub">实时日志</div></div>
+              <div style="display:flex;flex-direction:column;gap:10px;font-size:12px;color:var(--t2);letter-spacing:.005em">
+                <div style="display:flex;gap:12px"><span style="color:var(--t-mute);font-variant-numeric:tabular-nums;min-width:62px;font-size:11px">14:26:18</span><span style="flex:1;color:var(--t1)">检测到 <b style="color:var(--teal-2)">V203-001-089</b> 缺失合并用药字段，已标记</span></div>
+                <div style="display:flex;gap:12px"><span style="color:var(--t-mute);font-variant-numeric:tabular-nums;min-width:62px;font-size:11px">14:26:02</span><span style="flex:1;color:var(--t1)">完成中心03数据合并 · <b style="color:var(--teal-2)">312</b> 条记录</span></div>
+                <div style="display:flex;gap:12px"><span style="color:var(--t-mute);font-variant-numeric:tabular-nums;min-width:62px;font-size:11px">14:25:47</span><span style="flex:1;color:var(--t1)">MedDRA 编码完成 · 识别 <b style="color:var(--teal-2)">12</b> 个 PT 术语</span></div>
+                <div style="display:flex;gap:12px"><span style="color:var(--t-mute);font-variant-numeric:tabular-nums;min-width:62px;font-size:11px">14:25:12</span><span style="flex:1;color:var(--t1)">开始按系统器官分类（SOC）汇总</span></div>
+                <div style="display:flex;gap:12px"><span style="color:var(--t-mute);font-variant-numeric:tabular-nums;min-width:62px;font-size:11px">14:24:38</span><span style="flex:1;color:var(--t1)">完成 <b style="color:var(--teal-2)">892</b> 条不良反应记录提取</span></div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="lum" style="display:flex;flex-direction:column;overflow:hidden;min-height:480px;max-height:calc(100vh - 200px);position:sticky;top:14px">
+            <div style="display:flex;border-bottom:1px solid var(--line);padding:6px 10px 0;background:rgba(255,255,255,.014)">
+              <div style="padding:10px 14px;font-size:12px;color:var(--teal-2);font-weight:700;border-bottom:2px solid var(--teal-2);margin-bottom:-1px;letter-spacing:.005em;display:flex;align-items:center;gap:6px"><svg class="ic ic-sm"><use href="#i-message"/></svg>对话</div>
+              <div style="padding:10px 14px;font-size:12px;color:var(--t-mute);font-weight:500;letter-spacing:.005em;display:flex;align-items:center;gap:6px;cursor:pointer"><svg class="ic ic-sm"><use href="#i-folder"/></svg>文件</div>
+            </div>
+            <div style="flex:1;overflow-y:auto;padding:14px">
+              <div style="margin-bottom:14px"><div style="font-size:9.5px;color:var(--t-mute);font-weight:700;letter-spacing:.16em;margin-bottom:5px">QUANTUM&nbsp;CHAIN · AI</div><div style="background:var(--ink-2);border:1px solid var(--line-2);border-radius:12px;border-bottom-left-radius:4px;padding:10px 13px;font-size:12.5px;color:var(--t1);line-height:1.65">已完成 3/5 步骤。正在按 MedDRA 标准对 <b style="color:var(--teal-2)">892</b> 条不良反应记录进行编码归类。</div></div>
+              <div style="margin-bottom:14px;display:flex;flex-direction:column;align-items:flex-end"><div style="font-size:9.5px;color:var(--t-mute);font-weight:700;letter-spacing:.16em;margin-bottom:5px">您</div><div style="background:linear-gradient(135deg,#3ee0c2,#22d3ee);color:#030308;border-radius:12px;border-bottom-right-radius:4px;padding:10px 13px;font-size:12.5px;line-height:1.65;max-width:88%;box-shadow:0 8px 22px rgba(62,224,194,.35);font-weight:500">把严重不良反应单独导出</div></div>
+              <div style="margin-bottom:14px"><div style="font-size:9.5px;color:var(--t-mute);font-weight:700;letter-spacing:.16em;margin-bottom:5px">QUANTUM&nbsp;CHAIN · AI</div><div style="background:var(--ink-2);border:1px solid var(--line-2);border-radius:12px;border-bottom-left-radius:4px;padding:10px 13px;font-size:12.5px;color:var(--t1);line-height:1.65">好的，已加入任务清单。完成主报告后生成 <b style="color:var(--teal-2)">SAE_单独清单.xlsx</b>。</div></div>
+            </div>
+            <div style="padding:12px 14px;border-top:1px solid var(--line);background:rgba(255,255,255,.014)">
+              <div style="display:flex;align-items:center;gap:8px;background:var(--ink);border:1px solid var(--line-2);border-radius:11px;padding:8px 12px"><input style="flex:1;border:none;outline:none;background:transparent;font-size:12.5px;color:var(--t1);font-family:inherit" placeholder="向 AI 提问..."/><button onclick="toast('已发送')" style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#3ee0c2,#22d3ee);color:#030308;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(62,224,194,.35)"><svg class="ic ic-sm" style="stroke-width:2.5"><use href="#i-up"/></svg></button></div>
             </div>
           </aside>
         </div>
@@ -1425,11 +1611,44 @@ body::after{
   card.addEventListener('mouseleave',()=>{card.style.transition='transform .6s cubic-bezier(.22,1,.36,1)';card.style.transform=''});
 })();
 
+/* mouse spotlight on login stage */
+(function(){
+  const stage=document.getElementById('loginStage');if(!stage)return;
+  stage.addEventListener('mousemove',e=>{
+    stage.style.setProperty('--mx',e.clientX+'px');
+    stage.style.setProperty('--my',e.clientY+'px');
+  });
+})();
+
+/* ripple on click for buttons */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('.lf-submit,.new-btn,.sk-btn-use,.qs-skill-go,.ft-act,.pill.primary,.row-act.primary,.row-act.amber,.tn-input-send');
+  if(!t)return;
+  t.classList.add('ripple');
+  const r=t.getBoundingClientRect();
+  const ink=document.createElement('span');
+  ink.className='ripple-ink';
+  const size=Math.max(r.width,r.height);
+  ink.style.width=size+'px';ink.style.height=size+'px';
+  ink.style.left=(e.clientX-r.left-size/2)+'px';
+  ink.style.top=(e.clientY-r.top-size/2)+'px';
+  t.appendChild(ink);
+  setTimeout(()=>ink.remove(),700);
+});
+
+/* tab indicator */
+function moveLfInd(el){
+  const ind=document.getElementById('lfTabInd');if(!ind||!el)return;
+  ind.style.left=el.offsetLeft+'px';
+  ind.style.width=el.offsetWidth+'px';
+}
+
 function lfTab(el,which){
   document.querySelectorAll('.lf-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
   document.querySelectorAll('.lf-panel').forEach(p=>p.classList.remove('show'));
   document.getElementById('lfp-'+which).classList.add('show');
+  moveLfInd(el);
 }
 function pwToggle(){const i=document.getElementById('pwInp');i.type=i.type==='password'?'text':'password'}
 function loginGo(){
@@ -1437,8 +1656,53 @@ function loginGo(){
   setTimeout(()=>{
     document.getElementById('loginStage').classList.add('gone');
     document.getElementById('app').classList.add('show');
-    toast('已登录 · 欢迎回来，思远');
+    setTimeout(()=>toast('已登录 · 欢迎回来，思远'),300);
   },820);
+}
+function logout(){
+  closeAllPops();
+  document.getElementById('app').classList.remove('show');
+  setTimeout(()=>{
+    document.getElementById('loginStage').classList.remove('gone');
+    document.querySelector('.lf-panel.show .lf-submit')?.classList.remove('loading');
+  },350);
+}
+
+/* popovers */
+function closeAllPops(){document.querySelectorAll('.pop').forEach(p=>p.classList.remove('show'))}
+function togglePop(e,id){
+  e.stopPropagation();
+  const el=document.getElementById(id);if(!el)return;
+  const open=el.classList.contains('show');closeAllPops();
+  if(!open)el.classList.add('show');
+}
+document.addEventListener('click',closeAllPops);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAllPops()});
+
+/* task detail */
+const TASKS={
+  ae:{name:'疫苗V-203不良反应汇总',cat:'安全监查 · 执行中',desc:'使用 "AE/SAE 汇总" 技能 · 3 个输入文件 · 启动于 14:23',ico:'#i-alert',icoClass:'cell-ico'},
+  crf:{name:'中心01 vs 中心02 CRF比对',cat:'数据核查 · 待审核',desc:'V-203 第14周 · 共比对 231 行 · 发现 12 处差异，其中 3 项需要确认',ico:'#i-clip',icoClass:'cell-ico v2'},
+  sae:{name:'SAE 周报草稿 · 第14周',cat:'报告生成 · 已完成',desc:'使用 "SAE 周报生成" 技能 · 已生成 12 页 PDF',ico:'#i-chart',icoClass:'cell-ico v3'},
+  lab:{name:'实验室异常复核 W12',cat:'数据核查 · 已完成',desc:'识别 8 处异常值 · 报告已归档',ico:'#i-flask',icoClass:'cell-ico v5'},
+  dsmb:{name:'DSMB 月度安全报告',cat:'安全监查 · 排队中',desc:'排队第 2 位 · 预计 5 分钟内开始',ico:'#i-shield',icoClass:'cell-ico v4'},
+};
+function openTask(id){
+  closeAllPops();
+  const t=TASKS[id];if(!t)return;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-task-detail').classList.add('active');
+  document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.task-item').forEach(x=>x.classList.remove('active'));
+  document.querySelector(`.task-item[data-task="${id}"]`)?.classList.add('active');
+  document.getElementById('tdName').textContent=t.name;
+  document.getElementById('tdCat').textContent='[ '+t.cat.toUpperCase()+' ]';
+  document.getElementById('tdDesc').textContent=t.desc;
+  const ico=document.getElementById('tdIco');
+  ico.className=t.icoClass;ico.style.width='54px';ico.style.height='54px';ico.style.borderRadius='14px';
+  ico.innerHTML='<svg class="ic" style="width:24px;height:24px"><use href="'+t.ico+'"/></svg>';
+  setCrumb(['任务中心',t.name]);
+  document.querySelector('.screen-wrap').scrollTop=0;
 }
 
 function go(route){
@@ -1508,6 +1772,10 @@ function tnClearCtx(){
 }
 
 function toast(msg){const t=document.createElement('div');t.className='toast';t.innerHTML='<svg class="ic ic-sm"><use href="#i-check"/></svg>'+msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2200)}
+
+/* init tab indicator on load + window resize */
+window.addEventListener('load',()=>{moveLfInd(document.querySelector('.lf-tab.active'))});
+window.addEventListener('resize',()=>{moveLfInd(document.querySelector('.lf-tab.active'))});
 </script>
 </body>
 </html>
